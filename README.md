@@ -83,6 +83,8 @@ This is possibly the only public PS with updated mob and gadget spawns! (Up to V
 
 ## Credit
 
-proto Repository [hk4e-protos]((https://gitlab.com/CarolBicsi/genshin-protocol))
+Proto Repository [hk4e-protos]((https://gitlab.com/CarolBicsi/genshin-protocol))
 
-patch Repository [hk4e-patch-universal]((https://gitlab.com/oureveryday/hk4e-patch-universal))
+Patch Repository [hk4e-patch-universal]((https://gitlab.com/oureveryday/hk4e-patch-universal))
+
+Original Repository [kitkat033](https://github.com/kitkat033/)
