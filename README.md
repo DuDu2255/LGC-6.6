@@ -1,15 +1,12 @@
 # LunaGC-6.6.0 WIP
 
-## Note from the maintainer
-Might update to latest occasionally, depends on how I'm feeling and my situation. Of course, I post the protocol buffer definitions on [GitLab](https://gitlab.com/kitkat-multiverse/genshin-protocol) and translations. Contact me at my [Discord](https://discord.gg/5Rfyjrt5aB)
+## Important note
+Might move my 6.0 changes to this, depends if I feel like it.
+Protocol buffer definitions can be found on [GitLab]((https://gitlab.com/CarolBicsi/genshin-protocol)), including translations.
 
 ## Updated version of Grasscutters, with some new features implemented.
-Old Discord for LunaGC https://discord.gg/7D5gkyJR5Y (don't ask for support there as it's been taken over by other people (...), instead create an issue in this repository)
-
-Features and functionality of the ps is not guaranteed, try it yourself to see what works and what doesnt.
+Features and functionality of the PS is not guaranteed, try it yourself to see what works and what doesnt.
 This is possibly the only public PS with updated mob and gadget spawns! (Up to Version 5.4)
-
-Contribute if you want/can...
 
 # Read the [handbook](handbook.md)!
 
@@ -24,7 +21,7 @@ Contribute if you want/can...
 - Get game version REL6.6.0
 - Make sure to install java and set the environment variables.
 - Build the server (refer to "Compile the actual server" in this guide.)
-- Download the [Resources](https://github.com/kitkat033/LunaGC-Resources), make a new folder called `resources` in the downloaded LunaGC folder and then extract the resources in that new folder.
+- Download the [Resources]((https://github.com/Rafs-kk/LunaGC-6.6-res)), make a new folder called `resources` in the downloaded LunaGC folder and then extract the resources in that new folder.
 - Set useEncryption, Questing and useInRouting to false (it should be false by default, if not then change it)
 - [Patch the game](#patching-the-game)
 - Start the server and the game, make sure to also create an account in the LunaGC console!
@@ -86,6 +83,6 @@ Contribute if you want/can...
 
 ## Credit
 
-proto Repository [hk4e-protos](https://gitlab.com/kitkat-multiverse/genshin-protocol)
+proto Repository [hk4e-protos]((https://gitlab.com/CarolBicsi/genshin-protocol))
 
-patch Repository [hk4e-patch-universal](https://github.com/kitkat033/hk4e-patch-universal)
+patch Repository [hk4e-patch-universal]((https://gitlab.com/oureveryday/hk4e-patch-universal))
