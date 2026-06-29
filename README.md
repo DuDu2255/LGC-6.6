@@ -38,7 +38,7 @@ This is possibly the only public PS with updated mob and gadget spawns! (Up to V
 - Clone the repository (install [Git](https://git-scm.com) first )
 
   ```
-  git clone --recurse-submodules https://github.com/kitkat033/LunaGC.git
+  git clone --recurse-submodules https://github.com/Rafs-kk/LunaGC.git
   ```
 
 - Now you can continue with the steps below.
