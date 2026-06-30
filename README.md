@@ -28,7 +28,7 @@ This is possibly the only public PS with updated mob and gadget spawns! (Up to V
 - Have fun (or don't)
 
 ### Patching the game
-- Put Astrolabe.dll in the game folder at `GenshinImpact_Data/Plugins`. Make sure you back up the old `Astrolabe.dll` in the plugins folder.
+- Put [Astrolabe.dll](https://github.com/Rafs-kk/LunaGC-6.6/blob/6.6.0/patch/Astrolabe.dll) in the game folder at `GenshinImpact_Data/Plugins`. Make sure you back up the old `Astrolabe.dll` in the plugins folder.
 - To "disable" the patch, just rename Astrolabe.dll to something else so it's not a DLL or don't name it Astrolabe (for example Astrolabe.deleleu / astrollable.dll).
 - If you use Cutivation, put the file in the `Cultivation\patch` directory and rename it to `6versiona.dll`. Make sure you also back up the original dll before replacing it.
 
