@@ -28,17 +28,16 @@ This is possibly the only public PS with updated mob and gadget spawns! (Up to V
 - Have fun (or don't)
 
 ### Patching the game
-- Install [**Rust**](https://rust-lang.org/learn/get-started/) and **Cargo** (comes with rustup)
-- Go to the `patch/` folder (make sure you have cloned this repository with the `--recurse-submodules` flag)
-- Run `cargo build --release` to build the DLL at `target/release`
-- Inject the DLL into the game. You can do this by renaming the patch to `Astrolabe.dll` and putting it in the game folder at `GenshinImpact_Data/Plugins`. Make sure you back up the old `Astrolabe.dll` in the plugins folder.
+- Put Astrolabe.dll in the game folder at `GenshinImpact_Data/Plugins`. Make sure you back up the old `Astrolabe.dll` in the plugins folder.
+- To "disable" the patch, just rename Astrolabe.dll to something else so it's not a DLL or don't name it Astrolabe (for example Astrolabe.deleleu / astrollable.dll).
+- If you use Cutivation, put the file in the `Cultivation\patch` directory and rename it to `6versiona.dll`. Make sure you also back up the original dll before replacing it.
 
 ### Getting started
 
 - Clone the repository (install [Git](https://git-scm.com) first )
 
   ```
-  git clone --recurse-submodules https://github.com/Rafs-kk/LunaGC.git
+  git clone https://github.com/Rafs-kk/LunaGC.git
   ```
 
 - Now you can continue with the steps below.
