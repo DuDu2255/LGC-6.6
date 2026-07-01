@@ -532,9 +532,9 @@ public final class PacketOpcodes {
     public static final int WorldPlayerInfoNotify = 26668;
     public static final int WeaponPromoteReq = 28926;
     public static final int WeaponPromoteRsp = 29984;
-    public static final int WeaponUpgradeReq = 1;
+    public static final int WeaponUpgradeReq = 3748;
     public static final int WeaponUpgradeRsp = 26318;
-    public static final int CalcWeaponUpgradeReturnItemsReq = 1;
+    public static final int CalcWeaponUpgradeReturnItemsReq = 8208;
     public static final int CalcWeaponUpgradeReturnItemsRsp = 542;
     public static final int SetEquipLockStateReq = 38;
     public static final int SetEquipLockStateRsp = 298;

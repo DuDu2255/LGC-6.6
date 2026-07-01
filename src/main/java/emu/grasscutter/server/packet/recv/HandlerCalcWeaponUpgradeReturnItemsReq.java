@@ -1,7 +1,8 @@
 package emu.grasscutter.server.packet.recv;
 
-import emu.grasscutter.net.packet.*;
-import emu.grasscutter.net.proto.CalcWeaponUpgradeReturnItemsReqOuterClass.CalcWeaponUpgradeReturnItemsReq;
+import emu.grasscutter.net.packet.Opcodes;
+import emu.grasscutter.net.packet.PacketHandler;
+import emu.grasscutter.net.packet.PacketOpcodes;
 import emu.grasscutter.net.proto.ItemParamOuterClass.ItemParam;
 import emu.grasscutter.server.game.GameSession;
 import emu.grasscutter.server.packet.send.PacketCalcWeaponUpgradeReturnItemsRsp;
@@ -12,7 +13,7 @@ public class HandlerCalcWeaponUpgradeReturnItemsReq extends PacketHandler {
 
     @Override
     public void handle(GameSession session, byte[] header, byte[] payload) throws Exception {
-        CalcWeaponUpgradeReturnItemsReq req = CalcWeaponUpgradeReturnItemsReq.parseFrom(payload);
+        WeaponUpgradeReqCompat req = WeaponUpgradeReqCompat.parse(payload);
 
         List<ItemParam> returnOres =
                 session
@@ -21,14 +22,14 @@ public class HandlerCalcWeaponUpgradeReturnItemsReq extends PacketHandler {
                         .calcWeaponUpgradeReturnItems(
                                 session.getPlayer(),
                                 req.getTargetWeaponGuid(),
-                                req.getFoodWeaponGuidListList(),
-                                req.getItemParamListList());
+                                req.getFoodWeaponGuidList(),
+                                req.getItemParamList());
 
         if (returnOres != null) {
             session.send(
-                    new PacketCalcWeaponUpgradeReturnItemsRsp(req.getTargetWeaponGuid(), returnOres));
-        } else {
-            session.send(new PacketCalcWeaponUpgradeReturnItemsRsp());
+                    new PacketCalcWeaponUpgradeReturnItemsRsp(
+                            req.getTargetWeaponGuid(),
+                            returnOres));
         }
     }
 }
