@@ -155,8 +155,8 @@ public final class PacketOpcodes {
     public static final int FinishedParentQuestUpdateNotify = 6675;
     public static final int PersonalLineAllDataReq = 21854;
     public static final int PersonalLineAllDataRsp = 27945;
-    public static final int GetProfilePictureDataReq = 28253;
-    public static final int GetProfilePictureDataRsp = 3529;
+    public static final int GetProfilePictureDataReq = 8977;
+    public static final int GetProfilePictureDataRsp = 24009;
     public static final int AddNoGachaAvatarCardNotify = 25305;
     public static final int GachaWishReq = 1492;
     public static final int GachaWishRsp = 9399;
@@ -465,10 +465,10 @@ public final class PacketOpcodes {
     public static final int GetInvestigationMonsterRsp = 370;
     public static final int SetPlayerNameReq = 6248;
     public static final int SetPlayerNameRsp = 9831;
-    public static final int SetPlayerSignatureReq = 7439;
+    public static final int SetPlayerSignatureReq = 9039;
     public static final int SetPlayerSignatureRsp = 1359;
-    public static final int SetPlayerHeadImageReq = 1;
-    public static final int SetPlayerHeadImageRsp = 1;
+    public static final int SetPlayerHeadImageReq = 27689;
+    public static final int SetPlayerHeadImageRsp = 781;
     public static final int SetPlayerBirthdayReq = 2679;
     public static final int SetPlayerBirthdayRsp = 21082;
     public static final int AvatarExpeditionDataNotify = 28072;
@@ -551,7 +551,7 @@ public final class PacketOpcodes {
     public static final int EnterMapLayerReq_660 = 20501;
     public static final int EnterMapLayerRsp_660 = 20756;
     public static final int UnlockMapLayerGroupReq = 20718;
-    public static final int UnlockMapLayerGroupRsp = 27689;
+    public static final int UnlockMapLayerGroupRsp = 1;
     public static final int ReunionBriefInfoReq = 9863;
     public static final int ReunionBriefInfoRsp = 21567;
     public static final int GetQuestLackingResourceReq = 7336;

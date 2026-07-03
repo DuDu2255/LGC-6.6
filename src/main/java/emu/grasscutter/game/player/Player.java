@@ -58,6 +58,7 @@ import emu.grasscutter.server.packet.send.*;
 import emu.grasscutter.utils.*;
 import emu.grasscutter.utils.helpers.DateHelper;
 import emu.grasscutter.utils.objects.FieldFetch;
+import emu.grasscutter.utils.ProfilePictureUtils;
 import it.unimi.dsi.fastutil.ints.*;
 
 import lombok.*;
@@ -1035,7 +1036,7 @@ public class Player implements PlayerHook, FieldFetch {
             .setMpSettingType(this.getMpSetting())
             .setNameCardId(this.getNameCardId())
             .setSignature(this.getSignature())
-            .setProfilePicture(ProfilePicture.newBuilder().setAvatarId(this.getHeadImage()));
+            .setProfilePicture(ProfilePictureUtils.buildProfilePicture(this));
 
         if (this.getWorld() != null) {
             onlineInfo.setCurPlayerNumInWorld(getWorld().getPlayerCount());
@@ -1090,7 +1091,7 @@ public class Player implements PlayerHook, FieldFetch {
 
         return SocialDetail.newBuilder()
             .setUid(this.getUid())
-            .setProfilePicture(ProfilePicture.newBuilder().setAvatarId(this.getHeadImage()))
+            .setProfilePicture(ProfilePictureUtils.buildProfilePicture(this))
             .setNickname(this.getNickname())
             .setSignature(this.getSignature())
             .setLevel(this.getLevel())
