@@ -78,6 +78,11 @@ COMMANDS
     Usage: /[<language code>]
   list / players
     Usage: /[uid]
+  namecard / card / setnamecard
+    Usage: /<nameCardId>
+    Usage: /(clear|default|reset|remove|none)
+    Perm:  player.namecard | player.namecard.others
+    Note:  Unlocks the specified namecard if needed, then equips it. The reset options switch the equipped namecard back to 210001, Genshin Impact: A New World.
   NoFog / fog
     Usage: /nofog
     Perm:  player.windy | player.windy.others
