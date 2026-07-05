@@ -17,6 +17,7 @@ import emu.grasscutter.game.dungeons.DungeonSettleListener;
 import emu.grasscutter.game.dungeons.challenge.WorldChallenge;
 import emu.grasscutter.game.dungeons.enums.DungeonPassConditionType;
 import emu.grasscutter.game.entity.*;
+import emu.grasscutter.game.entity.gadget.GadgetGatherObject;
 import emu.grasscutter.game.entity.gadget.GadgetWorktop;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.managers.blossom.BlossomManager;
@@ -68,6 +69,7 @@ public class Scene {
     @Getter @Setter DungeonManager dungeonManager;
     @Getter Int2ObjectMap<Route> sceneRoutes;
     private Set<SpawnDataEntry.GridBlockId> loadedGridBlocks;
+	private Set<SpawnDataEntry.GridBlockId> loadedMissingScriptGridBlocks;
     @Getter @Setter private boolean dontDestroyWhenEmpty;
     @Getter private final SceneScriptManager scriptManager;
     @Getter @Setter private WorldChallenge challenge;
@@ -103,6 +105,7 @@ public class Scene {
         this.loadedBlocks = ConcurrentHashMap.newKeySet();
         this.loadedGroups = ConcurrentHashMap.newKeySet();
         this.loadedGridBlocks = new HashSet<>();
+		this.loadedMissingScriptGridBlocks = new HashSet<>();
         this.npcBornEntrySet = ConcurrentHashMap.newKeySet();
         this.scriptManager = new SceneScriptManager(this);
         this.blossomManager = new BlossomManager(this);
@@ -603,12 +606,11 @@ public class Scene {
         }
 
         if (this.getScriptManager().isInit()) {
-
-            this.checkGroups();
-        } else {
-
-            this.checkSpawns();
-        }
+			this.checkGroups();
+			this.checkLegacySpawnsForMissingScriptGroups();
+		} else {
+			this.checkSpawns();
+		}
 
         this.scriptManager.checkRegions();
 
@@ -769,112 +771,253 @@ public class Scene {
     }
 
     public void checkSpawns() {
-        Set<SpawnDataEntry.GridBlockId> loadedGridBlocks = new HashSet<>();
-        for (Player player : this.getPlayers()) {
-            Collections.addAll(
-                    loadedGridBlocks,
-                    SpawnDataEntry.GridBlockId.getAdjacentGridBlockIds(
-                            player.getSceneId(), player.getPosition()));
-        }
+		this.checkSpawns(false);
+	}
 
-        Set<SpawnDataEntry.GridBlockId> leavingBlocks = new HashSet<>(this.loadedGridBlocks);
-        leavingBlocks.removeAll(loadedGridBlocks);
-        if (!leavingBlocks.isEmpty()) {
-            this.getDeadSpawnedEntities().removeIf(entry -> leavingBlocks.contains(entry.getBlockId()));
-        }
-        if (this.loadedGridBlocks.containsAll(
-                loadedGridBlocks)) {
-            return;
-        }
-        this.loadedGridBlocks = loadedGridBlocks;
-        var spawnLists = GameDepot.getSpawnLists();
-        Set<SpawnDataEntry> visible = new HashSet<>();
-        for (var block : loadedGridBlocks) {
-            var spawns = spawnLists.get(block);
-            if (spawns != null) {
-                visible.addAll(spawns);
-            }
-        }
+	private void checkLegacySpawnsForMissingScriptGroups() {
+		this.checkSpawns(true);
+	}
 
-        WorldLevelData worldLevelData = GameData.getWorldLevelDataMap().get(getWorld().getWorldLevel());
-        int worldLevelOverride = 0;
+	private void checkSpawns(boolean missingScriptOnly) {
+		Set<SpawnDataEntry.GridBlockId> loadedGridBlocks = new HashSet<>();
 
-        if (worldLevelData != null) {
-            worldLevelOverride = worldLevelData.getMonsterLevel();
-        }
+		for (Player player : this.getPlayers()) {
+			Collections.addAll(
+					loadedGridBlocks,
+					SpawnDataEntry.GridBlockId.getAdjacentGridBlockIds(
+							player.getSceneId(), player.getPosition()));
+		}
 
-        List<GameEntity> toAdd = new ArrayList<>();
-        List<GameEntity> toRemove = new ArrayList<>();
-        var spawnedEntities = this.getSpawnedEntities();
-        for (SpawnDataEntry entry : visible) {
+		Set<SpawnDataEntry.GridBlockId> previousLoadedGridBlocks =
+				missingScriptOnly ? this.loadedMissingScriptGridBlocks : this.loadedGridBlocks;
 
-            if (!spawnedEntities.contains(entry) && !this.getDeadSpawnedEntities().contains(entry)) {
+		Set<SpawnDataEntry.GridBlockId> leavingBlocks = new HashSet<>(previousLoadedGridBlocks);
+		leavingBlocks.removeAll(loadedGridBlocks);
 
-                GameEntity entity = null;
+		if (!leavingBlocks.isEmpty()) {
+			this.getDeadSpawnedEntities().removeIf(entry -> leavingBlocks.contains(entry.getBlockId()));
+		}
 
-                if (entry.getMonsterId() > 0) {
-                    MonsterData data = GameData.getMonsterDataMap().get(entry.getMonsterId());
-                    if (data == null) continue;
+		if (previousLoadedGridBlocks.containsAll(loadedGridBlocks)) {
+			return;
+		}
 
-                    int level = this.getEntityLevel(entry.getLevel(), worldLevelOverride);
+		if (missingScriptOnly) {
+			this.loadedMissingScriptGridBlocks = loadedGridBlocks;
+		} else {
+			this.loadedGridBlocks = loadedGridBlocks;
+		}
 
-                    EntityMonster monster =
-                            new EntityMonster(this, data, entry.getPos(), entry.getRot(), level);
-                    monster.setGroupId(entry.getGroup().getGroupId());
-                    monster.setPoseId(entry.getPoseId());
-                    monster.setConfigId(entry.getConfigId());
-                    monster.setSpawnEntry(entry);
+		var spawnLists = GameDepot.getSpawnLists();
 
-                    entity = monster;
-                } else if (entry.getGadgetId() > 0) {
-                    EntityGadget gadget =
-                            new EntityGadget(this, entry.getGadgetId(), entry.getPos(), entry.getRot());
-                    gadget.setGroupId(entry.getGroup().getGroupId());
-                    gadget.setConfigId(entry.getConfigId());
-                    gadget.setSpawnEntry(entry);
-                    int state = entry.getGadgetState();
-                    if (state > 0) {
-                        gadget.setState(state);
-                    }
-                    gadget.buildContent();
+		Set<SpawnDataEntry> visible = new HashSet<>();
 
-                    gadget.setFightProperty(FightProperty.FIGHT_PROP_BASE_HP, Float.POSITIVE_INFINITY);
-                    gadget.setFightProperty(FightProperty.FIGHT_PROP_CUR_HP, Float.POSITIVE_INFINITY);
-                    gadget.setFightProperty(FightProperty.FIGHT_PROP_MAX_HP, Float.POSITIVE_INFINITY);
+		for (var block : loadedGridBlocks) {
+			var spawns = spawnLists.get(block);
 
-                    entity = gadget;
-                    blossomManager.initBlossom(gadget);
-                }
+			if (spawns != null) {
+				visible.addAll(spawns);
+			}
+		}
 
-                if (entity == null) continue;
+		if (missingScriptOnly) {
+			visible.removeIf(entry -> !this.shouldUseLegacyFallbackSpawn(entry));
+		}
 
-                toAdd.add(entity);
-                spawnedEntities.add(entry);
-            }
-        }
+		WorldLevelData worldLevelData = GameData.getWorldLevelDataMap().get(getWorld().getWorldLevel());
 
-        for (GameEntity entity : this.getEntities().values()) {
-            var spawnEntry = entity.getSpawnEntry();
-            if (spawnEntry != null
-                    && !(entity instanceof EntityWeapon)
-                    && !visible.contains(spawnEntry)) {
-                toRemove.add(entity);
-                spawnedEntities.remove(spawnEntry);
-            }
-        }
+		int worldLevelOverride = 0;
 
-        if (toAdd.size() > 0) {
-            toAdd.forEach(this::addEntityDirectly);
-            this.broadcastPacket(new PacketSceneEntityAppearNotify(toAdd, VisionType.VisionType_VISION_BORN));
-        }
+		if (worldLevelData != null) {
+			worldLevelOverride = worldLevelData.getMonsterLevel();
+		}
 
-        if (toRemove.size() > 0) {
-            toRemove.forEach(this::removeEntityDirectly);
-            this.broadcastPacket(
-                    new PacketSceneEntityDisappearNotify(toRemove, VisionType.VisionType_VISION_REMOVE));
-            blossomManager.recycleGadgetEntity(toRemove);
-        }
-    }
+		List<GameEntity> toAdd = new ArrayList<>();
+		List<GameEntity> toRemove = new ArrayList<>();
+
+		var spawnedEntities = this.getSpawnedEntities();
+
+		for (SpawnDataEntry entry : visible) {
+			if (!spawnedEntities.contains(entry) && !this.getDeadSpawnedEntities().contains(entry)) {
+				GameEntity entity = null;
+
+				if (entry.getMonsterId() > 0) {
+					MonsterData data = GameData.getMonsterDataMap().get(entry.getMonsterId());
+
+					if (data == null) {
+						continue;
+					}
+
+					int level = this.getEntityLevel(entry.getLevel(), worldLevelOverride);
+
+					EntityMonster monster =
+							new EntityMonster(this, data, entry.getPos(), entry.getRot(), level);
+
+					monster.setGroupId(entry.getGroup().getGroupId());
+					monster.setPoseId(entry.getPoseId());
+					monster.setConfigId(entry.getConfigId());
+					monster.setSpawnEntry(entry);
+
+					entity = monster;
+				} else if (entry.getGadgetId() > 0) {
+					EntityGadget gadget =
+							new EntityGadget(this, entry.getGadgetId(), entry.getPos(), entry.getRot());
+
+					gadget.setGroupId(entry.getGroup().getGroupId());
+					gadget.setConfigId(entry.getConfigId());
+					gadget.setSpawnEntry(entry);
+
+					int state = entry.getGadgetState();
+
+					if (state > 0) {
+						gadget.setState(state);
+					}
+
+					gadget.buildContent();
+
+					/*
+					 * Keep normal gather/interact gadgets unbreakable, but allow break-required
+					 * gather objects like crates/barrels/ore-like objects to actually break.
+					 */
+					if (gadget.getContent() instanceof GadgetGatherObject gatherObject
+							&& !gatherObject.requiresBreaking()) {
+						gadget.setFightProperty(FightProperty.FIGHT_PROP_BASE_HP, Float.POSITIVE_INFINITY);
+						gadget.setFightProperty(FightProperty.FIGHT_PROP_CUR_HP, Float.POSITIVE_INFINITY);
+						gadget.setFightProperty(FightProperty.FIGHT_PROP_MAX_HP, Float.POSITIVE_INFINITY);
+					}
+
+					entity = gadget;
+
+					blossomManager.initBlossom(gadget);
+				}
+
+				if (entity == null) {
+					continue;
+				}
+
+				toAdd.add(entity);
+				spawnedEntities.add(entry);
+			}
+		}
+
+		for (GameEntity entity : this.getEntities().values()) {
+			var spawnEntry = entity.getSpawnEntry();
+
+			if (spawnEntry != null
+					&& !(entity instanceof EntityWeapon)
+					&& (!missingScriptOnly || this.isMissingScriptSpawn(spawnEntry))
+					&& !visible.contains(spawnEntry)) {
+				toRemove.add(entity);
+				spawnedEntities.remove(spawnEntry);
+			}
+		}
+
+		if (toAdd.size() > 0) {
+			toAdd.forEach(this::addEntityDirectly);
+			this.broadcastPacket(new PacketSceneEntityAppearNotify(toAdd, VisionType.VisionType_VISION_BORN));
+		}
+
+		if (toRemove.size() > 0) {
+			toRemove.forEach(this::removeEntityDirectly);
+			this.broadcastPacket(
+					new PacketSceneEntityDisappearNotify(toRemove, VisionType.VisionType_VISION_REMOVE));
+
+			blossomManager.recycleGadgetEntity(toRemove);
+		}
+	}
+	
+	private boolean shouldUseLegacyFallbackSpawn(SpawnDataEntry entry) {
+		/*
+		 * Monsters use the missing-script-group rule.
+		 * This is what restores newer-region static monster spawns when Lua group scripts are absent.
+		 */
+		if (entry.getMonsterId() > 0) {
+			return this.isMissingScriptSpawn(entry);
+		}
+
+		/*
+		 * Static gadget data is useful in newer/partial regions too, but old regions may
+		 * already spawn equivalent gadgets through Lua scripts. Avoid duplicates by checking
+		 * whether an equivalent script/runtime gadget already exists nearby.
+		 */
+		if (entry.getGadgetId() > 0) {
+			return this.isMissingScriptSpawn(entry) && !this.hasEquivalentScriptGadget(entry);
+		}
+
+		return false;
+	}
+
+	private boolean hasEquivalentScriptGadget(SpawnDataEntry entry) {
+		if (entry.getGadgetId() <= 0 || entry.getPos() == null) {
+			return false;
+		}
+
+		for (GameEntity entity : this.getEntities().values()) {
+			if (!(entity instanceof EntityGadget gadget)) {
+				continue;
+			}
+
+			/*
+			 * Legacy fallback gadgets have a SpawnDataEntry.
+			 * Ignore them here so the fallback does not block itself.
+			 */
+			if (gadget.getSpawnEntry() != null) {
+				continue;
+			}
+
+			if (gadget.getGadgetId() != entry.getGadgetId()) {
+				continue;
+			}
+
+			if (isNearSameSpawnPoint(gadget.getPosition(), entry.getPos())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isNearSameSpawnPoint(Position a, Position b) {
+		float dx = a.getX() - b.getX();
+		float dy = a.getY() - b.getY();
+		float dz = a.getZ() - b.getZ();
+
+		/*
+		 * Strict enough to catch duplicate objects, but loose enough for tiny coordinate
+		 * differences between script-spawned and static-spawned data.
+		 */
+		return dx * dx + dz * dz <= 4.0f && Math.abs(dy) <= 5.0f;
+	}
+
+	private boolean isMissingScriptSpawn(SpawnDataEntry entry) {
+		if (!this.getScriptManager().isInit()) {
+			return true;
+		}
+
+		var spawnGroup = entry.getGroup();
+
+		if (spawnGroup == null) {
+			return false;
+		}
+
+		var scriptBlocks = this.getScriptManager().getBlocks();
+
+		if (scriptBlocks == null) {
+			return false;
+		}
+
+		var scriptBlock = scriptBlocks.get(spawnGroup.getBlockId());
+
+		if (scriptBlock == null) {
+			return true;
+		}
+
+		if (scriptBlock.groups == null) {
+			this.getScriptManager().loadBlockFromScript(scriptBlock);
+		}
+
+		return scriptBlock.groups == null || !scriptBlock.groups.containsKey(spawnGroup.getGroupId());
+	}
 
     public List<SceneBlock> getPlayerActiveBlocks(Player player) {
 

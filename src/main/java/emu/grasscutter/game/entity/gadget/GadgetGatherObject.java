@@ -102,4 +102,9 @@ public final class GadgetGatherObject extends GadgetContent {
         scene.killEntity(this.getGadget(), player.getTeamManager().getCurrentAvatarEntity().getId());
         // Todo: add record
     }
+	
+	public boolean requiresBreaking() {
+		return this.getGadget().getSpawnEntry() != null
+				&& this.getGadget().getSpawnEntry().getGadgetState() == 1;
+	}
 }
