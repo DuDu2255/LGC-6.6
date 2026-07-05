@@ -22,22 +22,69 @@ public final class GadgetGatherObject extends GadgetContent {
     private boolean isForbidGuest;
 
     public GadgetGatherObject(EntityGadget gadget) {
-        super(gadget);
+		super(gadget);
 
-        // overwrites the default spawn handling
-        if (gadget.getSpawnEntry() != null) {
-            this.itemId = gadget.getSpawnEntry().getGatherItemId();
-            return;
-        }
+		int staticGatherItemId = 0;
 
-        GatherData gatherData = GameData.getGatherDataMap().get(gadget.getPointType());
-        if (gatherData != null) {
-            this.itemId = gatherData.getItemId();
-            this.isForbidGuest = gatherData.isForbidGuest();
-        } else {
-            Grasscutter.getLogger().trace("invalid gather object: {}", gadget.getConfigId());
-        }
-    }
+		if (gadget.getSpawnEntry() != null) {
+			staticGatherItemId = gadget.getSpawnEntry().getGatherItemId();
+		}
+
+		GatherData gatherData = resolveGatherData(gadget, staticGatherItemId);
+
+		if (gatherData != null) {
+			this.itemId = staticGatherItemId > 0 ? staticGatherItemId : gatherData.getItemId();
+			this.isForbidGuest = gatherData.isForbidGuest();
+
+			if (gadget.getPointType() == 0 && gatherData.getId() > 0) {
+				gadget.setPointType(gatherData.getId());
+			}
+
+			return;
+		}
+
+		if (staticGatherItemId > 0) {
+			this.itemId = staticGatherItemId;
+			return;
+		}
+
+		Grasscutter.getLogger()
+				.debug(
+						"Could not resolve gather object item. configId={}, gadgetId={}, pointType={}, spawnEntry={}",
+						gadget.getConfigId(),
+						gadget.getGadgetId(),
+						gadget.getPointType(),
+						gadget.getSpawnEntry() != null);
+	}
+
+	private static GatherData resolveGatherData(EntityGadget gadget, int staticGatherItemId) {
+		if (gadget.getPointType() > 0) {
+			GatherData byPointType = GameData.getGatherDataMap().get(gadget.getPointType());
+
+			if (byPointType != null) {
+				return byPointType;
+			}
+		}
+
+		int gadgetId = gadget.getGadgetId();
+
+		if (gadgetId > 0) {
+			for (GatherData gatherData : GameData.getGatherDataMap().values()) {
+				if (gatherData.getGadgetId() == gadgetId) {
+					return gatherData;
+				}
+			}
+		}
+
+		if (staticGatherItemId > 0) {
+			for (GatherData gatherData : GameData.getGatherDataMap().values()) {
+				if (gatherData.getItemId() == staticGatherItemId) {
+					return gatherData;
+				}
+			}
+		}
+		return null;
+	}
 
     public int getItemId() {
         return this.itemId;
@@ -83,8 +130,18 @@ public final class GadgetGatherObject extends GadgetContent {
     }
 
     public void dropItems(Player player) {
-        Scene scene = getGadget().getScene();
-        int times = Utils.randomRange(1, 2);
+		if (this.itemId <= 0 || GameData.getItemDataMap().get(this.itemId) == null) {
+			Grasscutter.getLogger()
+					.trace(
+							"Skipping gather drop with invalid itemId. configId={}, gadgetId={}, pointType={}, spawnEntry={}",
+							getGadget().getConfigId(),
+							getGadget().getGadgetId(),
+							getGadget().getPointType(),
+							getGadget().getSpawnEntry() != null);
+			return;
+		}
+		Scene scene = getGadget().getScene();
+		int times = Utils.randomRange(1, 2);
 
         for (int i = 0; i < times; i++) {
             EntityItem item =
