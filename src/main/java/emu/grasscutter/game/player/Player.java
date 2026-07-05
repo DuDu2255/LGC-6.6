@@ -1365,7 +1365,10 @@ public class Player implements PlayerHook, FieldFetch {
         session.send(new PacketQuestListNotify(this));
         session.send(new PacketQuestGlobalVarNotify(this));
         session.send(new PacketCodexDataFullNotify(this));
-        session.send(new PacketAllWidgetDataNotify(this));
+        // REL6.6 quick-use widget slot sync.
+		// PacketAllWidgetDataNotify is still incomplete/stale for slot data.
+		session.send(new PacketGetWidgetSlotRsp(this));
+		session.send(new PacketGetWidgetQuickSlotListRsp(this));
 
         this.achievements.onLogin(this);
 

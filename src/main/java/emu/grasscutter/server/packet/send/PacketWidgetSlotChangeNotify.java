@@ -1,41 +1,34 @@
 package emu.grasscutter.server.packet.send;
 
-import emu.grasscutter.net.packet.*;
-import emu.grasscutter.net.proto.*;
+import com.google.protobuf.CodedOutputStream;
+import emu.grasscutter.net.packet.BasePacket;
+import emu.grasscutter.net.packet.PacketOpcodes;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class PacketWidgetSlotChangeNotify extends BasePacket {
 
-    public PacketWidgetSlotChangeNotify(
-            WidgetSlotChangeNotifyOuterClass.WidgetSlotChangeNotify proto) {
+    public PacketWidgetSlotChangeNotify(int materialId, int slotTag, int op, boolean active) {
         super(PacketOpcodes.WidgetSlotChangeNotify);
 
-        this.setData(proto);
-    }
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            CodedOutputStream output = CodedOutputStream.newInstance(baos);
 
-    public PacketWidgetSlotChangeNotify(WidgetSlotOpOuterClass.WidgetSlotOp op) {
-        super(PacketOpcodes.WidgetSlotChangeNotify);
+            /*
+             * REL6.6 WidgetSlotChangeNotify:
+             * WidgetSlotData slot = 10;
+             * WidgetSlotOp op = 4;
+             */
+            output.writeByteArray(
+                    10,
+                    WidgetSlotPacketHelper.buildWidgetSlotData(materialId, slotTag, active));
+            output.writeEnum(4, op);
 
-        WidgetSlotChangeNotifyOuterClass.WidgetSlotChangeNotify proto =
-                WidgetSlotChangeNotifyOuterClass.WidgetSlotChangeNotify.newBuilder()
-                        .setOp(op)
-                        .setSlot(WidgetSlotDataOuterClass.WidgetSlotData.newBuilder().setIsActive(true).build())
-                        .build();
-
-        this.setData(proto);
-    }
-
-    public PacketWidgetSlotChangeNotify(int materialId) {
-        super(PacketOpcodes.WidgetSlotChangeNotify);
-
-        WidgetSlotChangeNotifyOuterClass.WidgetSlotChangeNotify proto =
-                WidgetSlotChangeNotifyOuterClass.WidgetSlotChangeNotify.newBuilder()
-                        .setSlot(
-                                WidgetSlotDataOuterClass.WidgetSlotData.newBuilder()
-                                        .setIsActive(true)
-                                        .setMaterialId(materialId)
-                                        .build())
-                        .build();
-
-        this.setData(proto);
+            output.flush();
+            this.setData(baos.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to encode WidgetSlotChangeNotify for REL6.6", e);
+        }
     }
 }
