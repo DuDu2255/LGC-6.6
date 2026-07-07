@@ -318,19 +318,26 @@ public final class PlayerProgressManager extends BasePlayerDataManager {
      ******************************************************************************************************************
      *****************************************************************************************************************/
     public void addSceneTag(int sceneId, int sceneTagId) {
-        player.getSceneTags().computeIfAbsent(sceneId, k -> new HashSet<>()).add(sceneTagId);
-        player.sendPacket(new PacketPlayerWorldSceneInfoListNotify(player));
-    }
+		player.getSceneTags().computeIfAbsent(sceneId, k -> new HashSet<>()).add(sceneTagId);
 
-    public void delSceneTag(int sceneId, int sceneTagId) {
-        // Sanity check
-        if (player.getSceneTags().get(sceneId) == null) {
-            // Can't delete something that doesn't exist
-            return;
-        }
-        player.getSceneTags().get(sceneId).remove(sceneTagId);
-        player.sendPacket(new PacketPlayerWorldSceneInfoListNotify(player));
-    }
+		player.sendPacket(new PacketPlayerWorldSceneInfoListNotify(player));
+		player.save();
+	}
+
+	public void delSceneTag(int sceneId, int sceneTagId) {
+		if (player.getSceneTags().get(sceneId) == null) {
+			return;
+		}
+
+		player.getSceneTags().get(sceneId).remove(sceneTagId);
+
+		if (player.getSceneTags().get(sceneId).isEmpty()) {
+			player.getSceneTags().remove(sceneId);
+		}
+
+		player.sendPacket(new PacketPlayerWorldSceneInfoListNotify(player));
+		player.save();
+	}
 
     public boolean checkSceneTag(int sceneId, int sceneTagId) {
         return player.getSceneTags().get(sceneId).contains(sceneTagId);

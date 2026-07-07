@@ -1330,9 +1330,11 @@ public class Player implements PlayerHook, FieldFetch {
 
     public void onLogin() {
 
-        if (this.getSceneTags().isEmpty() || this.getSceneTags() == null) {
-            this.applyStartingSceneTags();
-        }
+        if (this.getSceneTags() == null || this.getSceneTags().isEmpty()) {
+			this.sceneTags = new HashMap<>();
+			this.applyStartingSceneTags();
+			this.save();
+		}
 
         if (GameHome.HOME_SCENE_IDS.contains(this.getSceneId())) {
             this.setSceneId(this.prevScene <= 0 ? 3 : this.prevScene);
