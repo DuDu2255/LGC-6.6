@@ -1,12 +1,14 @@
 package emu.grasscutter.server.packet.send;
 
 import com.google.protobuf.CodedOutputStream;
+import emu.grasscutter.data.GameData;
 import emu.grasscutter.net.packet.*;
 import java.io.ByteArrayOutputStream;
 
 public class PacketSceneDataNotify extends BasePacket {
 
     private static final int F_SCENE_ID = 3;
+    private static final int F_MAP_LAYER_INFO = 10;
 
     public PacketSceneDataNotify(int sceneId) {
         super(PacketOpcodes.SceneDataNotify);
@@ -15,9 +17,23 @@ public class PacketSceneDataNotify extends BasePacket {
 
     private static byte[] build(int sceneId) {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(16);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(64);
             CodedOutputStream cos = CodedOutputStream.newInstance(baos);
-            if (sceneId != 0) cos.writeUInt32(F_SCENE_ID, sceneId);
+
+            if (sceneId != 0) {
+                cos.writeUInt32(F_SCENE_ID, sceneId);
+            }
+
+            if (sceneId == 3) {
+                var mapLayerInfo =
+                        MapLayerInfoProto66.build(
+                                GameData.getMapLayerDataMap().keySet(),
+                                GameData.getMapLayerFloorDataMap().keySet(),
+                                GameData.getMapLayerGroupDataMap().keySet());
+
+                cos.writeMessage(F_MAP_LAYER_INFO, mapLayerInfo);
+            }
+
             cos.flush();
             return baos.toByteArray();
         } catch (Exception e) {

@@ -1,9 +1,9 @@
 package emu.grasscutter.server.packet.send;
 
+import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.net.packet.*;
-import emu.grasscutter.net.proto.MapLayerInfoOuterClass;
 import emu.grasscutter.net.proto.PlayerWorldSceneInfoListNotifyOuterClass.PlayerWorldSceneInfoListNotify;
 import emu.grasscutter.net.proto.PlayerWorldSceneInfoOuterClass.PlayerWorldSceneInfo;
 import java.util.Map;
@@ -11,22 +11,24 @@ import java.util.Map;
 public class PacketPlayerWorldSceneInfoListNotify extends BasePacket {
 
     public PacketPlayerWorldSceneInfoListNotify(Player player) {
-        super(PacketOpcodes.PlayerWorldSceneInfoListNotify); // Rename opcode later
+        super(PacketOpcodes.PlayerWorldSceneInfoListNotify);
 
         var sceneTags = player.getSceneTags();
 
         PlayerWorldSceneInfoListNotify.Builder proto =
                 PlayerWorldSceneInfoListNotify.newBuilder()
                         .addInfoList(
-                                PlayerWorldSceneInfo.newBuilder().setSceneId(1).setIsLocked(false).build());
+                                PlayerWorldSceneInfo.newBuilder()
+                                        .setSceneId(1)
+                                        .setIsLocked(false)
+                                        .build());
 
-        // Iterate over all scenes
         for (int scene : GameData.getSceneDataMap().keySet()) {
-            var worldInfoBuilder = PlayerWorldSceneInfo.newBuilder().setSceneId(scene).setIsLocked(false);
+            var worldInfoBuilder =
+                    PlayerWorldSceneInfo.newBuilder()
+                            .setSceneId(scene)
+                            .setIsLocked(false);
 
-            /** Add scene-specific data */
-
-            // Scenetags
             if (sceneTags.keySet().contains(scene)) {
                 worldInfoBuilder.addAllSceneTagIdList(
                         sceneTags.entrySet().stream()
@@ -36,17 +38,22 @@ public class PacketPlayerWorldSceneInfoListNotify extends BasePacket {
                                 .get(0));
             }
 
-            // Map layer information (Big world)
+            // Big world map-layer unlock data.
+            // Use REL6.6 unknown-field layout instead of the stale generated MapLayerInfo setters.
             if (scene == 3) {
+                var layerIds = GameData.getMapLayerDataMap().keySet();
+                var floorIds = GameData.getMapLayerFloorDataMap().keySet();
+                var groupIds = GameData.getMapLayerGroupDataMap().keySet();
+
                 worldInfoBuilder.setMapLayerInfo(
-                        MapLayerInfoOuterClass.MapLayerInfo.newBuilder()
-                                .addAllUnlockedMapLayerIdList(
-                                        GameData.getMapLayerDataMap().keySet()) // MapLayer Ids
-                                .addAllUnlockedMapLayerFloorIdList(GameData.getMapLayerFloorDataMap().keySet())
-                                .addAllUnlockedMapLayerGroupIdList(
-                                        GameData.getMapLayerGroupDataMap()
-                                                .keySet()) // will show MapLayer options when hovered over
-                                .build()); // map layer test
+                        MapLayerInfoProto66.build(layerIds, floorIds, groupIds));
+
+                Grasscutter.getLogger()
+                        .info(
+                                "MapLayerInfo66 in PlayerWorldSceneInfoListNotify: layers={}, floors={}, groups={}",
+                                layerIds.size(),
+                                floorIds.size(),
+                                groupIds.size());
             }
 
             proto.addInfoList(worldInfoBuilder.build());
