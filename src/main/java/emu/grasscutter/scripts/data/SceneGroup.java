@@ -203,9 +203,13 @@ public final class SceneGroup {
     }
 
     public Optional<SceneBossChest> searchBossChestInGroup() {
-        return this.gadgets.values().stream()
-                .filter(g -> g.boss_chest != null && g.boss_chest.monster_config_id > 0)
-                .map(g -> g.boss_chest)
-                .findFirst();
-    }
+		if (this.gadgets == null || this.gadgets.isEmpty()) {
+			return Optional.empty();
+		}
+
+		return this.gadgets.values().stream()
+				.filter(g -> g.boss_chest != null && g.boss_chest.monster_config_id > 0)
+				.map(g -> g.boss_chest)
+				.findFirst();
+	}
 }

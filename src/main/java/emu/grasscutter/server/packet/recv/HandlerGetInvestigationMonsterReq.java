@@ -16,6 +16,7 @@ public class HandlerGetInvestigationMonsterReq extends PacketHandler {
                 new PacketGetInvestigationMonsterRsp(
                         session.getPlayer(),
                         session.getServer().getWorldDataSystem(),
-                        req.getCityIdListList()));
+                        req.getCityIdListList(),
+                        req.getIsForMark()));
     }
 }
