@@ -1,7 +1,5 @@
 package emu.grasscutter.game.entity;
 
-import java.util.List;
-
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.config.ConfigEntityGadget;
@@ -85,14 +83,12 @@ public class EntityClientGadget extends EntityBaseGadget {
         GameEntity ownerEntity = scene.getEntityById(this.ownerEntityId);
         String ownerTypeBeforeResolve = ownerEntity != null ? ownerEntity.getClass().getSimpleName() : "null";
         ownerEntity = findOwnerEntity(ownerEntity);
-        if (ownerEntity == null) {
-            ownerEntity = scene.getEntityById(16777225);
-        }
-        if (ownerEntity instanceof EntityClientGadget ownerGadget) {
-            this.originalOwnerEntityId = ownerGadget.getOriginalOwnerEntityId();
-        } else {
-            this.originalOwnerEntityId = this.ownerEntityId;
-        }
+
+		if (ownerEntity instanceof EntityClientGadget ownerGadget) {
+			this.originalOwnerEntityId = ownerGadget.getOriginalOwnerEntityId();
+		} else {
+			this.originalOwnerEntityId = this.ownerEntityId;
+		}
 
         this.initAbilities();
     }
@@ -171,29 +167,35 @@ public class EntityClientGadget extends EntityBaseGadget {
                 .build();
         entityInfo.addFightPropList(pair2);
 
-        ClientGadgetInfoOuterClass.ClientGadgetInfo clientGadget =
-                ClientGadgetInfoOuterClass.ClientGadgetInfo.newBuilder()
-                        .setCampId(this.getCampId())
-                        .setCampType(this.getCampType())
-                        .setGuid(this.getGuid())
-                        .setOwnerEntityId(this.getOwnerEntityId())
-                        .setTargetEntityId(this.getTargetEntityId())
-                        .setAsyncLoad(this.isAsyncLoad())
-                        .setIsPeerIdFromPlayer(this.isPeerIdFromPlayer())
-                        .build();
+        ClientGadgetInfoOuterClass.ClientGadgetInfo.Builder clientGadgetBuilder =
+				ClientGadgetInfoOuterClass.ClientGadgetInfo.newBuilder()
+						.setCampId(this.getCampId())
+						.setCampType(this.getCampType())
+						.setGuid(this.getGuid())
+						.setOwnerEntityId(this.getOwnerEntityId())
+						.setTargetEntityId(this.getTargetEntityId())
+						.setAsyncLoad(this.isAsyncLoad())
+						.setIsPeerIdFromPlayer(this.isPeerIdFromPlayer());
+
+		if (this.getTargetEntityId() > 0) {
+			clientGadgetBuilder.addTargetEntityIdList(this.getTargetEntityId());
+		}
+
+		ClientGadgetInfoOuterClass.ClientGadgetInfo clientGadget = clientGadgetBuilder.build();
 
         SceneGadgetInfo.Builder gadgetInfo =
                 SceneGadgetInfo.newBuilder()
-                        .setGadgetId(this.getGadgetId())
-                        .setOwnerEntityId(this.getOwnerEntityId())
-                        .setBornType(this.bornType != null ? this.bornType : GadgetBornType.GadgetBornType_GADGET_BORN_PLAYER)
-                        .setGadgetState(this.getGadgetState())
+						.setGadgetId(this.getGadgetId())
+						.setOwnerEntityId(this.getOwnerEntityId())
+						.setGadgetState(this.getGadgetState())
+						.setIsEnableInteract(true)
+						.setPropOwnerEntityId(this.getPropOwnerEntityId())
+						.setClientGadget(clientGadget)
+						.setAuthorityPeerId(this.getOwner().getPeerId());
 
-                        .setIsEnableInteract(true)
-                        .setPropOwnerEntityId(this.getPropOwnerEntityId())
-                        .setClientGadget(clientGadget)
-                        .setPropOwnerEntityId(this.getOwnerEntityId())
-                        .setAuthorityPeerId(this.getOwner().getPeerId());
+		if (this.getBornType() != null) {
+			gadgetInfo.setBornType(this.getBornType());
+		}
 
         entityInfo.setGadget(gadgetInfo);
 
