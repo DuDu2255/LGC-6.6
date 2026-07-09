@@ -456,33 +456,32 @@ public final class TeamManager extends BasePlayerDataManager {
 
     public synchronized void setupAvatarTeam(int teamId, List<Long> list) {
 
-        if (list.isEmpty()
-            || list.size() > this.getMaxTeamSize()
-            || this.getPlayer().isInMultiplayer()) {
-            return;
-        }
+		if (list.isEmpty()
+				|| list.size() > this.getMaxTeamSize()
+				|| this.getPlayer().isInMultiplayer()) {
+			return;
+		}
 
-        List<Integer> team = new ArrayList<>();
-        team.add(teamId);
+		TeamInfo teamInfo = this.getTeams().get(teamId);
+		if (teamInfo == null) {
+			Grasscutter.getLogger()
+					.warn("Invalid teamId {} in SetUpAvatarTeamReq. Existing teams: {}", teamId, this.getTeams().keySet());
+			return;
+		}
 
-        TeamInfo teamInfo = this.getTeams().get(team.size());
-        if (teamInfo == null) {
-            return;
-        }
+		LinkedHashSet<Avatar> newTeam = new LinkedHashSet<>();
+		for (Long guid : list) {
+			Avatar avatar = this.getPlayer().getAvatars().getAvatarByGuid(guid);
+			if (avatar == null || newTeam.contains(avatar)) {
+				return;
+			}
 
-        LinkedHashSet<Avatar> newTeam = new LinkedHashSet<>();
-        for (Long aLong : list) {
-            Avatar avatar = this.getPlayer().getAvatars().getAvatarByGuid(aLong);
-            if (avatar == null || newTeam.contains(avatar)) {
+			newTeam.add(avatar);
+		}
 
-                return;
-            }
-            newTeam.add(avatar);
-        }
-
-        teamInfo.getAvatars().clear();
-        this.addAvatarsToTeam(teamInfo, newTeam);
-    }
+		teamInfo.getAvatars().clear();
+		this.addAvatarsToTeam(teamInfo, newTeam);
+	}
 
     public void setupMpTeam(List<Long> list) {
 
