@@ -1621,4 +1621,43 @@ public class ScriptLib {
 
         return configIds;
     }
+	
+	public int CreateMonsterByConfigIdByPos(int configId, LuaTable bornPos, LuaTable face) {
+		logger.debug("[LUA] Call CreateMonsterByConfigIdByPos with {}, {}, {}", configId, bornPos, face);
+
+		var currentGroup = this.getCurrentGroup();
+		if (currentGroup.isEmpty()) {
+			logger.warn("[LUA] CreateMonsterByConfigIdByPos failed: no current group for config {}", configId);
+			return 1;
+		}
+
+		Position pos = luaTableToPositionOrNull(bornPos);
+		Position rot = luaTableToPositionOrNull(face);
+
+		EntityMonster entity =
+				this.getSceneScriptManager()
+						.createMonsterByConfigIdByPos(currentGroup.get(), configId, pos, rot);
+
+		if (entity == null) {
+			logger.warn(
+					"[LUA] CreateMonsterByConfigIdByPos failed for group {}, config {}",
+					currentGroup.get().id,
+					configId);
+			return 2;
+		}
+
+		this.getSceneScriptManager().addEntity(entity);
+		return 0;
+	}
+
+	private Position luaTableToPositionOrNull(LuaTable table) {
+		if (table == null) {
+			return null;
+		}
+
+		return new Position(
+				table.get("x").tofloat(),
+				table.get("y").tofloat(),
+				table.get("z").tofloat());
+	}
 }
