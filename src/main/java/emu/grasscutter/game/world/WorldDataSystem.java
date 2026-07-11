@@ -16,6 +16,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WorldDataSystem extends BaseGameSystem {
     private final Map<String, ChestInteractHandler> chestInteractHandlerMap;
     private final Map<String, SceneGroup> sceneInvestigationGroupMap;
+	
+	private static final int BATHYSMAL_VISHAP_HERD_INVESTIGATION_ID = 37;
+	private static final int BATHYSMAL_VISHAP_HERD_GROUP_ID = 155005095;
 
     public WorldDataSystem(GameServer server) {
         super(server);
@@ -223,7 +226,23 @@ public class WorldDataSystem extends BaseGameSystem {
 		int monsterId = imd.getMonsterIdList().get(0);
 		int sceneId = getInvestigationMonsterSceneId(imd);
 
-		var markerPos = getInvestigationMonsterMarkerPosition(imd, sceneId, groupId, monsterId);
+		Position markerPos;
+
+		if (imd.getId() == BATHYSMAL_VISHAP_HERD_INVESTIGATION_ID
+				&& groupId == BATHYSMAL_VISHAP_HERD_GROUP_ID
+				&& imd.hasMapMarkerPosition()) {
+
+			var markerData = imd.getDJLCKJCAKDA();
+
+			markerPos =
+					new Position(
+							markerData.get(0),
+							markerData.get(1),
+							markerData.get(2));
+		} else {
+			markerPos = getInvestigationMonsterMarkerPosition(imd, sceneId, groupId, monsterId);
+		}
+
 		if (markerPos == null) {
 			return null;
 		}
