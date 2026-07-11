@@ -10,11 +10,15 @@ public final class HandlerClientLockGameTimeNotify extends PacketHandler {
     @Override
     public void handle(GameSession session, byte[] header, byte[] payload) throws Exception {
         var packet = ClientLockGameTimeNotify.parseFrom(payload);
-        // session.getPlayer().getWorld().lockTime(packet.getIsLock());
-        // TODO: figure out what to implement here
-        if (packet.getIsLock())
-            Grasscutter.getLogger()
-                    .warn(
-                            "Invalid 'ClientLockGameTimeNotify' received; value is true. (please report to development channel)");
+
+        Grasscutter.getLogger()
+                .info(
+                        "[ClientLockGameTimeNotify] uid={}, isLock={}",
+                        session.getPlayer() != null ? session.getPlayer().getUid() : 0,
+                        packet.getIsLock());
+
+        if (session.getPlayer() != null && session.getPlayer().getWorld() != null) {
+            session.getPlayer().getWorld().lockTime(packet.getIsLock());
+        }
     }
 }

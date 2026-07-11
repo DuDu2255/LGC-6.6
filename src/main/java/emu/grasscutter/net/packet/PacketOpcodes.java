@@ -119,7 +119,9 @@ public final class PacketOpcodes {
     public static final int GetActivityInfoReq = 23363;
     public static final int GetActivityInfoRsp = 6055;
     public static final int ChangeGameTimeReq = 20114;
-    public static final int ChangeGameTimeRsp = 27622;
+	public static final int ChangeGameTimeRsp = 27622;
+	public static final int ClientSetGameTimeReq = 5329;
+	public static final int ClientSetGameTimeRsp = 5187;
     public static final int EvtAiSyncSkillCdNotify = 1142;
     public static final int WorktopOptionNotify = 28149;
     public static final int GadgetStateNotify = 9894;
@@ -165,8 +167,8 @@ public final class PacketOpcodes {
     public static final int DoGachaReq = 6060;
     public static final int DoGachaRsp = 4034;
     public static final int UnlockNameCardNotify = 21597;
-    public static final int GetAllUnlockNameCardReq = 0;
-    public static final int GetAllUnlockNameCardRsp = 20337;
+    public static final int GetAllUnlockNameCardReq = 29849;
+    public static final int GetAllUnlockNameCardRsp = 9926;
     public static final int SetNameCardReq = 22222;
     public static final int SetNameCardRsp = 26152;
     public static final int UpdatePlayerShowNameCardListReq = 2551;
@@ -550,7 +552,7 @@ public final class PacketOpcodes {
     public static final int EnterMapLayerRsp = 27977;
     public static final int EnterMapLayerReq_660 = 20501;
     public static final int EnterMapLayerRsp_660 = 20756;
-    public static final int UnlockMapLayerGroupReq = 20718;
+    public static final int UnlockMapLayerGroupReq = 1;
     public static final int UnlockMapLayerGroupRsp = 1;
     public static final int ReunionBriefInfoReq = 9863;
     public static final int ReunionBriefInfoRsp = 21567;
