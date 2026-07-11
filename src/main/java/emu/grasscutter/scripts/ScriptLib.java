@@ -23,6 +23,7 @@ import org.luaj.vm2.*;
 import org.slf4j.*;
 
 import javax.annotation.Nullable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
 
 import static emu.grasscutter.GameConstants.ENTITY_ID_BIT_SHIFT;
@@ -37,6 +38,7 @@ public class ScriptLib {
     private final FastThreadLocal<SceneGroup> currentGroup;
     private final FastThreadLocal<ScriptArgs> callParams;
     private final FastThreadLocal<GameEntity> currentEntity;
+	private final Map<Integer, Map<String, Integer>> groupTempValues = new ConcurrentHashMap<>();
 
     public ScriptLib() {
         this.sceneScriptManager = new FastThreadLocal<>();
@@ -67,6 +69,23 @@ public class ScriptLib {
         sb.append("}");
         return sb.toString();
     }
+	
+	private int resolveTempValueGroupId(LuaTable table) {
+		if (table != null) {
+			int groupId = table.get("group_id").optint(0);
+			if (groupId > 0) {
+				return groupId;
+			}
+
+			groupId = table.get("groupId").optint(0);
+			if (groupId > 0) {
+				return groupId;
+			}
+		}
+
+		var group = this.currentGroup.getIfExists();
+		return group != null ? group.id : 0;
+	}
 
     public void setCurrentGroup(SceneGroup currentGroup) {
         this.currentGroup.set(currentGroup);
@@ -626,14 +645,37 @@ public class ScriptLib {
     }
 
     public int GetGadgetStateByConfigId(int groupId, int configId) {
-        logger.debug("[LUA] Call GetGadgetStateByConfigId with {},{}", groupId, configId);
-        val scene = getSceneScriptManager().getScene();
-        val gadget = groupId == 0 ? scene.getEntityByConfigId(configId, getCurrentGroup().get().id) : scene.getEntityByConfigId(configId, groupId);
-        if (!(gadget instanceof EntityGadget)) {
-            return -1;
-        }
-        return ((EntityGadget) gadget).getState();
-    }
+		logger.debug("[LUA] Call GetGadgetStateByConfigId with {},{}", groupId, configId);
+
+		var scene = getSceneScriptManager().getScene();
+
+		int resolvedGroupId = groupId;
+		if (resolvedGroupId == 0) {
+			var group = this.currentGroup.getIfExists();
+			resolvedGroupId = group != null ? group.id : 0;
+		}
+
+		if (resolvedGroupId <= 0) {
+			return 0;
+		}
+
+		var entity = scene.getEntityByConfigId(configId, resolvedGroupId);
+
+		if (entity instanceof EntityGadget gadget) {
+			return gadget.getState();
+		}
+
+		// Fallback for scripts that query gadget state during group load before the gadget has actually been spawned as a runtime EntityGadget.
+		SceneGroup group = getSceneScriptManager().getGroupById(resolvedGroupId);
+		if (group != null && group.gadgets != null) {
+			var metaGadget = group.gadgets.get(configId);
+			if (metaGadget != null) {
+				return metaGadget.state;
+			}
+		}
+
+		return 0;
+	}
 
     public int GetGameHour() {
         logger.debug("[LUA] Call GetGameHour");
@@ -663,11 +705,43 @@ public class ScriptLib {
         return 0;
     }
 
-    public int GetGroupTempValue(String name, LuaTable var2) {
-        logger.warn("[LUA] Call unimplemented GetGroupTempValue with {} {}", name, printTable(var2));
+    public int GetGroupTempValue(String name, LuaTable table) {
+		int groupId = resolveTempValueGroupId(table);
 
-        return 0;
-    }
+		int value =
+				this.groupTempValues
+						.getOrDefault(groupId, Collections.emptyMap())
+						.getOrDefault(name, 0);
+
+		logger.debug("[LUA] Call GetGroupTempValue with groupId={}, {} = {}", groupId, name, value);
+		return value;
+	}
+	
+	public int SetGroupTempValue(String name, int value, LuaTable table) {
+		int groupId = resolveTempValueGroupId(table);
+
+		if ("weatherId".equals(name) && shouldBlockScriptWeather(value)) {
+			logger.debug("[LUA] Blocked SetGroupTempValue weatherId={} and stored 0 instead.", value);
+			value = 0;
+			forceDefaultWeatherForScenePlayers();
+		}
+
+		if (groupId <= 0) {
+			logger.warn(
+					"[LUA] SetGroupTempValue failed: could not resolve group id for {} = {}, params={}",
+					name,
+					value,
+					table != null ? printTable(table) : "{}");
+			return 1;
+		}
+
+		this.groupTempValues
+				.computeIfAbsent(groupId, ignored -> new ConcurrentHashMap<>())
+				.put(name, value);
+
+		logger.debug("[LUA] Call SetGroupTempValue with groupId={}, {} = {}", groupId, name, value);
+		return 0;
+	}
 
     public int GetGroupVariableValue(String var) {
         int returnValue = getSceneScriptManager().getVariables(currentGroup.get().id).getOrDefault(var, 0);
@@ -676,10 +750,11 @@ public class ScriptLib {
     }
 
     public int GetGroupVariableValueByGroup(String var, int groupId) {
-        int returnValue = getSceneScriptManager().getVariables(groupId).getOrDefault(var, 0);
-        logger.debug("[LUA] Call GetGroupVariableValueByGroup with {},{} = {}", var, groupId, returnValue);
-        return returnValue;
-    }
+		var variables = getSceneScriptManager().getVariables(groupId);
+		int returnValue = variables != null ? variables.getOrDefault(var, 0) : 0;
+		logger.debug("[LUA] Call GetGroupVariableValueByGroup with {},{} = {}", var, groupId, returnValue);
+		return returnValue;
+	}
 
     public int GetHostQuestState(int questId) {
         logger.debug("[LUA] Call GetHostQuestState with {}", questId);
@@ -937,13 +1012,13 @@ public class ScriptLib {
         return 0;
     }
 
-    public void PrintContextLog(String msg) {
-        printLog("PrintContextLog", msg);
-    }
+    public void PrintContextLog(Object msg) {
+		printLog("PrintContextLog", String.valueOf(msg));
+	}
 
-    public void PrintLog(String msg) {
-        printLog("PrintLog", msg);
-    }
+	public void PrintLog(Object msg) {
+		printLog("PrintLog", String.valueOf(msg));
+	}
 
     public int RefreshBlossomDropRewardByGroupId(int groupId) {
         logger.warn("[LUA] Call unimplemented RefreshBlossomDropRewardByGroupId with {}", groupId);
@@ -1092,15 +1167,29 @@ public class ScriptLib {
         return 0;
     }
 
-    public int SetGroupGadgetStateByConfigId(int groupId, int configId, int gadgetState) {
-        logger.debug("[LUA] Call SetGroupGadgetStateByConfigId with {},{},{}", groupId, configId, gadgetState);
-        val entity = getSceneScriptManager().getScene().getEntityByConfigId(configId, groupId);
-        if (!(entity instanceof EntityGadget gadget)) {
-            return -1;
-        }
-        gadget.updateState(gadgetState);
-        return 0;
-    }
+    public int SetGroupGadgetStateByConfigId(int groupId, int configId, int state) {
+		logger.debug(
+				"[LUA] Call SetGroupGadgetStateByConfigId with groupId={}, configId={}, state={}",
+				groupId,
+				configId,
+				state);
+		int resolvedGroupId = groupId;
+		if (resolvedGroupId == 0) {
+			var group = this.currentGroup.getIfExists();
+			resolvedGroupId = group != null ? group.id : 0;
+		}
+
+		if (resolvedGroupId <= 0) {
+			return 1;
+		}
+		var entity = getSceneScriptManager().getScene().getEntityByConfigId(configId, resolvedGroupId);
+
+		if (entity instanceof EntityGadget gadget) {
+			gadget.updateState(state);
+			return 0;
+		}
+		return 0;
+	}
 
     public int SetGroupReplaceable(int groupId, boolean value) {
         logger.warn("[LUA] Call unchecked SetGroupReplaceable with {} {}", groupId, value);
@@ -1110,12 +1199,6 @@ public class ScriptLib {
             return 0;
         }
         return 1;
-    }
-
-    public int SetGroupTempValue(String name, int value, LuaTable var3) {
-        logger.warn("[LUA] Call unimplemented SetGroupTempValue with {} {} {}", name, value, printTable(var3));
-
-        return 0;
     }
 
     public int SetGroupVariableValue(String var, int value) {
@@ -1241,12 +1324,21 @@ public class ScriptLib {
         return 0;
     }
 
-    public int SetWeatherAreaState(int var1, int var2) {
-        logger.debug("[LUA] Call SetWeatherAreaState with {} {}", var1, var2);
-        this.getSceneScriptManager().getScene().getPlayers()
-                .forEach(p -> p.setWeather(var1, ClimateType.getTypeByValue(var2)));
-        return 0;
-    }
+    public int SetWeatherAreaState(int weatherId, int climateType) {
+		if (shouldBlockScriptWeather(weatherId)) {
+			logger.debug(
+					"[LUA] Blocked scripted weather {} and forced default weather instead.",
+					weatherId);
+
+			forceDefaultWeatherForScenePlayers();
+			return 0;
+		}
+
+		logger.debug("[LUA] Call SetWeatherAreaState with {} {}", weatherId, climateType);
+		this.getSceneScriptManager().getScene().getPlayers()
+				.forEach(p -> p.setWeather(weatherId, ClimateType.getTypeByValue(climateType)));
+		return 0;
+	}
 
     public int SetWorktopOptions(LuaTable table) {
         logger.debug("[LUA] Call SetWorktopOptions with {}", printTable(table));
@@ -1659,5 +1751,97 @@ public class ScriptLib {
 				table.get("x").tofloat(),
 				table.get("y").tofloat(),
 				table.get("z").tofloat());
+	}
+	
+	private boolean shouldBlockScriptWeather(int weatherId) {
+		var scriptManager = this.sceneScriptManager.getIfExists();
+		if (scriptManager == null || scriptManager.getScene() == null) {
+			return false;
+		}
+
+		// Scene 3 = main open world. Weather 4014 is the unwanted Chasm/Sumeru script weather.
+		return scriptManager.getScene().getId() == 3 && weatherId == 4014;
+	}
+
+	private void forceDefaultWeatherForScenePlayers() {
+		var scriptManager = this.sceneScriptManager.getIfExists();
+		if (scriptManager == null || scriptManager.getScene() == null) {
+			return;
+		}
+
+		scriptManager.getScene().getPlayers()
+				.forEach(player -> player.setWeather(0, ClimateType.CLIMATE_SUNNY));
+	}
+	
+	public int GetDeathZoneStatus() {
+		logger.debug("[LUA] Call fallback GetDeathZoneStatus");
+		return 0;
+	}
+
+	public int GetDeathZoneStatus(int configId) {
+		logger.debug("[LUA] Call fallback GetDeathZoneStatus with {}", configId);
+		return 0;
+	}
+
+	public int GetDeathZoneStatus(int groupId, int configId) {
+		logger.debug("[LUA] Call fallback GetDeathZoneStatus with {},{}", groupId, configId);
+		return 0;
+	}
+
+	public int GetSceneOwnerUid() {
+		var scriptManager = this.sceneScriptManager.getIfExists();
+		if (scriptManager == null || scriptManager.getScene() == null || scriptManager.getScene().getHost() == null) {
+			return 0;
+		}
+
+		return scriptManager.getScene().getHost().getUid();
+	}
+
+	public int SetPlayerEyePoint(int[] uidList, int groupId, int configId, int duration) {
+		logger.debug(
+				"[LUA] Call fallback SetPlayerEyePoint with groupId={}, configId={}, duration={}",
+				groupId,
+				configId,
+				duration);
+		return 0;
+	}
+
+	public int SetPlayerEyePoint(int uid, int groupId, int configId, int duration) {
+		logger.debug(
+				"[LUA] Call fallback SetPlayerEyePoint with uid={}, groupId={}, configId={}, duration={}",
+				uid,
+				groupId,
+				configId,
+				duration);
+		return 0;
+	}
+
+	public int TrySetPlayerEyePoint(int[] uidList, int groupId, int configId, int duration) {
+		logger.debug(
+				"[LUA] Call fallback TrySetPlayerEyePoint with groupId={}, configId={}, duration={}",
+				groupId,
+				configId,
+				duration);
+		return 0;
+	}
+
+	public int TrySetPlayerEyePoint(int uid, int groupId, int configId, int duration) {
+		logger.debug(
+				"[LUA] Call fallback TrySetPlayerEyePoint with uid={}, groupId={}, configId={}, duration={}",
+				uid,
+				groupId,
+				configId,
+				duration);
+		return 0;
+	}
+
+	public int SetPlayerGroupVisionType(int[] uidList, int[] visionTypeList) {
+		logger.debug("[LUA] Call fallback SetPlayerGroupVisionType");
+		return 0;
+	}
+
+	public int SetPlayerGroupVisionType(int[] uidList, int visionType) {
+		logger.debug("[LUA] Call fallback SetPlayerGroupVisionType with visionType={}", visionType);
+		return 0;
 	}
 }
