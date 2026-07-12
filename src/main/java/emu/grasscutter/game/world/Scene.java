@@ -192,10 +192,14 @@ public class Scene {
 
 	private static final int DRAGONSPINE_WEATHER_DEFAULT = 0;
 	private static final int DRAGONSPINE_WEATHER_GENERAL = 2022;
+	private static final int DRAGONSPINE_WEATHER_PEAK = 2023;
 	private static final int DRAGONSPINE_WEATHER_CRYO_HYPOSTASIS = 2125;
 
+	/*
+	 * Dragonspine regional fallback centers.
+	 */
 	private static final Position DRAGONSPINE_CORE_POS =
-        new Position(1150.0f, 300.0f, -950.0f);
+			new Position(1150.0f, 300.0f, -950.0f);
 
 	private static final Position DRAGONSPINE_OUTSKIRTS_POS =
 			new Position(1460.2603f, 268.03598f, -573.91376f);
@@ -206,8 +210,19 @@ public class Scene {
 	private static final Position DRAGONSPINE_LIYUE_SIDE_WAYPOINT_POS =
 			new Position(860.82733f, 326.54297f, -486.15005f);
 
+	/*
+	 * Broader Dragonspine area around the Cryo Hypostasis side.
+	 * This receives the ordinary 2022 weather outside the arena.
+	 */
 	private static final Position DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_POS =
 			new Position(1236.6396f, 293.92908f, -556.36945f);
+
+	/*
+	 * Actual Cryo Hypostasis arena center, based on the measured
+	 * center and arena boundaries.
+	 */
+	private static final Position DRAGONSPINE_CRYO_HYPOSTASIS_ARENA_POS =
+			new Position(1171.1259f, 285.6235f, -547.84076f);
 
 	private static final Position DRAGONSPINE_NORTH_LIYUE_PASS_POS =
 			new Position(1161.982f, 270.2541f, -410.60388f);
@@ -218,7 +233,19 @@ public class Scene {
 	private static final float DRAGONSPINE_LIYUE_SIDE_RADIUS = 100.0f;
 	private static final float DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_RADIUS = 120.0f;
 	private static final float DRAGONSPINE_NORTH_LIYUE_PASS_RADIUS = 90.0f;
-	private static final float DRAGONSPINE_CRYO_HYPOSTASIS_EXCLUSION_RADIUS = 145.0f;
+
+	/*
+	 * Switch to the dedicated peak profile at or above this height.
+	 * Anything below it returns to the ordinary Dragonspine profile.
+	 */
+	private static final float DRAGONSPINE_PEAK_MIN_Y = 438.0f;
+
+	/*
+	 * The measured arena edges are roughly 27–31 units from the
+	 * center. A radius of 40 leaves a small safety margin without
+	 * extending deeply outside the arena.
+	 */
+	private static final float DRAGONSPINE_CRYO_HYPOSTASIS_WEATHER_RADIUS = 40.0f;
 
 	private static final int OCEANID_SCENE_ID = 3;
 	private static final int OCEANID_WEATHER_DEFAULT = 0;
@@ -2581,12 +2608,32 @@ public class Scene {
 			return DRAGONSPINE_WEATHER_DEFAULT;
 		}
 
-		// Cryo Hypostasis appears to depend on its local/default boss-area state.
+		boolean inDragonspine =
+				this.isInDragonspineWeatherZone(pos);
+
+		/*
+		 * The peak profile takes priority at high altitude.
+		 *
+		 * Y >= 438:
+		 *     weather 2023
+		 *
+		 * Y < 438:
+		 *     continue evaluating local Dragonspine weather
+		 */
+		if (inDragonspine
+				&& pos.getY() >= DRAGONSPINE_PEAK_MIN_Y) {
+
+			return DRAGONSPINE_WEATHER_PEAK;
+		}
+
+		/*
+		 * Use the boss profile only inside the actual Cryo Hypostasis arena.
+		 */
 		if (this.isInCryoHypostasisWeatherSensitiveZone(pos)) {
 			return DRAGONSPINE_WEATHER_CRYO_HYPOSTASIS;
 		}
 
-		if (this.isInDragonspineWeatherZone(pos)) {
+		if (inDragonspine) {
 			return DRAGONSPINE_WEATHER_GENERAL;
 		}
 
@@ -2594,8 +2641,14 @@ public class Scene {
 	}
 
 	private boolean isInDragonspineWeatherZone(Position pos) {
-		return this.isNear2d(pos, DRAGONSPINE_CORE_POS, DRAGONSPINE_CORE_RADIUS)
-				|| this.isNear2d(pos, DRAGONSPINE_OUTSKIRTS_POS, DRAGONSPINE_OUTSKIRTS_RADIUS)
+		return this.isNear2d(
+						pos,
+						DRAGONSPINE_CORE_POS,
+						DRAGONSPINE_CORE_RADIUS)
+				|| this.isNear2d(
+						pos,
+						DRAGONSPINE_OUTSKIRTS_POS,
+						DRAGONSPINE_OUTSKIRTS_RADIUS)
 				|| this.isNear2d(
 						pos,
 						DRAGONSPINE_WATER_OUTSKIRTS_POS,
@@ -2606,6 +2659,10 @@ public class Scene {
 						DRAGONSPINE_LIYUE_SIDE_RADIUS)
 				|| this.isNear2d(
 						pos,
+						DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_POS,
+						DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_RADIUS)
+				|| this.isNear2d(
+						pos,
 						DRAGONSPINE_NORTH_LIYUE_PASS_POS,
 						DRAGONSPINE_NORTH_LIYUE_PASS_RADIUS);
 	}
@@ -2613,8 +2670,8 @@ public class Scene {
 	private boolean isInCryoHypostasisWeatherSensitiveZone(Position pos) {
 		return this.isNear2d(
 				pos,
-				DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_POS,
-				DRAGONSPINE_CRYO_HYPOSTASIS_EXCLUSION_RADIUS);
+				DRAGONSPINE_CRYO_HYPOSTASIS_ARENA_POS,
+				DRAGONSPINE_CRYO_HYPOSTASIS_WEATHER_RADIUS);
 	}
 
 	private void checkOceanidFallbackWeather() {
