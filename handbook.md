@@ -16,7 +16,7 @@
 
 ## Various commands
 
-- Create accounts: /account <username>
+- Create accounts: `/account create <username>`
 - Get all achievements: /am grantall
 - God mode: /prop god 1
 - Enter a domain: /dungeon <ID>
