@@ -108,12 +108,31 @@ public final class PlayerBuffManager extends BasePlayerManager {
                                         if (ability.type == AbilityModifierAction.Type.HealHP) {
                                             if (target == null) continue;
 
-                                            var maxHp = target.getFightProperty(FightProperty.FIGHT_PROP_MAX_HP);
-                                            var amount =
-                                                    ability.amount.get() + ability.amountByCasterMaxHPRatio.get() * maxHp;
+                                            var maxHp =
+													target.getFightProperty(
+															FightProperty.FIGHT_PROP_MAX_HP);
 
-                                            target.getAsEntity().heal(amount);
-                                            shouldHeal = true;
+											var targetHpRatio =
+													ability.amountByTargetMaxHPRatio.get();
+
+											var casterHpRatio =
+													ability.amountByCasterMaxHPRatio.get();
+
+											/*
+											 * Food healing normally uses the target's Max HP ratio.
+											 * Preserve the previous caster-ratio behavior as a fallback for server buffs that still encode their heal that way.
+											 */
+											var hpRatio =
+													targetHpRatio != 0f
+															? targetHpRatio
+															: casterHpRatio;
+
+											var amount =
+													ability.amount.get()
+															+ hpRatio * maxHp;
+
+											target.getAsEntity().heal(amount);
+											shouldHeal = true;
                                         }
                                     }
 
