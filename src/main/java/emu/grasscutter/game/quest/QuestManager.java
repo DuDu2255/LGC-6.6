@@ -31,6 +31,7 @@ public final class QuestManager extends BasePlayerManager {
 
     private long lastHourCheck = 0;
     private long lastDayCheck = 0;
+	private static final int BROKEN_HIDDEN_PLOT_QUEST_ID = 7101702;
 
     public static final ExecutorService eventExecutor =
             new ThreadPoolExecutor(
@@ -230,19 +231,35 @@ public final class QuestManager extends BasePlayerManager {
         List<GameMainQuest> activeQuests = getActiveMainQuests();
         List<GameQuest> activeSubs = new ArrayList<>(activeQuests.size());
         for (GameMainQuest quest : activeQuests) {
-            List<Position> rewindPos = quest.rewind(); // <pos, rotation>
-            var activeQuest = quest.getActiveQuests();
-            if (rewindPos != null) {
-                getPlayer().getPosition().set(rewindPos.get(0));
-                getPlayer().getRotation().set(rewindPos.get(1));
-            }
-            if (activeQuest != null && rewindPos != null) {
-                // activeSubs.add(activeQuest);
-                // player.sendPacket(new PacketQuestProgressUpdateNotify(activeQuest));
-            }
-            quest.checkProgress();
-        }
+			List<Position> rewindPos = quest.rewind();
 
+			var activeQuest = quest.getActiveQuests();
+
+			if (rewindPos != null) {
+				getPlayer().getPosition().set(rewindPos.get(0));
+				getPlayer().getRotation().set(rewindPos.get(1));
+			}
+
+			quest.checkProgress();
+		}
+
+		var brokenPlotQuest =
+				this.getQuestById(
+						BROKEN_HIDDEN_PLOT_QUEST_ID);
+
+		if (brokenPlotQuest != null
+				&& brokenPlotQuest.getState()
+						== QuestState.QUEST_STATE_UNFINISHED) {
+
+			Grasscutter.getLogger()
+					.warn(
+							"Auto-finishing broken hidden plot quest {} for uid {}",
+							BROKEN_HIDDEN_PLOT_QUEST_ID,
+							this.player.getUid());
+
+			brokenPlotQuest.finish();
+		}
+		
         if (this.player.getActivityManager() != null)
             this.player.getActivityManager().triggerActivityConditions();
     }
