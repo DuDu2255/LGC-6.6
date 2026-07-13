@@ -2,7 +2,7 @@
 
 ## Important note
 This is an experimental 6.6 branch containing changes catered to fix some gameplay aspects related to farming and building characters for the heck of it.
-Protocol buffer definitions can be found on [GitLab]((https://gitlab.com/CarolBicsi/genshin-protocol)), including translations.
+Protocol buffer definitions can be found on [GitLab](https://gitlab.com/CarolBicsi/genshin-protocol), including translations.
 
 ## Updated version of Grasscutters, with some new features implemented.
 Features and functionality of the PS is not guaranteed, try it yourself to see what works and what doesnt.
