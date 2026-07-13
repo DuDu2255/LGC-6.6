@@ -157,9 +157,8 @@ public class Scene {
 	private static final int SEIRAI_WEATHER_DEFAULT = 0;
 	private static final int SEIRAI_WEATHER_THUNDER_MANIFESTATION = 3264;
 	private static final int SEIRAI_WEATHER_AMAKUMO_LOWER = 3219;
-	private static final int SEIRAI_WEATHER_SEIRAIMARU = 3065;
-	private static final int SEIRAI_WEATHER_INITIAL_ISLAND = 3164;
-	private static final int SEIRAI_WEATHER_ASASE_SHRINE = 3068;
+	private static final int SEIRAI_WEATHER_SEIRAIMARU = 3165;
+	private static final int SEIRAI_WEATHER_INITIAL_ISLAND = 3165;
 
 	private static final Position THUNDER_MANIFESTATION_ARENA_POS =
 			new Position(-4707.378f, 479.99323f, -4258.842f);
@@ -173,13 +172,12 @@ public class Scene {
 	private static final Position SEIRAI_INITIAL_ISLAND_POS =
 			new Position(-4254.716f, 200.696f, -3929.955f);
 
-	private static final Position SEIRAI_ASASE_SHRINE_POS =
-			new Position(-4624.874f, 209.291f, -3756.113f);
+	private static final Position SEIRAI_ASASE_SHRINE_CLEAR_POS = new Position(-4700.761f, 205.0f, -3674.826f);
 
 	private static final float THUNDER_MANIFESTATION_WEATHER_RADIUS = 230.0f;
 	private static final float THUNDER_MANIFESTATION_MIN_WEATHER_Y = 350.0f;
 
-	private static final float SEIRAI_ASASE_SHRINE_RADIUS = 260.0f;
+	private static final float SEIRAI_ASASE_SHRINE_CLEAR_RADIUS = 165.0f;
 	private static final float SEIRAI_SEIRAIMARU_RADIUS = 220.0f;
 	private static final float SEIRAI_INITIAL_ISLAND_RADIUS = 430.0f;
 	private static final float SEIRAI_AMAKUMO_LOWER_RADIUS = 560.0f;
@@ -2483,26 +2481,35 @@ public class Scene {
 			return SEIRAI_WEATHER_DEFAULT;
 		}
 
-		// Highest priority: high-altitude Thunder Manifestation arena and approach.
-		// Needs a Y check so the lower Amakumo pool does not accidentally receive boss-arena weather.
 		if (this.isInThunderManifestationWeatherZone(pos)) {
 			return SEIRAI_WEATHER_THUNDER_MANIFESTATION;
 		}
 
-		// Specific calm/special zones before the large general storm zone.
-		if (this.isNear2d(pos, SEIRAI_ASASE_SHRINE_POS, SEIRAI_ASASE_SHRINE_RADIUS)) {
-			return SEIRAI_WEATHER_ASASE_SHRINE;
+		/*
+		 * Asase Shrine use weather 0.
+		 */
+		if (this.isInAsaseShrineClearWeatherZone(pos)) {
+			return SEIRAI_WEATHER_DEFAULT;
 		}
 
-		if (this.isNear2d(pos, SEIRAI_SEIRAIMARU_POS, SEIRAI_SEIRAIMARU_RADIUS)) {
+		if (this.isNear2d(
+				pos,
+				SEIRAI_SEIRAIMARU_POS,
+				SEIRAI_SEIRAIMARU_RADIUS)) {
 			return SEIRAI_WEATHER_SEIRAIMARU;
 		}
 
-		if (this.isNear2d(pos, SEIRAI_INITIAL_ISLAND_POS, SEIRAI_INITIAL_ISLAND_RADIUS)) {
+		if (this.isNear2d(
+				pos,
+				SEIRAI_INITIAL_ISLAND_POS,
+				SEIRAI_INITIAL_ISLAND_RADIUS)) {
 			return SEIRAI_WEATHER_INITIAL_ISLAND;
 		}
 
-		if (this.isNear2d(pos, SEIRAI_AMAKUMO_LOWER_POS, SEIRAI_AMAKUMO_LOWER_RADIUS)) {
+		if (this.isNear2d(
+				pos,
+				SEIRAI_AMAKUMO_LOWER_POS,
+				SEIRAI_AMAKUMO_LOWER_RADIUS)) {
 			return SEIRAI_WEATHER_AMAKUMO_LOWER;
 		}
 
@@ -2515,6 +2522,14 @@ public class Scene {
 						pos,
 						THUNDER_MANIFESTATION_ARENA_POS,
 						THUNDER_MANIFESTATION_WEATHER_RADIUS);
+	}
+	
+	private boolean isInAsaseShrineClearWeatherZone(Position pos) {
+		return pos != null
+				&& this.isNear2d(
+						pos,
+						SEIRAI_ASASE_SHRINE_CLEAR_POS,
+						SEIRAI_ASASE_SHRINE_CLEAR_RADIUS);
 	}
 
 	private boolean isNear2d(Position pos, Position center, float radius) {
@@ -2529,34 +2544,89 @@ public class Scene {
 	}
 	
 	private void applySeiraiFallbackWeather(Player player, boolean allowDefaultReset) {
+
 		if (player == null || this.getId() != SEIRAI_SCENE_ID) {
 			return;
 		}
 
-		int desiredWeather = this.getDesiredSeiraiWeather(player.getPosition());
-		boolean hadFallbackWeather = this.seiraiFallbackWeatherByUid.containsKey(player.getUid());
+		Position pos = player.getPosition();
+
+		boolean inAsaseClearZone =
+				this.isInAsaseShrineClearWeatherZone(pos);
+
+		int desiredWeather =
+				this.getDesiredSeiraiWeather(pos);
+
+		boolean hadFallbackWeather =
+				this.seiraiFallbackWeatherByUid.containsKey(
+						player.getUid());
+
 		int currentWeather =
 				this.seiraiFallbackWeatherByUid.getOrDefault(
-						player.getUid(), SEIRAI_WEATHER_DEFAULT);
+						player.getUid(),
+						SEIRAI_WEATHER_DEFAULT);
 
-		if (desiredWeather == SEIRAI_WEATHER_DEFAULT) {
-			boolean dragonspineOwnsWeather = this.getDesiredDragonspineWeather(player.getPosition()) != DRAGONSPINE_WEATHER_DEFAULT;
+		/*
+		 * Explicitly own the clear weather while inside Asase Shrine.
+		 *
+		 * Keeping weather 0 in the tracking map lets the system correctly
+		 * switch back to a Seirai weather profile when the player leaves
+		 * the shrine circle.
+		 */
+		if (inAsaseClearZone) {
+			if (!hadFallbackWeather
+					|| currentWeather != SEIRAI_WEATHER_DEFAULT) {
 
-			if (hadFallbackWeather && dragonspineOwnsWeather) {
-				this.seiraiFallbackWeatherByUid.remove(player.getUid());
-				return;
+				player.setWeather(
+						SEIRAI_WEATHER_DEFAULT,
+						ClimateType.CLIMATE_SUNNY);
 			}
 
-			if (allowDefaultReset && hadFallbackWeather) {
-				player.setWeather(SEIRAI_WEATHER_DEFAULT, ClimateType.CLIMATE_SUNNY);
-				this.seiraiFallbackWeatherByUid.remove(player.getUid());
-			}
+			this.seiraiFallbackWeatherByUid.put(
+					player.getUid(),
+					SEIRAI_WEATHER_DEFAULT);
+
 			return;
 		}
 
-		if (!hadFallbackWeather || desiredWeather != currentWeather) {
-			player.setWeather(desiredWeather, ClimateType.CLIMATE_SUNNY);
-			this.seiraiFallbackWeatherByUid.put(player.getUid(), desiredWeather);
+		if (desiredWeather == SEIRAI_WEATHER_DEFAULT) {
+			boolean dragonspineOwnsWeather =
+					this.getDesiredDragonspineWeather(pos)
+							!= DRAGONSPINE_WEATHER_DEFAULT;
+
+			if (hadFallbackWeather && dragonspineOwnsWeather) {
+				this.seiraiFallbackWeatherByUid.remove(
+						player.getUid());
+
+				return;
+			}
+
+			/*
+			 * Preserve the existing behavior that resets the weather to
+			 * ID 0 when the player travels away from Seirai Island.
+			 */
+			if (allowDefaultReset && hadFallbackWeather) {
+				player.setWeather(
+						SEIRAI_WEATHER_DEFAULT,
+						ClimateType.CLIMATE_SUNNY);
+
+				this.seiraiFallbackWeatherByUid.remove(
+						player.getUid());
+			}
+
+			return;
+		}
+
+		if (!hadFallbackWeather
+				|| desiredWeather != currentWeather) {
+
+			player.setWeather(
+					desiredWeather,
+					ClimateType.CLIMATE_SUNNY);
+
+			this.seiraiFallbackWeatherByUid.put(
+					player.getUid(),
+					desiredWeather);
 		}
 	}
 	
