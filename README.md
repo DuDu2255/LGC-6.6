@@ -1,7 +1,7 @@
 # LunaGC-6.6.0 WIP
 
 ## Important note
-Might move my 6.0 changes to this, depends if I feel like it.
+This is an experimental 6.6 branch containing changes catered to fix some gameplay aspects related to farming and building characters for the heck of it.
 Protocol buffer definitions can be found on [GitLab]((https://gitlab.com/CarolBicsi/genshin-protocol)), including translations.
 
 ## Updated version of Grasscutters, with some new features implemented.
