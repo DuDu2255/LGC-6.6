@@ -205,6 +205,7 @@ public class EntityGadget extends EntityBaseGadget {
                     case RewardStatue -> new GadgetRewardStatue(this);
                     case Chest -> new GadgetChest(this);
                     case Gadget -> new GadgetObject(this);
+                    case ViewPoint -> new GadgetViewPoint(this);
                     default -> null;
                 };
     }
