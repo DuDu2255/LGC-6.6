@@ -649,21 +649,45 @@ public class Player implements PlayerHook, FieldFetch {
     }
 
     public void addExpDirectly(int gain) {
+        int currentExp = getExp();
+        int exp = currentExp + gain;
         int level = getLevel();
-        int exp = getExp();
         int reqExp = getExpRequired(level);
 
-        exp += gain;
+        var changeReason =
+            PropChangeReason.PropChangeReason_PROP_CHANGE_PLAYER_ADD_EXP;
 
         while (exp >= reqExp && reqExp > 0) {
             exp -= reqExp;
             level += 1;
             reqExp = getExpRequired(level);
 
-            this.setLevel(level);
+            // Set level each time to allow level-up specific logic to run.
+            if (!this.setLevel(level)) return;
+
+            // This ensures the number of gained exp is correct
+            // when the remaining exp is lower than the previous exp.
+            this.sendPacket(
+                new PacketPlayerPropChangeReasonNotify(
+                        this,
+                        PlayerProperty.PROP_PLAYER_LEVEL,
+                        level - 1,
+                        level,
+                        changeReason));
+
+            changeReason =
+                    PropChangeReason.PropChangeReason_PROP_CHANGE_AVATAR_UPGRADE;
         }
 
-        this.setProperty(PlayerProperty.PROP_PLAYER_EXP, exp);
+        if (this.setProperty(PlayerProperty.PROP_PLAYER_EXP, exp)) {
+            this.sendPacket(
+                    new PacketPlayerPropChangeReasonNotify(
+                            this,
+                            PlayerProperty.PROP_PLAYER_EXP,
+                            currentExp,
+                            exp,
+                            changeReason));
+        }
     }
 
     private void updateWorldLevel() {
@@ -1519,19 +1543,20 @@ public class Player implements PlayerHook, FieldFetch {
         if (min <= value && value <= max) {
             this.properties.put(prop.getId(), value);
             if (sendPacket) {
-
-                switch (prop) {
-                    case PROP_PLAYER_EXP -> this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value,
-                        PropChangeReason.PropChangeReason_PROP_CHANGE_PLAYER_ADD_EXP));
-                    case PROP_PLAYER_LEVEL -> this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value,
-                        PropChangeReason.PropChangeReason_PROP_CHANGE_LEVELUP));
-                    case PROP_MAX_STAMINA -> this.sendPacket(new PacketPlayerPropChangeReasonNotify(this, prop, currentValue, value,
-                        PropChangeReason.PropChangeReason_PROP_CHANGE_CITY_LEVELUP));
-
-                }
-
+                // Notify the client about the player property change.
+                // For cb1 clients we probably need to send
+                // PlayerPropChangeNotify instead. TODO: verify
                 this.sendPacket(new PacketPlayerPropNotify(this, prop));
-                this.sendPacket(new PacketPlayerPropChangeNotify(this, prop, value - currentValue));
+
+                if (prop == PlayerProperty.PROP_MAX_STAMINA) {
+                    this.sendPacket(
+                            new PacketPlayerPropChangeReasonNotify(
+                                    this,
+                                    prop,
+                                    currentValue,
+                                    value,
+                                    PropChangeReason.PropChangeReason_PROP_CHANGE_CITY_LEVELUP));
+                }
             }
             return true;
         } else {
