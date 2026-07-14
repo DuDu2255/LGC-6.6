@@ -117,6 +117,13 @@ public class PlayerCodex {
                         });
     }
 
+    public void checkBook(int bookId) {
+        if (this.getUnlockedBook().add(bookId)) {
+            this.player.save();
+            this.player.sendPacket(new PacketCodexDataUpdateNotify(5, bookId));
+        }
+    }
+
     @Deprecated // Maybe remove this if we ever stop caring about older dbs
     private void fixReliquaries() {
         // Migrate older database entries which were using non-canonical forms of itemIds

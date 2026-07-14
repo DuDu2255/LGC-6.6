@@ -14,6 +14,7 @@ public class ItemUseUnlockCodex extends ItemUseInt {
 
     @Override
     public boolean useItem(UseItemParams params) {
-        return false;
+        params.player.getCodex().checkBook(this.i);
+        return true;
     }
 }
