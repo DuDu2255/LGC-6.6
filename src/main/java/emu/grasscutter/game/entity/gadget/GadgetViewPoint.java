@@ -5,7 +5,9 @@ import emu.grasscutter.data.excels.codex.CodexViewpointData;
 import emu.grasscutter.game.entity.EntityGadget;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.net.proto.GadgetInteractReqOuterClass.GadgetInteractReq;
+import emu.grasscutter.net.proto.InteractTypeOuterClass.InteractType;
 import emu.grasscutter.net.proto.SceneGadgetInfoOuterClass.SceneGadgetInfo;
+import emu.grasscutter.server.packet.send.PacketGadgetInteractRsp;
 
 public final class GadgetViewPoint extends GadgetContent {
     public GadgetViewPoint(EntityGadget gadget) {
@@ -25,7 +27,13 @@ public final class GadgetViewPoint extends GadgetContent {
         }
 
         player.getCodex().checkUnlockedViewPoint(viewpoint);
-        return true;
+
+        player.sendPacket(
+                new PacketGadgetInteractRsp(
+                        getGadget(),
+                        InteractType.InteractType_INTERACT_VIEW));
+
+        return false;
     }
 
     @Override
