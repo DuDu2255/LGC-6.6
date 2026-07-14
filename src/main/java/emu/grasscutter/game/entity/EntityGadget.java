@@ -258,9 +258,11 @@ public class EntityGadget extends EntityBaseGadget {
                         new ScriptArgs(this.getGroupId(), EventType.EVENT_ANY_GADGET_DIE, this.getConfigId()));
 
         SceneGroupInstance groupInstance =
-                getScene().getScriptManager().getGroupInstanceById(this.getGroupId());
-        if (groupInstance != null && metaGadget != null)
+        getScene().getScriptManager().getGroupInstanceById(this.getGroupId());
+
+        if (groupInstance != null && metaGadget != null && metaGadget.isOneoff) {
             groupInstance.getDeadEntities().add(metaGadget.config_id);
+        }
     }
 
     public boolean startPlatform() {
