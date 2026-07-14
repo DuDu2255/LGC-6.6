@@ -5,6 +5,7 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.GameDepot;
 import emu.grasscutter.data.binout.SceneNpcBornEntry;
 import emu.grasscutter.data.binout.routes.Route;
+import emu.grasscutter.data.binout.config.ConfigEntityGadget;
 import emu.grasscutter.data.excels.ItemData;
 import emu.grasscutter.data.excels.codex.CodexAnimalData;
 import emu.grasscutter.data.excels.monster.MonsterData;
@@ -36,6 +37,7 @@ import emu.grasscutter.net.proto.VisionTypeOuterClass.VisionType;
 import emu.grasscutter.scripts.SceneIndexManager;
 import emu.grasscutter.scripts.SceneScriptManager;
 import emu.grasscutter.scripts.constants.EventType;
+import emu.grasscutter.scripts.constants.ScriptGadgetState;
 import emu.grasscutter.scripts.data.SceneBlock;
 import emu.grasscutter.scripts.data.SceneGroup;
 import emu.grasscutter.scripts.data.ScriptArgs;
@@ -201,6 +203,43 @@ public class Scene {
 	// -5% per second outside Subzero Climate.
 	private static final int SHEER_COLD_GAIN_PER_SECOND = 100;
 	private static final int SHEER_COLD_DRAIN_PER_SECOND = 500;
+	private static final int SHEER_COLD_WARMTH_DRAIN_PER_SECOND = 2500;
+
+	private static final float SHEER_COLD_GADGET_WARMTH_RADIUS = 8.0f;
+	private static final float SHEER_COLD_SCENE_POINT_WARMTH_RADIUS = 10.0f;
+
+	/*
+	 * Confirmed by REL6.6 runtime probes:
+	 * 70310015 = lit Dragonspine fire basin / campfire
+	 * 70310022 = lit Dragonspine bonfire ("Bornfires" in the internal name)
+	 * 70310023 = Frostbearing Tree invisible heat producer
+	 */
+	private static final Set<Integer> DRAGONSPINE_CONFIRMED_WARMTH_GADGET_IDS =
+			Set.of(
+					70310015,
+					70310022,
+					70310023);
+
+	private static final Set<String> DRAGONSPINE_WARMTH_NAME_HINTS = Set.of(
+			"campfire",
+			"bonfire",
+			"firebasin",
+			"bornfires",
+			"cookpot",
+			"cooking",
+			"torch",
+			"brazier",
+			"heatsource",
+			"heat_source",
+			"invisibleheat",
+			"heat_producer",
+			"warming",
+			"seelie",
+			"warmseelie",
+			"warm_seelie",
+			"frostbearing",
+			"ancientbloodtree",
+			"dragonspinetree");
 
 	private final Map<Integer, Long> sheerColdLastUpdateByUid =
         	new ConcurrentHashMap<>();
@@ -2758,126 +2797,276 @@ public class Scene {
 	}
 
 	private void updateDragonspineClimate(Player player) {
-    	if (player == null) {
-        	return;
-    	}
+		if (player == null) {
+			return;
+		}
 
-    	int uid = player.getUid();
-    	long now = System.currentTimeMillis();
+		int uid = player.getUid();
+		long now = System.currentTimeMillis();
 
-    	Long lastUpdate = this.sheerColdLastUpdateByUid.put(uid, now);
+		Long lastUpdate = this.sheerColdLastUpdateByUid.put(uid, now);
 
-    	if (lastUpdate == null) {
-        	return;
-    	}
+		if (lastUpdate == null) {
+			return;
+		}
 
-    	float elapsedSeconds = (now - lastUpdate) / 1000.0f;
+		/*
+		 * PlayerSetPauseReq already propagates the pause state to World, Player and Scene.
+		 * Keep refreshing lastUpdate while paused so the climate loop cannot deal queued
+		 * damage or meter changes immediately after the player closes a menu.
+		 */
+		if (this.isPaused || player.isPaused() || this.getWorld().isPaused()) {
+			return;
+		}
 
-    	if (elapsedSeconds <= 0.0f) {
-        	return;
-    	}
+		float elapsedSeconds = (now - lastUpdate) / 1000.0f;
 
-    	elapsedSeconds = Math.min(elapsedSeconds, 1.0f);
+		if (elapsedSeconds <= 0.0f) {
+			return;
+		}
 
-    	boolean inSubzeroClimate =
-            this.getId() == DRAGONSPINE_SCENE_ID
-                    && this.isInDragonspineWeatherZone(player.getPosition());
+		elapsedSeconds = Math.min(elapsedSeconds, 1.0f);
 
-    	int current =
-            player.getProperty(PlayerProperty.PROP_CUR_CLIMATE_METER);
+		boolean inSubzeroClimate =
+				this.getId() == DRAGONSPINE_SCENE_ID
+						&& this.isInDragonspineWeatherZone(player.getPosition());
 
-    	float preciseMeter =
-            this.sheerColdMeterByUid.getOrDefault(
-                    uid,
-                    (float) current);
+		boolean nearWarmthSource =
+				inSubzeroClimate && this.isNearDragonspineWarmthSource(player);
 
-    	float nextMeter;
+		int current = player.getProperty(PlayerProperty.PROP_CUR_CLIMATE_METER);
 
-    	if (inSubzeroClimate) {
-        	player.setProperty(
-                PlayerProperty.PROP_CUR_CLIMATE_TYPE,
-                1,
-                true);
+		float preciseMeter =
+				this.sheerColdMeterByUid.getOrDefault(uid, (float) current);
 
-        player.setProperty(
-                PlayerProperty.PROP_CUR_CLIMATE_AREA_CLIMATE_TYPE,
-                1,
-                true);
+		float nextMeter;
 
-        		nextMeter =
-                Math.min(
-                        preciseMeter
-                                + SHEER_COLD_GAIN_PER_SECOND * elapsedSeconds,
-                        SHEER_COLD_MAX);
-    		} else {
-        		nextMeter =
-                Math.max(
-                        preciseMeter
-                                - SHEER_COLD_DRAIN_PER_SECOND * elapsedSeconds,
-                        0.0f);
+		if (inSubzeroClimate) {
+			player.setProperty(PlayerProperty.PROP_CUR_CLIMATE_TYPE, 1, true);
+			player.setProperty(PlayerProperty.PROP_CUR_CLIMATE_AREA_CLIMATE_TYPE, 1, true);
 
-        if (nextMeter <= 0.0f) {
-            player.setProperty(
-                    PlayerProperty.PROP_CUR_CLIMATE_TYPE,
-                    0,
-                    true);
+			if (nearWarmthSource) {
+				nextMeter =
+						Math.max(
+								preciseMeter
+										- SHEER_COLD_WARMTH_DRAIN_PER_SECOND * elapsedSeconds,
+								0.0f);
+			} else {
+				nextMeter =
+						Math.min(
+								preciseMeter
+										+ SHEER_COLD_GAIN_PER_SECOND * elapsedSeconds,
+								SHEER_COLD_MAX);
+			}
+		} else {
+			nextMeter =
+					Math.max(
+							preciseMeter
+									- SHEER_COLD_DRAIN_PER_SECOND * elapsedSeconds,
+							0.0f);
 
-            player.setProperty(
-                    PlayerProperty.PROP_CUR_CLIMATE_AREA_CLIMATE_TYPE,
-                    0,
-                    true);
-        	}
-    	}
+			if (nextMeter <= 0.0f) {
+				player.setProperty(PlayerProperty.PROP_CUR_CLIMATE_TYPE, 0, true);
+				player.setProperty(PlayerProperty.PROP_CUR_CLIMATE_AREA_CLIMATE_TYPE, 0, true);
+			}
+		}
 
-    	this.sheerColdMeterByUid.put(uid, nextMeter);
+		this.sheerColdMeterByUid.put(uid, nextMeter);
 
-    	int next = Math.round(nextMeter);
+		int next = Math.round(nextMeter);
 
-    	if (next != current) {
-        	player.setProperty(
-                PlayerProperty.PROP_CUR_CLIMATE_METER,
-                next,
-                true);
-        }
+		if (next != current) {
+			player.setProperty(PlayerProperty.PROP_CUR_CLIMATE_METER, next, true);
+		}
 
-    	if (next >= SHEER_COLD_MAX) {
-    		this.applySheerColdDamage(player);
-    	} else {
-        	this.sheerColdLastDamageByUid.remove(uid);
-    	}
+		if (next >= SHEER_COLD_MAX) {
+			this.applySheerColdDamage(player);
+		} else {
+			this.sheerColdLastDamageByUid.remove(uid);
+		}
+	}
+
+	private boolean isNearDragonspineWarmthSource(Player player) {
+		Position playerPos = player.getPosition();
+
+		if (playerPos == null) {
+			return false;
+		}
+
+		if (this.isNearDragonspineWarmScenePoint(playerPos)) {
+			return true;
+		}
+
+		for (GameEntity entity : this.getEntities().values()) {
+			if (!(entity instanceof EntityBaseGadget gadget)
+					|| !entity.isAlive()
+					|| gadget.getPosition() == null
+					|| playerPos.computeDistance(gadget.getPosition())
+							> SHEER_COLD_GADGET_WARMTH_RADIUS) {
+				continue;
+			}
+
+			if (!this.isActiveDragonspineWarmthGadget(gadget)) {
+				continue;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean isNearDragonspineWarmScenePoint(Position playerPos) {
+		List<Integer> pointIds = GameData.getScenePointsPerScene().get(this.getId());
+
+		if (pointIds == null || pointIds.isEmpty()) {
+			return false;
+		}
+
+		for (int pointId : pointIds) {
+			var entry = GameData.getScenePointEntryById(this.getId(), pointId);
+
+			if (entry == null || entry.getPointData() == null) {
+				continue;
+			}
+
+			var pointData = entry.getPointData();
+			String pointType = pointData.getType();
+
+			if (pointType == null) {
+				continue;
+			}
+
+			String normalizedType = pointType.toLowerCase(Locale.ROOT);
+
+			/*
+			 * SceneTransPoint covers normal Teleport Waypoints in the bin output.
+			 * Keep the Statue check separate in case this resource set labels statues
+			 * with a dedicated point type.
+			 */
+			if (!normalizedType.contains("transpoint")
+					&& !normalizedType.contains("statue")) {
+				continue;
+			}
+
+			Position pointPos =
+					pointData.getTranPos() != null
+							? pointData.getTranPos()
+							: pointData.getPos();
+
+			if (pointPos != null
+					&& playerPos.computeDistance(pointPos)
+							<= SHEER_COLD_SCENE_POINT_WARMTH_RADIUS) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private boolean isActiveDragonspineWarmthGadget(EntityBaseGadget gadget) {
+		int state = 0;
+		ConfigEntityGadget configGadget = null;
+		var gadgetData = GameData.getGadgetDataMap().get(gadget.getGadgetId());
+
+		if (gadget instanceof EntityGadget serverGadget) {
+			state = serverGadget.getState();
+			configGadget = serverGadget.getConfigGadget();
+		} else if (gadget instanceof EntityClientGadget clientGadget) {
+			state = clientGadget.getGadgetState();
+			configGadget = clientGadget.getConfigGadget();
+		}
+
+		/* GearStop is the normal inactive state for braziers and similar mechanisms. */
+		if (state == ScriptGadgetState.GearStop) {
+			return false;
+		}
+
+		if (DRAGONSPINE_CONFIRMED_WARMTH_GADGET_IDS.contains(gadget.getGadgetId())) {
+			return true;
+		}
+
+		StringBuilder descriptor = new StringBuilder();
+
+		if (gadgetData != null) {
+			this.appendWarmthDescriptor(descriptor, gadgetData.getJsonName());
+			this.appendWarmthDescriptor(descriptor, gadgetData.getItemJsonName());
+
+			if (gadgetData.getTags() != null) {
+				for (String tag : gadgetData.getTags()) {
+					this.appendWarmthDescriptor(descriptor, tag);
+				}
+			}
+		}
+
+		if (configGadget != null && configGadget.getAbilities() != null) {
+			configGadget
+					.getAbilities()
+					.forEach(
+							ability -> {
+								this.appendWarmthDescriptor(descriptor, ability.getAbilityName());
+								this.appendWarmthDescriptor(descriptor, ability.getAbilityID());
+								this.appendWarmthDescriptor(descriptor, ability.getAbilityOverride());
+							});
+		}
+
+		String normalized = descriptor.toString().toLowerCase(Locale.ROOT);
+
+		for (String hint : DRAGONSPINE_WARMTH_NAME_HINTS) {
+			if (normalized.contains(hint)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private void appendWarmthDescriptor(StringBuilder descriptor, String value) {
+		if (value == null || value.isBlank()) {
+			return;
+		}
+
+		if (!descriptor.isEmpty()) {
+			descriptor.append(' ');
+		}
+
+		descriptor.append(value);
 	}
 
 	private void applySheerColdDamage(Player player) {
-    	int uid = player.getUid();
-    	int now = (int) (System.currentTimeMillis() / 1000L);
+		if (player == null
+				|| this.isPaused
+				|| player.isPaused()
+				|| this.getWorld().isPaused()) {
+			return;
+		}
 
-    	int lastDamage =
-            this.sheerColdLastDamageByUid.getOrDefault(uid, now - 1);
+		int uid = player.getUid();
+		int now = (int) (System.currentTimeMillis() / 1000L);
 
-    	if (now - lastDamage < 1) {
-        	return;
-    	}
+		int lastDamage = this.sheerColdLastDamageByUid.getOrDefault(uid, now - 1);
 
-    	this.sheerColdLastDamageByUid.put(uid, now);
+		if (now - lastDamage < 1) {
+			return;
+		}
 
-    	var avatar = player.getTeamManager().getCurrentAvatarEntity();
+		this.sheerColdLastDamageByUid.put(uid, now);
 
-    	if (avatar == null || avatar.isDead()) {
-        	return;
-    	}
+		var avatar = player.getTeamManager().getCurrentAvatarEntity();
 
-    	float maxHp =
-            avatar.getFightProperty(
-                    FightProperty.FIGHT_PROP_MAX_HP);
+		if (avatar == null || avatar.isDead()) {
+			return;
+		}
 
-    	float damage = maxHp * 0.01f + 150.0f;
+		float maxHp = avatar.getFightProperty(FightProperty.FIGHT_PROP_MAX_HP);
+		float damage = maxHp * 0.01f + 150.0f;
 
-    	avatar.damage(
-            damage,
-            PropChangeReason.PropChangeReason_PROP_CHANGE_ABILITY,
-            ChangeHpReason.ChangeHpReason_CHANGE_HP_SUB_ABILITY);
+		avatar.damage(
+				damage,
+				PropChangeReason.PropChangeReason_PROP_CHANGE_ABILITY,
+				ChangeHpReason.ChangeHpReason_CHANGE_HP_SUB_ABILITY);
 	}
-	
+
 	private boolean isInCryoHypostasisWeatherSensitiveZone(Position pos) {
 		return this.isNear2d(
 				pos,
@@ -3510,5 +3699,4 @@ private void resetOceanidFallbackWeather() {
 			}
 		}
 	}
-
 }
