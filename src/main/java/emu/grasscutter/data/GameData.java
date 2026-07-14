@@ -206,6 +206,10 @@ public final class GameData {
             new Int2ObjectOpenHashMap<>();
 
     @Getter
+    private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataIdMap =
+            new Int2ObjectOpenHashMap<>();
+
+    @Getter
     private static final Int2ObjectMap<CombineData> combineDataMap = new Int2ObjectOpenHashMap<>();
 
     @Getter
@@ -508,6 +512,8 @@ public final class GameData {
             new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<CodexWeaponData> codexWeaponDataMap =
             new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<CodexViewpointData> codexViewpointDataMap =
+            new Int2ObjectOpenHashMap<>();
 
     @Getter @Setter private static ConfigGlobalCombat configGlobalCombat = null;
 
@@ -659,6 +665,10 @@ public final class GameData {
     }
 
     // Generic getter
+    public static CodexViewpointData getViewCodexByGroupConfig(int groupId, int configId) {
+        return codexViewpointDataIdMap.get(CodexViewpointData.getViewpointId(groupId, configId));
+    }
+
     public static Int2ObjectMap<?> getMapByResourceDef(Class<?> resourceDefinition) {
         Int2ObjectMap<?> map = null;
 
