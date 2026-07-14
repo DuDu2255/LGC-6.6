@@ -248,26 +248,51 @@ public class Scene {
         	new ConcurrentHashMap<>();
 
 	/*
-	 * Dragonspine regional fallback centers.
+	 * Main Dragonspine perimeter in the X/Z plane.
+	 *
+	 * These points were sampled around the mountain's weather boundary and are
+	 * arranged continuously around the perimeter. Y is intentionally ignored so the same horizontal
+	 * boundary applies at every elevation; the summit weather is still selected separately by DRAGONSPINE_PEAK_MIN_Y.
+	 *
+	 * A perimeter polygon is used instead of several overlapping circles. This
+	 * removes the gaps between old circles and avoids their weather spill into
+	 * nearby Mondstadt/Liyue terrain.
 	 */
-	private static final Position DRAGONSPINE_CORE_POS =
-			new Position(1150.0f, 300.0f, -950.0f);
-
-	private static final Position DRAGONSPINE_OUTSKIRTS_POS =
-			new Position(1460.2603f, 268.03598f, -573.91376f);
-
-	private static final Position DRAGONSPINE_WATER_OUTSKIRTS_POS =
-			new Position(826.83826f, 199.61209f, -1335.8583f);
-
-	private static final Position DRAGONSPINE_LIYUE_SIDE_WAYPOINT_POS =
-			new Position(860.82733f, 326.54297f, -486.15005f);
-
-	/*
-	 * Broader Dragonspine area around the Cryo Hypostasis side.
-	 * This receives the ordinary 2022 weather outside the arena.
-	 */
-	private static final Position DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_POS =
-			new Position(1236.6396f, 293.92908f, -556.36945f);
+	private static final double[][] DRAGONSPINE_WEATHER_PERIMETER_XZ = {
+			{556.2268, -790.966},
+			{595.8846, -974.2335},
+			{499.84894, -1207.7948},
+			{831.9527, -1391.7156},
+			{1011.6961, -1356.859},
+			{1081.2991, -1340.9827},
+			{1163.5707, -1266.6521},
+			{1246.9128, -1248.8917},
+			{1280.1598, -1237.4648},
+			{1403.036, -1157.1901},
+			{1549.2825, -1036.5328},
+			{1561.4319, -1000.49426},
+			{1603.198, -953.9342},
+			{1566.95, -897.82227},
+			{1541.3408, -755.0368},
+			{1535.5869, -635.9338},
+			{1510.0792, -557.6269},
+			{1506.585, -512.81573},
+			{1496.8411, -461.16733},
+			{1431.2866, -438.4074},
+			{1428.5781, -355.90057},
+			{1266.4911, -363.1467},
+			{1133.2083, -321.52982},
+			{1064.3125, -334.4753},
+			{968.65173, -357.35547},
+			{801.35126, -408.56415},
+			{729.0226, -516.79865},
+			{730.2262, -521.92706},
+			{691.1538, -549.14105},
+			{667.6577, -595.8496},
+			{646.4743, -621.7398},
+			{613.2624, -694.8876},
+			{571.9562, -773.13544}
+	};
 
 	/*
 	 * Actual Cryo Hypostasis arena center, based on the measured
@@ -275,16 +300,6 @@ public class Scene {
 	 */
 	private static final Position DRAGONSPINE_CRYO_HYPOSTASIS_ARENA_POS =
 			new Position(1171.1259f, 285.6235f, -547.84076f);
-
-	private static final Position DRAGONSPINE_NORTH_LIYUE_PASS_POS =
-			new Position(1161.982f, 270.2541f, -410.60388f);
-
-	private static final float DRAGONSPINE_CORE_RADIUS = 420.0f;
-	private static final float DRAGONSPINE_OUTSKIRTS_RADIUS = 90.0f;
-	private static final float DRAGONSPINE_WATER_OUTSKIRTS_RADIUS = 180.0f;
-	private static final float DRAGONSPINE_LIYUE_SIDE_RADIUS = 100.0f;
-	private static final float DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_RADIUS = 120.0f;
-	private static final float DRAGONSPINE_NORTH_LIYUE_PASS_RADIUS = 90.0f;
 
 	/*
 	 * Switch to the dedicated peak profile at or above this height.
@@ -2770,30 +2785,39 @@ public class Scene {
 	}
 
 	private boolean isInDragonspineWeatherZone(Position pos) {
-		return this.isNear2d(
-						pos,
-						DRAGONSPINE_CORE_POS,
-						DRAGONSPINE_CORE_RADIUS)
-				|| this.isNear2d(
-						pos,
-						DRAGONSPINE_OUTSKIRTS_POS,
-						DRAGONSPINE_OUTSKIRTS_RADIUS)
-				|| this.isNear2d(
-						pos,
-						DRAGONSPINE_WATER_OUTSKIRTS_POS,
-						DRAGONSPINE_WATER_OUTSKIRTS_RADIUS)
-				|| this.isNear2d(
-						pos,
-						DRAGONSPINE_LIYUE_SIDE_WAYPOINT_POS,
-						DRAGONSPINE_LIYUE_SIDE_RADIUS)
-				|| this.isNear2d(
-						pos,
-						DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_POS,
-						DRAGONSPINE_CRYO_HYPOSTASIS_SIDE_RADIUS)
-				|| this.isNear2d(
-						pos,
-						DRAGONSPINE_NORTH_LIYUE_PASS_POS,
-						DRAGONSPINE_NORTH_LIYUE_PASS_RADIUS);
+		if (pos == null) {
+			return false;
+		}
+
+		/*
+		 * Standard ray-casting point-in-polygon test using only X and Z.
+		 * The comparison form avoids division by zero for horizontal edges.
+		 */
+		double x = pos.getX();
+		double z = pos.getZ();
+		boolean inside = false;
+
+		for (int i = 0, j = DRAGONSPINE_WEATHER_PERIMETER_XZ.length - 1;
+				i < DRAGONSPINE_WEATHER_PERIMETER_XZ.length;
+				j = i++) {
+
+			double xi = DRAGONSPINE_WEATHER_PERIMETER_XZ[i][0];
+			double zi = DRAGONSPINE_WEATHER_PERIMETER_XZ[i][1];
+			double xj = DRAGONSPINE_WEATHER_PERIMETER_XZ[j][0];
+			double zj = DRAGONSPINE_WEATHER_PERIMETER_XZ[j][1];
+
+			boolean crossesZ = (zi > z) != (zj > z);
+
+			if (crossesZ) {
+				double edgeX = (xj - xi) * (z - zi) / (zj - zi) + xi;
+
+				if (x < edgeX) {
+					inside = !inside;
+				}
+			}
+		}
+
+		return inside;
 	}
 
 	private void updateDragonspineClimate(Player player) {
@@ -2982,6 +3006,10 @@ public class Scene {
 			return false;
 		}
 
+		/*
+		 * Use exact IDs for sources confirmed by the runtime probe. This avoids
+		 * depending on localized/display terminology or inconsistent internal names.
+		 */
 		if (DRAGONSPINE_CONFIRMED_WARMTH_GADGET_IDS.contains(gadget.getGadgetId())) {
 			return true;
 		}
