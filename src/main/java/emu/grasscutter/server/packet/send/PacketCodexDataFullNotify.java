@@ -88,6 +88,14 @@ public class PacketCodexDataFullNotify extends BasePacket {
                                         .addAllHaveViewedList(Collections.singleton(true));
                             }
                         });
+        player
+                .getCodex()
+                .getUnlockedBook()
+                .forEach(
+                        book ->
+                                bookTypeData
+                                        .addCodexIdList(book)
+                                        .addAllHaveViewedList(Collections.singleton(true)));
 
         player
                 .getCodex()
