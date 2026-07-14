@@ -99,6 +99,15 @@ public class PacketCodexDataFullNotify extends BasePacket {
 
         player
                 .getCodex()
+                .getUnlockedView()
+                .forEach(
+                        view ->
+                                viewTypeData
+                                        .addCodexIdList(view)
+                                        .addAllHaveViewedList(Collections.singleton(true)));
+
+        player
+                .getCodex()
                 .getUnlockedReliquarySuitCodex()
                 .forEach(
                         reliquarySuit -> {

@@ -3,6 +3,7 @@ package emu.grasscutter.game.player;
 import dev.morphia.annotations.*;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.excels.codex.CodexAnimalData;
+import emu.grasscutter.data.excels.codex.CodexViewpointData;
 import emu.grasscutter.game.entity.*;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.server.packet.send.PacketCodexDataUpdateNotify;
@@ -115,6 +116,13 @@ public class PlayerCodex {
                             this.player.save();
                             this.player.sendPacket(new PacketCodexDataUpdateNotify(8, id));
                         });
+    }
+
+    public void checkUnlockedViewPoint(CodexViewpointData viewpoint) {
+        if (this.getUnlockedView().add(viewpoint.getId())) {
+            this.player.save();
+            this.player.sendPacket(new PacketCodexDataUpdateNotify(7, viewpoint.getId()));
+        }
     }
 
     public void checkBook(int bookId) {
