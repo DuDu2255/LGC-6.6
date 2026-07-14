@@ -38,7 +38,7 @@ public class ItemUseAction {
                 // Unlock recipes - TODO: allow scheduling packets for after recipe is removed
             case ITEM_USE_UNLOCK_COMBINE -> new ItemUseUnlockCombine(useParam);
             case ITEM_USE_UNLOCK_CODEX -> new ItemUseUnlockCodex(
-                    useParam); // TODO: No backend for this yet
+                    useParam); // Implemented
             case ITEM_USE_UNLOCK_COOK_RECIPE -> new ItemUseUnlockCookRecipe(useParam);
             case ITEM_USE_UNLOCK_FORGE -> new ItemUseUnlockForge(useParam);
             case ITEM_USE_UNLOCK_FURNITURE_FORMULA -> new ItemUseUnlockFurnitureFormula(useParam);
