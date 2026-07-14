@@ -689,7 +689,7 @@ public class Player implements PlayerHook, FieldFetch {
                             changeReason));
         }
     }
-
+    
     private void updateWorldLevel() {
         int currentWorldLevel = this.getWorldLevel();
         int currentLevel = this.getLevel();
@@ -1520,8 +1520,20 @@ public class Player implements PlayerHook, FieldFetch {
     public int getPropertyMax(PlayerProperty prop) {
         if (prop.isDynamicRange()) {
             return switch (prop) {
-                case PROP_CUR_SPRING_VOLUME -> getProperty(PlayerProperty.PROP_MAX_SPRING_VOLUME);
-                case PROP_CUR_PERSIST_STAMINA -> getProperty(PlayerProperty.PROP_MAX_STAMINA);
+                case PROP_CUR_SPRING_VOLUME ->
+                        getProperty(PlayerProperty.PROP_MAX_SPRING_VOLUME);
+
+                case PROP_CUR_PERSIST_STAMINA ->
+                        getProperty(PlayerProperty.PROP_MAX_STAMINA);
+
+                case PROP_CUR_CLIMATE_METER ->
+                        10000;
+
+                case PROP_CUR_CLIMATE_TYPE,
+                        PROP_CUR_CLIMATE_AREA_ID,
+                        PROP_CUR_CLIMATE_AREA_CLIMATE_TYPE ->
+                        Integer.MAX_VALUE;
+
                 default -> 0;
             };
         } else {

@@ -30,7 +30,8 @@ import emu.grasscutter.net.packet.BasePacket;
 import emu.grasscutter.net.proto.*;
 import emu.grasscutter.net.proto.AttackResultOuterClass.AttackResult;
 import emu.grasscutter.net.proto.ChangeHpDebtsReasonOuterClass;
-import emu.grasscutter.net.proto.PropChangeReasonOuterClass;
+import emu.grasscutter.net.proto.ChangeHpReasonOuterClass.ChangeHpReason;
+import emu.grasscutter.net.proto.PropChangeReasonOuterClass.PropChangeReason;
 import emu.grasscutter.net.proto.VisionTypeOuterClass.VisionType;
 import emu.grasscutter.scripts.SceneIndexManager;
 import emu.grasscutter.scripts.SceneScriptManager;
@@ -193,6 +194,20 @@ public class Scene {
 	private static final int DRAGONSPINE_WEATHER_PEAK = 2023;
 	private static final int DRAGONSPINE_WEATHER_CRYO_HYPOSTASIS = 2125;
 
+	private static final int SHEER_COLD_MAX = 10000;
+
+	// Retail baseline:
+	// +1% per second in Subzero Climate.
+	// -5% per second outside Subzero Climate.
+	private static final int SHEER_COLD_GAIN_PER_SECOND = 100;
+	private static final int SHEER_COLD_DRAIN_PER_SECOND = 500;
+
+	private final Map<Integer, Long> sheerColdLastUpdateByUid =
+        	new ConcurrentHashMap<>();
+
+	private final Map<Integer, Integer> sheerColdLastDamageByUid =
+        	new ConcurrentHashMap<>();
+
 	/*
 	 * Dragonspine regional fallback centers.
 	 */
@@ -313,6 +328,7 @@ public class Scene {
 	
 	private final Map<Integer, Float> oceanidFallbackVirtualHp = new ConcurrentHashMap<>();
 	private final Map<Integer, Float> oceanidFallbackVirtualMaxHp = new ConcurrentHashMap<>();
+	private final Map<Integer, Float> sheerColdMeterByUid = new ConcurrentHashMap<>();
 
     @Getter private GameEntity sceneEntity;
     @Getter private final ServerTaskScheduler scheduler;
@@ -967,6 +983,10 @@ public class Scene {
 			this.checkDragonspineFallbackWeather();
 			this.checkOceanidFallbackWeather();
 			this.checkOceanidFallbackEncounter();
+		}
+
+		for (Player player : this.getPlayers()) {
+			this.updateDragonspineClimate(player);
 		}
 
 
@@ -2631,13 +2651,13 @@ public class Scene {
 	}
 	
 	private void checkDragonspineFallbackWeather() {
-		if (this.getId() != DRAGONSPINE_SCENE_ID) {
-			return;
-		}
+    	if (this.getId() != DRAGONSPINE_SCENE_ID) {
+        	return;
+   		}
 
-		for (Player player : this.getPlayers()) {
-			this.applyDragonspineFallbackWeather(player, true);
-		}
+    	for (Player player : this.getPlayers()) {
+        	this.applyDragonspineFallbackWeather(player, true);
+    	}	
 	}
 
 	private void applyDragonspineFallbackWeather(Player player, boolean allowDefaultReset) {
@@ -2736,6 +2756,127 @@ public class Scene {
 						DRAGONSPINE_NORTH_LIYUE_PASS_POS,
 						DRAGONSPINE_NORTH_LIYUE_PASS_RADIUS);
 	}
+
+	private void updateDragonspineClimate(Player player) {
+    	if (player == null) {
+        	return;
+    	}
+
+    	int uid = player.getUid();
+    	long now = System.currentTimeMillis();
+
+    	Long lastUpdate = this.sheerColdLastUpdateByUid.put(uid, now);
+
+    	if (lastUpdate == null) {
+        	return;
+    	}
+
+    	float elapsedSeconds = (now - lastUpdate) / 1000.0f;
+
+    	if (elapsedSeconds <= 0.0f) {
+        	return;
+    	}
+
+    	elapsedSeconds = Math.min(elapsedSeconds, 1.0f);
+
+    	boolean inSubzeroClimate =
+            this.getId() == DRAGONSPINE_SCENE_ID
+                    && this.isInDragonspineWeatherZone(player.getPosition());
+
+    	int current =
+            player.getProperty(PlayerProperty.PROP_CUR_CLIMATE_METER);
+
+    	float preciseMeter =
+            this.sheerColdMeterByUid.getOrDefault(
+                    uid,
+                    (float) current);
+
+    	float nextMeter;
+
+    	if (inSubzeroClimate) {
+        	player.setProperty(
+                PlayerProperty.PROP_CUR_CLIMATE_TYPE,
+                1,
+                true);
+
+        player.setProperty(
+                PlayerProperty.PROP_CUR_CLIMATE_AREA_CLIMATE_TYPE,
+                1,
+                true);
+
+        		nextMeter =
+                Math.min(
+                        preciseMeter
+                                + SHEER_COLD_GAIN_PER_SECOND * elapsedSeconds,
+                        SHEER_COLD_MAX);
+    		} else {
+        		nextMeter =
+                Math.max(
+                        preciseMeter
+                                - SHEER_COLD_DRAIN_PER_SECOND * elapsedSeconds,
+                        0.0f);
+
+        if (nextMeter <= 0.0f) {
+            player.setProperty(
+                    PlayerProperty.PROP_CUR_CLIMATE_TYPE,
+                    0,
+                    true);
+
+            player.setProperty(
+                    PlayerProperty.PROP_CUR_CLIMATE_AREA_CLIMATE_TYPE,
+                    0,
+                    true);
+        	}
+    	}
+
+    	this.sheerColdMeterByUid.put(uid, nextMeter);
+
+    	int next = Math.round(nextMeter);
+
+    	if (next != current) {
+        	player.setProperty(
+                PlayerProperty.PROP_CUR_CLIMATE_METER,
+                next,
+                true);
+        }
+
+    	if (next >= SHEER_COLD_MAX) {
+    		this.applySheerColdDamage(player);
+    	} else {
+        	this.sheerColdLastDamageByUid.remove(uid);
+    	}
+	}
+
+	private void applySheerColdDamage(Player player) {
+    	int uid = player.getUid();
+    	int now = (int) (System.currentTimeMillis() / 1000L);
+
+    	int lastDamage =
+            this.sheerColdLastDamageByUid.getOrDefault(uid, now - 1);
+
+    	if (now - lastDamage < 1) {
+        	return;
+    	}
+
+    	this.sheerColdLastDamageByUid.put(uid, now);
+
+    	var avatar = player.getTeamManager().getCurrentAvatarEntity();
+
+    	if (avatar == null || avatar.isDead()) {
+        	return;
+    	}
+
+    	float maxHp =
+            avatar.getFightProperty(
+                    FightProperty.FIGHT_PROP_MAX_HP);
+
+    	float damage = maxHp * 0.01f + 150.0f;
+
+    	avatar.damage(
+            damage,
+            PropChangeReason.PropChangeReason_PROP_CHANGE_ABILITY,
+            ChangeHpReason.ChangeHpReason_CHANGE_HP_SUB_ABILITY);
+	}
 	
 	private boolean isInCryoHypostasisWeatherSensitiveZone(Position pos) {
 		return this.isNear2d(
@@ -2750,7 +2891,7 @@ public class Scene {
 		}
 
 		for (Player player : this.getPlayers()) {
-			this.applyOceanidFallbackWeather(player, true);
+				this.applyOceanidFallbackWeather(player, true);
 		}
 	}
 
