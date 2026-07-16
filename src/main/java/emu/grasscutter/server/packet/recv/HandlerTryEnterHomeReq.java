@@ -1,5 +1,6 @@
 package emu.grasscutter.server.packet.recv;
 
+import emu.grasscutter.Grasscutter;
 import emu.grasscutter.game.home.GameHome;
 import emu.grasscutter.net.packet.Opcodes;
 import emu.grasscutter.net.packet.PacketHandler;
@@ -15,9 +16,36 @@ public class HandlerTryEnterHomeReq extends PacketHandler {
     @Override
     public void handle(GameSession session, byte[] header, byte[] payload) throws Exception {
         var req = TryEnterHomeReqOuterClass.TryEnterHomeReq.parseFrom(payload);
+        var player = session.getPlayer();
+
+        Grasscutter.getLogger()
+                .debug(
+                        "[TryEnterHome] uid={}, targetUid={}, targetPoint={}, "
+                                + "transferToSafePoint={}, transferToMainHousePoint={}, "
+                                + "currentSceneId={}, previousSceneId={}, currentRealmId={}, "
+                                + "realmList={}, payloadLength={}",
+                        player.getUid(),
+                        req.getTargetUid(),
+                        req.getTargetPoint(),
+                        req.getIsTransferToSafePoint(),
+                        req.getIsTransferToMainHousePoint(),
+                        player.getSceneId(),
+                        player.getPrevScene(),
+                        player.getCurrentRealmId(),
+                        player.getRealmList(),
+                        payload != null ? payload.length : 0);
+
         var targetPlayer = session.getServer().getPlayerByUid(req.getTargetUid(), true);
 
         if (targetPlayer == null || !GameHome.doesHomeExist(targetPlayer.getUid())) {
+            Grasscutter.getLogger()
+                    .warn(
+                            "[TryEnterHome] rejected: uid={}, generatedTargetUid={}, "
+                                    + "targetPlayerFound={}, homeExists={}",
+                            player.getUid(),
+                            req.getTargetUid(),
+                            targetPlayer != null,
+                            targetPlayer != null && GameHome.doesHomeExist(targetPlayer.getUid()));
             session.send(new PacketTryEnterHomeRsp());
             return;
         }

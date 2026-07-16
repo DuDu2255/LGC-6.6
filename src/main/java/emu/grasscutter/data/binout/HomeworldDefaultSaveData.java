@@ -12,7 +12,12 @@ public class HomeworldDefaultSaveData {
 
     @SerializedName(
             value = "homeBlockLists",
-            alternate = {"PKACPHDGGEI", "AKOLOBLHDFK", "KFHBFNPDJBE"})
+            alternate = {
+                "blockArrangementInfoList",
+                "PKACPHDGGEI",
+                "AKOLOBLHDFK",
+                "KFHBFNPDJBE"
+            })
     List<HomeBlock> homeBlockLists;
 
     @SerializedName(
@@ -27,23 +32,26 @@ public class HomeworldDefaultSaveData {
 
     @SerializedName(
             value = "djinPos",
-            alternate = {"CJAKHCIFHNP", "HHOLBNPIHEM"})
+            alternate = {"djinnPos", "CJAKHCIFHNP", "HHOLBNPIHEM"})
     Position djinPos;
 
     @SerializedName(
             value = "mainhouse",
-            alternate = {"AMDNOHPGKMI", "KNHCJKHCOAN"})
+            alternate = {"mainHouse", "AMDNOHPGKMI", "KNHCJKHCOAN"})
     HomeFurniture mainhouse;
 
     @SerializedName(
             value = "doorLists",
-            alternate = {"BHCPEAOPIDC", "NIHOJFEKFPG"})
+            alternate = {"doorList", "BHCPEAOPIDC", "NIHOJFEKFPG"})
     List<HomeFurniture> doorLists;
 
     @SerializedName(
             value = "stairLists",
-            alternate = {"AABEPENIFLN", "EPGELGEFJFK"})
+            alternate = {"stairList", "AABEPENIFLN", "EPGELGEFJFK"})
     List<HomeFurniture> stairLists;
+
+    @SerializedName(value = "tmpVersion", alternate = {"version"})
+    int tmpVersion;
 
     @Data
     @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -56,12 +64,21 @@ public class HomeworldDefaultSaveData {
 
         @SerializedName(
                 value = "furnitures",
-                alternate = {"NCIMIKKFLOH", "BEAPOFELABD"})
+                alternate = {
+                    "deployFurniureList",
+                    "deployFurnitureList",
+                    "NCIMIKKFLOH",
+                    "BEAPOFELABD"
+                })
         List<HomeFurniture> furnitures;
 
         @SerializedName(
                 value = "persistentFurnitures",
-                alternate = {"GJGNLIINBGB", "MLIODLGDFHJ"})
+                alternate = {
+                    "persistentFurnitureList",
+                    "GJGNLIINBGB",
+                    "MLIODLGDFHJ"
+                })
         List<HomeFurniture> persistentFurnitures;
     }
 
@@ -71,17 +88,33 @@ public class HomeworldDefaultSaveData {
 
         @SerializedName(
                 value = "id",
-                alternate = {"KMAAJJHPNBA", "FFLCGFGGGND", "ENHNGKJBJAB"})
+                alternate = {
+                    "furnitureId",
+                    "KMAAJJHPNBA",
+                    "FFLCGFGGGND",
+                    "ENHNGKJBJAB"
+                })
         int id;
 
         @SerializedName(
                 value = "pos",
-                alternate = {"JFKAHNCPDME", "BPCGGBKIAMG", "NGIEEIOLPPO"})
+                alternate = {
+                    "spawnPos",
+                    "JFKAHNCPDME",
+                    "BPCGGBKIAMG",
+                    "NGIEEIOLPPO"
+                })
         Position pos;
 
         @SerializedName(
                 value = "rot",
-                alternate = {"LKCKOOGFDBM", "HEOCEHKEBFM"})
+                alternate = {"spawnRot", "LKCKOOGFDBM", "HEOCEHKEBFM"})
         Position rot;
+
+        @SerializedName(value = "parentFurnitureIndex", alternate = {"parentIndex"})
+        int parentFurnitureIndex;
+
+        @SerializedName(value = "version", alternate = {"tmpVersion"})
+        int version;
     }
 }

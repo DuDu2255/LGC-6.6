@@ -27,7 +27,16 @@ public class HomeBlockItem {
         // create from default setting
         return HomeBlockItem.of()
                 .blockId(homeBlock.getBlockId())
-                .unlocked(homeBlock.getFurnitures() != null)
+                /*
+                 * Indoor room blocks are built almost entirely from
+                 * persistentFurnitureList. Treating only deploy furniture as
+                 * an unlock signal marks every mansion room as locked.
+                 */
+                .unlocked(
+                        (homeBlock.getFurnitures() != null
+                                        && !homeBlock.getFurnitures().isEmpty())
+                                || (homeBlock.getPersistentFurnitures() != null
+                                        && !homeBlock.getPersistentFurnitures().isEmpty()))
                 .deployFurnitureList(
                         homeBlock.getFurnitures() == null
                                 ? List.of()

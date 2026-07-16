@@ -45,11 +45,19 @@ public class HomeFurnitureItem implements HomeMarkPointProtoFactory {
     }
 
     public static HomeFurnitureItem parseFrom(HomeworldDefaultSaveData.HomeFurniture homeFurniture) {
+        if (homeFurniture == null) {
+            return HomeFurnitureItem.of()
+                    .spawnPos(new Position())
+                    .spawnRot(new Position())
+                    .build();
+        }
+
         return HomeFurnitureItem.of()
                 .furnitureId(homeFurniture.getId())
-                .parentFurnitureIndex(1)
+                .parentFurnitureIndex(homeFurniture.getParentFurnitureIndex())
                 .spawnPos(homeFurniture.getPos() == null ? new Position() : homeFurniture.getPos())
-                .spawnRot(new Position())
+                .spawnRot(homeFurniture.getRot() == null ? new Position() : homeFurniture.getRot())
+                .version(homeFurniture.getVersion())
                 .build();
     }
 

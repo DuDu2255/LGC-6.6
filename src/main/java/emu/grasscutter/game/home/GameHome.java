@@ -69,8 +69,13 @@ public class GameHome {
             home = GameHome.create(uid);
         }
 
-        home.reassignIfNull();
         home.fixMainHouseIfOld();
+        home.reassignIfNull();
+
+        if (home.repairPersistedDefaultStructures()) {
+            home.save();
+        }
+
         home.syncHomeAvatarCostume();
 
         return home;
@@ -92,22 +97,156 @@ public class GameHome {
                 .build();
     }
 
-    // avoid NPE caused by database remover.
+    // Avoid NPEs caused by old or partially removed database documents.
     private void reassignIfNull() {
-        this.getSceneMap().values().stream()
-                .map(HomeSceneItem::getBlockItems)
-                .map(Map::values)
-                .flatMap(Collection::stream)
-                .forEach(HomeBlockItem::reassignIfNull);
+        if (this.sceneMap == null) {
+            this.sceneMap = new ConcurrentHashMap<>();
+        }
+
+        if (this.mainHouseMap == null) {
+            this.mainHouseMap = new ConcurrentHashMap<>();
+        }
+
+        Stream.concat(this.sceneMap.values().stream(), this.mainHouseMap.values().stream())
+                .filter(Objects::nonNull)
+                .forEach(
+                        sceneItem -> {
+                            if (sceneItem.getBlockItems() == null) {
+                                sceneItem.setBlockItems(new HashMap<>());
+                            }
+
+                            sceneItem.reassignStructureListsIfNull();
+
+                            sceneItem.getBlockItems().values().stream()
+                                    .filter(Objects::nonNull)
+                                    .forEach(HomeBlockItem::reassignIfNull);
+                        });
+    }
+
+    /**
+     * Migrates Home structure metadata introduced after an existing Home document was created.
+     *
+     * <p>Older saved mansion scenes already contain the 27 persistent room-shell furniture
+     * entries, but they have every block stored as locked and do not contain the newly modeled
+     * door/stair lists. Because mainHouseMap uses computeIfAbsent, changing parseFrom() alone does
+     * not rebuild those existing MongoDB objects.
+     *
+     * <p>This migration only fills missing default structure data. It never replaces a non-empty
+     * player list, so future player furniture remains intact.
+     */
+    private boolean repairPersistedDefaultStructures() {
+        boolean changed = false;
+
+        var savedScenes =
+                Stream.concat(this.sceneMap.values().stream(), this.mainHouseMap.values().stream())
+                        .filter(Objects::nonNull)
+                        .toList();
+
+        for (var savedScene : savedScenes) {
+            var defaultData =
+                    GameData.getHomeworldDefaultSaveData().get(savedScene.getSceneId());
+
+            if (defaultData == null) {
+                continue;
+            }
+
+            var defaultScene =
+                    HomeSceneItem.parseFrom(defaultData, savedScene.getSceneId());
+
+            savedScene.reassignStructureListsIfNull();
+            defaultScene.reassignStructureListsIfNull();
+
+            int doorsAdded = 0;
+            int stairsAdded = 0;
+            int persistentFurnitureAdded = 0;
+            int blocksUnlocked = 0;
+            int blocksAdded = 0;
+
+            if (savedScene.getDoorList().isEmpty()
+                    && !defaultScene.getDoorList().isEmpty()) {
+                savedScene.setDoorList(new ArrayList<>(defaultScene.getDoorList()));
+                doorsAdded = defaultScene.getDoorList().size();
+                changed = true;
+            }
+
+            if (savedScene.getStairList().isEmpty()
+                    && !defaultScene.getStairList().isEmpty()) {
+                savedScene.setStairList(new ArrayList<>(defaultScene.getStairList()));
+                stairsAdded = defaultScene.getStairList().size();
+                changed = true;
+            }
+
+            if (savedScene.getBlockItems() == null) {
+                savedScene.setBlockItems(new HashMap<>());
+                changed = true;
+            }
+
+            for (var entry : defaultScene.getBlockItems().entrySet()) {
+                int blockId = entry.getKey();
+                var defaultBlock = entry.getValue();
+                var savedBlock = savedScene.getBlockItems().get(blockId);
+
+                defaultBlock.reassignIfNull();
+
+                if (savedBlock == null) {
+                    savedScene.getBlockItems().put(blockId, defaultBlock);
+                    blocksAdded++;
+                    changed = true;
+                    continue;
+                }
+
+                savedBlock.reassignIfNull();
+
+                if (savedBlock.getPersistentFurnitureList().isEmpty()
+                        && !defaultBlock.getPersistentFurnitureList().isEmpty()) {
+                    savedBlock.setPersistentFurnitureList(
+                            new ArrayList<>(defaultBlock.getPersistentFurnitureList()));
+                    persistentFurnitureAdded +=
+                            defaultBlock.getPersistentFurnitureList().size();
+                    changed = true;
+                }
+
+                boolean containsDefaultStructure =
+                        !savedBlock.getDeployFurnitureList().isEmpty()
+                                || !savedBlock.getPersistentFurnitureList().isEmpty()
+                                || !defaultBlock.getDeployFurnitureList().isEmpty()
+                                || !defaultBlock.getPersistentFurnitureList().isEmpty();
+
+                if (!savedBlock.isUnlocked() && containsDefaultStructure) {
+                    savedBlock.setUnlocked(true);
+                    blocksUnlocked++;
+                    changed = true;
+                }
+            }
+
+            if (doorsAdded > 0
+                    || stairsAdded > 0
+                    || persistentFurnitureAdded > 0
+                    || blocksUnlocked > 0
+                    || blocksAdded > 0) {
+                Grasscutter.getLogger()
+                        .info(
+                                "[HomeStructureRepair] ownerUid={}, sceneId={}, "
+                                        + "blocksUnlocked={}, blocksAdded={}, "
+                                        + "persistentFurnitureAdded={}, doorsAdded={}, stairsAdded={}",
+                                this.ownerUid,
+                                savedScene.getSceneId(),
+                                blocksUnlocked,
+                                blocksAdded,
+                                persistentFurnitureAdded,
+                                doorsAdded,
+                                stairsAdded);
+            }
+        }
+
+        return changed;
     }
 
     // Data fixer.
     private void fixMainHouseIfOld() {
         if (this.getMainHouseMap() == null) {
             Grasscutter.getLogger()
-                    .debug(
-                            "Player {}'s main house will be deleted due to GC update! (ps. sorry XD)",
-                            this.getPlayer().getUid());
+                    .debug("Reinitialized missing mainHouseMap for ownerUid={}", this.ownerUid);
             this.mainHouseMap = new ConcurrentHashMap<>(); // assign.
         }
 
@@ -143,7 +282,7 @@ public class GameHome {
                     var defaultItem = GameData.getHomeworldDefaultSaveData().get(sceneId);
                     if (defaultItem != null) {
                         Grasscutter.getLogger()
-                                .info("Set player {} home {} to initial setting", ownerUid, sceneId);
+                                .debug("Initialized default Home scene: ownerUid={}, sceneId={}", ownerUid, sceneId);
                     } else {
                         // Realm res missing bricks account, use default realm data to allow main house
                         defaultItem = GameData.getHomeworldDefaultSaveData().get(2001);
@@ -162,14 +301,20 @@ public class GameHome {
                             var roomSceneId = curHomeSceneItem.getRoomSceneId();
                             var defaultItem = GameData.getHomeworldDefaultSaveData().get(roomSceneId);
                             if (defaultItem == null) {
-                                Grasscutter.getLogger().info("defaultItem == null! returns Liyue style house.");
+                                Grasscutter.getLogger()
+                                        .warn(
+                                                "Missing default room arrangement for scene {}. "
+                                                        + "Falling back to scene 2202.",
+                                                roomSceneId);
                                 return HomeSceneItem.parseFrom(
                                         GameData.getHomeworldDefaultSaveData().get(2202), 2202); // Liyue style
                             }
 
                             Grasscutter.getLogger()
-                                    .info(
-                                            "Set player {} main house {} to initial setting", this.ownerUid, roomSceneId);
+                                    .debug(
+                                            "Initialized default main house: ownerUid={}, roomSceneId={}",
+                                            this.ownerUid,
+                                            roomSceneId);
                             return HomeSceneItem.parseFrom(defaultItem, roomSceneId);
                         });
     }

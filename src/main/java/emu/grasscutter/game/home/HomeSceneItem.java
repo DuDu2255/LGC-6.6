@@ -32,30 +32,89 @@ public class HomeSceneItem {
     Position djinnPos;
     int homeBgmId;
     HomeFurnitureItem mainHouse;
+    List<HomeFurnitureItem> doorList;
+    List<HomeFurnitureItem> stairList;
     int tmpVersion;
 
     public static HomeSceneItem parseFrom(HomeworldDefaultSaveData defaultItem, int sceneId) {
+        if (defaultItem == null) {
+            Grasscutter.getLogger()
+                    .error(
+                            "[HomeDefaultSave] Missing default arrangement for scene {}. "
+                                    + "Creating an empty scene item to avoid bricking the player account.",
+                            sceneId);
+
+            return HomeSceneItem.of()
+                    .sceneId(sceneId)
+                    .blockItems(new java.util.HashMap<>())
+                    .bornPos(new Position())
+                    .bornRot(new Position())
+                    .djinnPos(new Position())
+                    .doorList(List.of())
+                    .stairList(List.of())
+                    .build();
+        }
+
+        var homeBlocks =
+                defaultItem.getHomeBlockLists() == null
+                        ? List.<HomeworldDefaultSaveData.HomeBlock>of()
+                        : defaultItem.getHomeBlockLists();
+
+        if (homeBlocks.isEmpty()) {
+            Grasscutter.getLogger()
+                    .warn(
+                            "[HomeDefaultSave] Scene {} loaded with no home blocks. "
+                                    + "Check the HomeworldDefaultSave resource field mappings.",
+                            sceneId);
+        }
+
         return HomeSceneItem.of()
                 .sceneId(sceneId)
                 .blockItems(
-                        defaultItem.getHomeBlockLists().stream()
+                        homeBlocks.stream()
                                 .map(HomeBlockItem::parseFrom)
-                                .collect(Collectors.toMap(HomeBlockItem::getBlockId, y -> y)))
-                .bornPos(defaultItem.getBornPos())
+                                .collect(
+                                        Collectors.toMap(
+                                                HomeBlockItem::getBlockId,
+                                                block -> block,
+                                                (first, ignored) -> first)))
+                .bornPos(defaultItem.getBornPos() == null ? new Position() : defaultItem.getBornPos())
                 .bornRot(defaultItem.getBornRot() == null ? new Position() : defaultItem.getBornRot())
                 .djinnPos(defaultItem.getDjinPos() == null ? new Position() : defaultItem.getDjinPos())
                 .mainHouse(
                         defaultItem.getMainhouse() == null
                                 ? null
                                 : HomeFurnitureItem.parseFrom(defaultItem.getMainhouse()))
+                .doorList(parseFurnitureList(defaultItem.getDoorLists()))
+                .stairList(parseFurnitureList(defaultItem.getStairLists()))
+                .tmpVersion(defaultItem.getTmpVersion())
                 .build();
+    }
+
+    private static List<HomeFurnitureItem> parseFurnitureList(
+            List<HomeworldDefaultSaveData.HomeFurniture> furnitureList) {
+        if (furnitureList == null || furnitureList.isEmpty()) {
+            return List.of();
+        }
+
+        return furnitureList.stream().map(HomeFurnitureItem::parseFrom).toList();
+    }
+
+    public void reassignStructureListsIfNull() {
+        if (this.doorList == null) {
+            this.doorList = List.of();
+        }
+
+        if (this.stairList == null) {
+            this.stairList = List.of();
+        }
     }
 
     public void update(HomeSceneArrangementInfo arrangementInfo, Player owner) {
         for (var blockItem : arrangementInfo.getBlockArrangementInfoListList()) {
             var block = this.blockItems.get(blockItem.getBlockId());
             if (block == null) {
-                Grasscutter.getLogger().warn("Could not found the Home Block {}", blockItem.getBlockId());
+                Grasscutter.getLogger().warn("Could not find Home block {}", blockItem.getBlockId());
                 continue;
             }
             block.update(blockItem, owner);

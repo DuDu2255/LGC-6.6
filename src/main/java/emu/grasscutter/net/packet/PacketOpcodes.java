@@ -119,9 +119,9 @@ public final class PacketOpcodes {
     public static final int GetActivityInfoReq = 23363;
     public static final int GetActivityInfoRsp = 6055;
     public static final int ChangeGameTimeReq = 20114;
-	public static final int ChangeGameTimeRsp = 27622;
-	public static final int ClientSetGameTimeReq = 5329;
-	public static final int ClientSetGameTimeRsp = 5187;
+    public static final int ChangeGameTimeRsp = 27622;
+    public static final int ClientSetGameTimeReq = 5329;
+    public static final int ClientSetGameTimeRsp = 5187;
     public static final int EvtAiSyncSkillCdNotify = 1142;
     public static final int WorktopOptionNotify = 28149;
     public static final int GadgetStateNotify = 9894;
@@ -647,7 +647,7 @@ public final class PacketOpcodes {
     public static final int HomeAvatarTalkRsp = 8598;
     public static final int HomeGetBasicInfoReq = 1;
     public static final int HomeBasicInfoNotify = 492;
-    public static final int HomeChooseModuleReq = 1;
+    public static final int HomeChooseModuleReq = 24156;
     public static final int HomeChooseModuleRsp = 24344;
     public static final int HomeComfortInfoNotify = 24351;
     public static final int HomeModuleSeenReq = 1;
@@ -668,8 +668,8 @@ public final class PacketOpcodes {
     public static final int HomeGetArrangementInfoRsp = 22920;
     public static final int HomeUpdateArrangementInfoReq = 26770;
     public static final int HomeUpdateArrangementInfoRsp = 1;
-    public static final int HomeSceneJumpReq = 1;
-    public static final int HomeSceneJumpRsp = 1;
+    public static final int HomeSceneJumpReq = 5352;
+    public static final int HomeSceneJumpRsp = 5998;
     public static final int HomeGetOnlineStatusReq = 1;
     public static final int HomeGetOnlineStatusRsp = 3692;
     public static final int HomeKickPlayerReq = 3975;
@@ -682,7 +682,7 @@ public final class PacketOpcodes {
     public static final int HomeResourceTakeHomeCoinRsp = 22917;
     public static final int HomeSaveArrangementNoChangeReq = 28563;
     public static final int HomeSaveArrangementNoChangeRsp = 482;
-    public static final int HomeSceneInitFinishReq = 1;
+    public static final int HomeSceneInitFinishReq = 26751;
     public static final int HomeSceneInitFinishRsp = 1;
     public static final int HomeTransferReq = 29761;
     public static final int HomeTransferRsp = 1;

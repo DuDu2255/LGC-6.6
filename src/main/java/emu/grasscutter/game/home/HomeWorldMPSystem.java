@@ -1,10 +1,12 @@
 package emu.grasscutter.game.home;
 
+import emu.grasscutter.Grasscutter;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.EnterReason;
 import emu.grasscutter.game.world.Position;
 import emu.grasscutter.game.world.World;
 import emu.grasscutter.game.world.data.TeleportProperties;
+import emu.grasscutter.net.packet.PacketOpcodes;
 import emu.grasscutter.net.proto.*;
 import emu.grasscutter.server.event.player.PlayerEnterHomeEvent;
 import emu.grasscutter.server.event.player.PlayerLeaveHomeEvent;
@@ -188,9 +190,64 @@ public class HomeWorldMPSystem extends BaseGameSystem {
     }
 
     public boolean leaveCoop(Player player, int prevScene, Position pos) {
+        if (player == null) {
+            Grasscutter.getLogger().warn("[HomeExit] leaveCoop called with a null player");
+            return false;
+        }
 
-        for (var p : player.getWorld().getPlayers()) {
-            if (p.getSceneLoadState() != Player.SceneLoadState.LOADED) {
+        var sourceWorld = player.getWorld();
+
+        if (!(sourceWorld instanceof HomeWorld sourceHomeWorld)) {
+            Grasscutter.getLogger()
+                    .warn(
+                            "[HomeExit] Rejected Home exit because the active world is not a HomeWorld: "
+                                    + "uid={}, currentSceneId={}, worldClass={}",
+                            player.getUid(),
+                            player.getSceneId(),
+                            sourceWorld != null
+                                    ? sourceWorld.getClass().getSimpleName()
+                                    : "null");
+            return false;
+        }
+
+        Position destination =
+                pos != null
+                        ? pos.clone()
+                        : player.getPrevPosForHome() != null
+                                ? player.getPrevPosForHome().clone()
+                                : new Position();
+
+        Grasscutter.getLogger()
+                .debug(
+                        "[HomeExit] Begin leaveCoop: uid={}, requestedSceneId={}, "
+                                + "currentSceneId={}, previousSceneId={}, sceneLoadState={}, "
+                                + "peerId={}, sourceWorldClass={}, sourceHostUid={}, "
+                                + "destination={}, players={}",
+                        player.getUid(),
+                        prevScene,
+                        player.getSceneId(),
+                        player.getPrevScene(),
+                        player.getSceneLoadState(),
+                        player.getPeerId(),
+                        sourceHomeWorld.getClass().getSimpleName(),
+                        sourceHomeWorld.getHost() != null
+                                ? sourceHomeWorld.getHost().getUid()
+                                : 0,
+                        destination,
+                        describeWorldPlayers(sourceHomeWorld));
+
+        for (var worldPlayer : sourceHomeWorld.getPlayers()) {
+            if (worldPlayer.getSceneLoadState() != Player.SceneLoadState.LOADED) {
+                Grasscutter.getLogger()
+                        .warn(
+                                "[HomeExit] Blocked Home exit because a player is not LOADED: "
+                                        + "requesterUid={}, blockedUid={}, blockedSceneId={}, "
+                                        + "blockedState={}, players={}",
+                                player.getUid(),
+                                worldPlayer.getUid(),
+                                worldPlayer.getSceneId(),
+                                worldPlayer.getSceneLoadState(),
+                                describeWorldPlayers(sourceHomeWorld));
                 return false;
             }
         }
@@ -198,23 +255,61 @@ public class HomeWorldMPSystem extends BaseGameSystem {
         var event =
                 new PlayerLeaveHomeEvent(
                         player,
-                        player.getCurHomeWorld().getHost(),
-                        player.getCurHomeWorld().getHome(),
+                        sourceHomeWorld.getHost(),
+                        sourceHomeWorld.getHome(),
                         PlayerLeaveHomeEvent.Reason.PLAYER_LEAVE);
         event.call();
 
-        player.getPosition().set(pos);
+        player.getPosition().set(destination);
+
+        Grasscutter.getLogger()
+                .debug(
+                        "[HomeExit] Creating single-player world: uid={}, oldWorldPlayers={}, "
+                                + "oldSceneId={}, targetSceneId={}, targetPos={}",
+                        player.getUid(),
+                        describeWorldPlayers(sourceHomeWorld),
+                        player.getSceneId(),
+                        prevScene,
+                        destination);
+
         var world = new World(player);
         world.addPlayer(player, prevScene);
-        player
-                .getCurHomeWorld()
-                .sendPacketToHostIfOnline(
-                        new PacketOtherPlayerEnterOrLeaveHomeNotify(
-                                player,
-                                OtherPlayerEnterHomeNotifyOuterClass.OtherPlayerEnterHomeNotify.Reason.LEAVE));
+
+        Grasscutter.getLogger()
+                .debug(
+                        "[HomeExit] World swap complete: uid={}, worldClass={}, isMultiplayer={}, "
+                                + "sceneId={}, peerId={}, sceneLoadState={}, worldPlayers={}",
+                        player.getUid(),
+                        player.getWorld() != null
+                                ? player.getWorld().getClass().getSimpleName()
+                                : "null",
+                        player.getWorld() != null && player.getWorld().isMultiplayer(),
+                        player.getSceneId(),
+                        player.getPeerId(),
+                        player.getSceneLoadState(),
+                        describeWorldPlayers(player.getWorld()));
+
+        sourceHomeWorld.sendPacketToHostIfOnline(
+                new PacketOtherPlayerEnterOrLeaveHomeNotify(
+                        player,
+                        OtherPlayerEnterHomeNotifyOuterClass.OtherPlayerEnterHomeNotify.Reason.LEAVE));
+
         var myHome = this.server.getHomeWorldOrCreate(player);
         player.setCurHomeWorld(myHome);
         myHome.getHome().onOwnerLogin(player);
+
+        Grasscutter.getLogger()
+                .debug(
+                        "[HomeExit] Sending Home exit packets: uid={}, "
+                                + "PlayerQuitFromHomeNotifyOpcode={}, PlayerEnterSceneNotifyOpcode={}, "
+                                + "EnterScenePeerNotifyOpcode={}, sceneId={}, peerId={}, targetPos={}",
+                        player.getUid(),
+                        PacketOpcodes.PlayerQuitFromHomeNotify,
+                        PacketOpcodes.PlayerEnterSceneNotify,
+                        PacketOpcodes.EnterScenePeerNotify,
+                        prevScene,
+                        player.getPeerId(),
+                        destination);
 
         player.sendPacket(
                 new PacketPlayerQuitFromHomeNotify(
@@ -226,10 +321,57 @@ public class HomeWorldMPSystem extends BaseGameSystem {
                         EnterTypeOuterClass.EnterType.EnterType_ENTER_BACK,
                         EnterReason.TeamBack,
                         prevScene,
-                        pos));
-        player.sendPacket(new PacketEnterScenePeerNotify(player));
+                        destination));
+
+        /*
+         * Normal scene transfers wait for EnterSceneReadyReq before sending
+         * EnterScenePeerNotify. Keep Home exit on that same sequence.
+         */
+        Grasscutter.getLogger()
+                .debug(
+                        "[HomeExit] Waiting for EnterSceneReadyReq before sending "
+                                + "EnterScenePeerNotify: uid={}, enterSceneToken={}, sceneId={}",
+                        player.getUid(),
+                        player.getEnterSceneToken(),
+                        player.getSceneId());
+
+        Grasscutter.getLogger()
+                .debug(
+                        "[HomeExit] leaveCoop completed: uid={}, worldClass={}, "
+                                + "isMultiplayer={}, sceneId={}, peerId={}, sceneLoadState={}, "
+                                + "enterSceneToken={}",
+                        player.getUid(),
+                        player.getWorld() != null
+                                ? player.getWorld().getClass().getSimpleName()
+                                : "null",
+                        player.getWorld() != null && player.getWorld().isMultiplayer(),
+                        player.getSceneId(),
+                        player.getPeerId(),
+                        player.getSceneLoadState(),
+                        player.getEnterSceneToken());
 
         return true;
+    }
+
+    private static String describeWorldPlayers(World world) {
+        if (world == null) {
+            return "[]";
+        }
+
+        return world.getPlayers().stream()
+                .map(
+                        player ->
+                                "{uid="
+                                        + player.getUid()
+                                        + ",sceneId="
+                                        + player.getSceneId()
+                                        + ",state="
+                                        + player.getSceneLoadState()
+                                        + ",peerId="
+                                        + player.getPeerId()
+                                        + "}")
+                .toList()
+                .toString();
     }
 
     public boolean kickPlayerFromHome(Player owner, int targetUid) {
