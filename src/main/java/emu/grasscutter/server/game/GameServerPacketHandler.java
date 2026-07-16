@@ -5,10 +5,15 @@ import static emu.grasscutter.config.Configuration.SERVER;
 
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.Grasscutter.ServerDebugMode;
+import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.WireFormat;
+import emu.grasscutter.game.home.GameHome;
 import emu.grasscutter.net.packet.*;
 import emu.grasscutter.server.event.game.ReceivePacketEvent;
 import emu.grasscutter.server.game.GameSession.SessionState;
+import emu.grasscutter.utils.Utils;
 import it.unimi.dsi.fastutil.ints.*;
+import java.util.StringJoiner;
 public final class GameServerPacketHandler {
 
     private final Int2ObjectMap<PacketHandler> handlers;
@@ -80,11 +85,142 @@ public final class GameServerPacketHandler {
                 if (!event.isCanceled())
                 handler.handle(session, header, event.getPacketData());
             } catch (Exception ex) {
-
-                ex.printStackTrace();
+                Grasscutter.getLogger()
+                        .error(
+                                "Error while handling packet opcode {} ({})",
+                                opcode,
+                                PacketOpcodesUtils.getOpcodeName(opcode),
+                                ex);
             }
             return;
         }
+
+        /*
+         * Debug-only REL6.6 Home handshake probe.
+         *
+         * Several Home request opcodes are still placeholders. Some important
+         * requests, especially scene-init acknowledgements, may have an empty
+         * payload, so this intentionally accepts zero-length packets.
+         */
+        probeUnhandledHomePacket(session, opcode, header, payload);
+    }
+
+    private static void probeUnhandledHomePacket(
+            GameSession session, int opcode, byte[] header, byte[] payload) {
+        if (session == null
+                || session.getState() != SessionState.ACTIVE
+                || session.getPlayer() == null
+                || !Grasscutter.getLogger().isDebugEnabled()) {
+            return;
+        }
+
+        var player = session.getPlayer();
+        int currentSceneId = player.getSceneId();
+        int previousSceneId = player.getPrevScene();
+
+        boolean currentIsHome = GameHome.HOME_SCENE_IDS.contains(currentSceneId);
+        boolean previousWasHome = GameHome.HOME_SCENE_IDS.contains(previousSceneId);
+
+        if (!currentIsHome && !previousWasHome) {
+            return;
+        }
+
+        int payloadLength = payload != null ? payload.length : 0;
+
+        /*
+         * Home transition/control packets are normally tiny. Avoid logging
+         * unrelated large traffic while still allowing empty init packets.
+         */
+        if (payloadLength > 128) {
+            return;
+        }
+
+        Grasscutter.getLogger()
+                .debug(
+                        "[HomeHandshakeProbe] unhandled packet: uid={}, opcode={}, opcodeName={}, "
+                                + "currentSceneId={}, previousSceneId={}, worldClass={}, "
+                                + "currentRealmId={}, realmList={}, headerLength={}, payloadLength={}, "
+                                + "wireFields={}, payloadHex={}",
+                        player.getUid(),
+                        opcode & 0xFFFF,
+                        PacketOpcodesUtils.getOpcodeName(opcode),
+                        currentSceneId,
+                        previousSceneId,
+                        player.getWorld() != null
+                                ? player.getWorld().getClass().getSimpleName()
+                                : "null",
+                        player.getCurrentRealmId(),
+                        player.getRealmList(),
+                        header != null ? header.length : 0,
+                        payloadLength,
+                        describeWireFields(payload),
+                        payload != null ? Utils.bytesToHex(payload) : "");
+    }
+
+    private static String describeWireFields(byte[] payload) {
+        if (payload == null || payload.length == 0) {
+            return "[]";
+        }
+
+        StringJoiner fields = new StringJoiner(", ", "[", "]");
+
+        try {
+            CodedInputStream input = CodedInputStream.newInstance(payload);
+
+            while (!input.isAtEnd()) {
+                int tag = input.readTag();
+
+                if (tag == 0) {
+                    break;
+                }
+
+                int fieldNumber = WireFormat.getTagFieldNumber(tag);
+                int wireType = WireFormat.getTagWireType(tag);
+
+                switch (wireType) {
+                    case WireFormat.WIRETYPE_VARINT ->
+                            fields.add(
+                                    "f"
+                                            + fieldNumber
+                                            + "=varint:"
+                                            + Long.toUnsignedString(input.readUInt64()));
+
+                    case WireFormat.WIRETYPE_FIXED64 ->
+                            fields.add(
+                                    "f"
+                                            + fieldNumber
+                                            + "=fixed64:"
+                                            + Long.toUnsignedString(input.readFixed64()));
+
+                    case WireFormat.WIRETYPE_LENGTH_DELIMITED -> {
+                        byte[] value = input.readByteArray();
+                        fields.add(
+                                "f"
+                                        + fieldNumber
+                                        + "=bytes("
+                                        + value.length
+                                        + "):"
+                                        + Utils.bytesToHex(value));
+                    }
+
+                    case WireFormat.WIRETYPE_FIXED32 ->
+                            fields.add(
+                                    "f"
+                                            + fieldNumber
+                                            + "=fixed32:"
+                                            + Integer.toUnsignedString(input.readFixed32()));
+
+                    default -> {
+                        fields.add("f" + fieldNumber + "=wireType:" + wireType);
+                        input.skipField(tag);
+                    }
+                }
+            }
+        } catch (Exception exception) {
+            fields.add("decodeError:" + exception.getClass().getSimpleName());
+        }
+
+        return fields.toString();
     }
 
     private static boolean shouldDump(GameSession session, int opcode) {
