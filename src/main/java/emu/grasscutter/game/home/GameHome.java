@@ -62,6 +62,7 @@ public class GameHome {
     int enterHomeOption;
     Map<Integer, Set<Integer>> finishedTalkIdMap;
     Set<Integer> finishedRewardEventIdSet;
+    Set<Integer> madeFurnitureIdSet;
 
     public static GameHome getByUid(Integer uid) {
         var home = DatabaseHelper.getHomeByUid(uid);
@@ -94,11 +95,16 @@ public class GameHome {
                 .unlockedHomeBgmList(new HashSet<>())
                 .finishedTalkIdMap(new HashMap<>())
                 .finishedRewardEventIdSet(new HashSet<>())
+                .madeFurnitureIdSet(new HashSet<>())
                 .build();
     }
 
     // Avoid NPEs caused by old or partially removed database documents.
     private void reassignIfNull() {
+        if (this.madeFurnitureIdSet == null) {
+            this.madeFurnitureIdSet = new HashSet<>();
+        }
+
         if (this.sceneMap == null) {
             this.sceneMap = new ConcurrentHashMap<>();
         }
@@ -476,6 +482,18 @@ public class GameHome {
                 .filter(e -> e.getValue().isDefaultUnlock())
                 .map(Int2ObjectMap.Entry::getIntKey)
                 .collect(Collectors.toUnmodifiableSet());
+    }
+
+    /**
+     * Genshin only grants Adeptal Energy (home exp) the first time a given furnishing is crafted,
+     * not on every craft. Returns true (and marks the furniture as made) the first time this is
+     * called for a given furniture item id, false on every subsequent call.
+     */
+    public boolean furnitureShouldGiveExp(int furnitureItemId) {
+        if (this.madeFurnitureIdSet == null) {
+            this.madeFurnitureIdSet = new HashSet<>();
+        }
+        return this.madeFurnitureIdSet.add(furnitureItemId);
     }
 
     // Same as Player.java addExpDirectly
