@@ -334,6 +334,20 @@
       "unlocked": "🇺🇸%s unlocked.",
       "unlocked_for": "🇺🇸%s for %s unlocked."
     },
+    "teapot": {
+      "description": "Manipula\u021bi func\u021biile oal\u0103 serenitea. \n\tValori pentru setLevel<1-10> \n\tValori pentru unlockModule<1-4> \n\tValori pentru lockModule<1-4> \n\tValori pentru giveAllFurniture<num\u0103r> \n\tValori pentru refreshLimitedShop<none >",
+      "level_range_error": "Nivelul oal\u0103 Serenitea trebuie s\u0103 fie \u00eentre 1 \u0219i 10.",
+      "level_success": "Nivelul oal\u0103 Serenitea setat la %s.",
+      "invalid_param": "Parametru invalid.",
+      "module_sumeru_error": "Modulul Sumeru nu este acceptat momentan.",
+      "module_range_error" : "Num\u0103rul modulului trebuie s\u0103 fie \u00eentre 1 - 4.",
+      "unlock_module_contain_error" : "Modulul este deja deblocat.",
+      "unlock_module_success": "Modulul deblocat %s.",
+      "lock_module_in_scene_error": "Modulul activ nu poate fi blocat.",
+      "lock_module_contain_error": "Modulul nu exist\u0103.",
+      "lock_module_success": "Modulul blocat %s.",
+      "give_furniture_success": "Am dat toat\u0103 mobila."
+    },
     "spawn": {
       "success": "A generat %s de %s.",
       "limit_reached": "Limita de reproducere a scenei a fost atinsă. În schimb, se generează %s de entități.",

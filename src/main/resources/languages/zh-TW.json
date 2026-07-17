@@ -334,6 +334,20 @@
       "unlocked": "%s 已解鎖。",
       "unlocked_for": "%s (玩家 %s) 已解鎖。"
     },
+    "teapot": {
+      "description": "\u8a2d\u7f6e\u5875\u6b4c\u58fa\u5404\u7a2e\u529f\u80fd.  \n\t\u53ef\u66f4\u6539\u7684\u529f\u80fd\uff1a setLevel<\u7b49\u7d1a>  \n\tunlockModule<\u6d1e\u5929\u503c\uff08\u4e0d\u5305\u62ec\u9808\u5f4c\uff09> \n\tlockModule<\u6d1e\u5929\u503c\uff08\u4e0d\u5305\u62ec\u9808\u5f4c\uff09> \n\tgiveAllFurniture<\u5bb6\u5177\u6578\u91cf> \n\tValues for refreshLimitedShop<\u7121/\u4e0d\u9700\u8981>",
+      "level_range_error": "\u5875\u6b4c\u58fa\u7b49\u7d1a\u5fc5\u9808\u5728 1 - 10 \u4e4b\u9593\u3002",
+      "level_success": "\u6210\u529f\u8a2d\u5b9a\u5875\u6b4c\u58fa\u7b49\u7d1a\u70ba %s.",
+      "invalid_param": "\u7121\u6548\u7684\u53c3\u6578\u3002",
+      "module_sumeru_error": "\u7576\u524d\u4e0d\u652f\u6301\u9808\u5f4c\u6d1e\u5929\u3002",
+      "module_range_error" : "\u6d1e\u5929\u5fc5\u9808\u5728 1 - 4 \u4e4b\u9593\u3002",
+      "unlock_module_contain_error" : "\u6d1e\u5929\u5df2\u89e3\u9396\u3002",
+      "unlock_module_success": "\u6210\u529f\u89e3\u9396\u6d1e\u5929 %s\u3002",
+      "lock_module_in_scene_error": "\u7121\u6cd5\u9396\u5b9a\u9078\u5b9a\u4e2d\u7684\u6d1e\u5929\u3002",
+      "lock_module_contain_error": "\u6d1e\u5929\u4e0d\u5b58\u5728\u3002",
+      "lock_module_success": "\u6210\u529f\u9396\u5b9a\u6d1e\u5929 %s\u3002",
+      "give_furniture_success": "\u5df2\u7d66\u4e88\u6240\u6709\u7684\u5bb6\u5177\u3002"
+    },
     "spawn": {
       "success": "已生成 %s 個 %s。",
       "limit_reached": "已達到場景生成上限，已改為 %s 個實體。",

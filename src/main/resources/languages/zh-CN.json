@@ -334,6 +334,20 @@
       "unlocked": "%s 已解锁。",
       "unlocked_for": "%s [玩家 %s] 已解锁。"
     },
+    "teapot": {
+      "description": "\u8bbe\u7f6e\u5c18\u6b4c\u58f6\u5404\u79cd\u529f\u80fd.  \n\t\u53ef\u66f4\u6539\u7684\u529f\u80fd\uff1a setLevel<\u7b49\u7ea7>  \n\tunlockModule<\u6d1e\u5929\u503c\uff08\u4e0d\u5305\u62ec\u987b\u5f25\uff09> \n\tlockModule<\u6d1e\u5929\u503c\uff08\u4e0d\u5305\u62ec\u987b\u5f25\uff09> \n\tgiveAllFurniture<\u5bb6\u5177\u6570\u91cf> \n\tValues for refreshLimitedShop<\u65e0/\u4e0d\u9700\u8981>",
+      "level_range_error": "\u5c18\u6b4c\u58f6\u7b49\u7ea7\u5fc5\u987b\u5728 1 - 10 \u4e4b\u95f4\u3002",
+      "level_success": "\u6210\u529f\u8bbe\u5b9a\u5c18\u6b4c\u58f6\u7b49\u7ea7\u4e3a %s.",
+      "invalid_param": "\u65e0\u6548\u7684\u53c2\u6570\u3002",
+      "module_sumeru_error": "\u5f53\u524d\u4e0d\u652f\u6301\u987b\u5f25\u6d1e\u5929\u3002",
+      "module_range_error" : "\u6d1e\u5929\u5fc5\u987b\u5728 1 - 4 \u4e4b\u95f4\u3002",
+      "unlock_module_contain_error" : "\u6d1e\u5929\u5df2\u89e3\u9501\u3002",
+      "unlock_module_success": "\u6210\u529f\u89e3\u9501\u6d1e\u5929 %s\u3002",
+      "lock_module_in_scene_error": "\u65e0\u6cd5\u9501\u5b9a\u9009\u5b9a\u4e2d\u7684\u6d1e\u5929\u3002",
+      "lock_module_contain_error": "\u6d1e\u5929\u4e0d\u5b58\u5728\u3002",
+      "lock_module_success": "\u6210\u529f\u9501\u5b9a\u6d1e\u5929 %s\u3002",
+      "give_furniture_success": "\u5df2\u7ed9\u4e88\u6240\u6709\u7684\u5bb6\u5177\u3002"
+    },
     "spawn": {
       "success": "已生成 %s 个 %s。",
       "limit_reached": "场景中的生成数量已达上限。已替代为生成 %s 个实体。",
