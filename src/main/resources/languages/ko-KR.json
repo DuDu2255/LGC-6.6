@@ -334,6 +334,20 @@
       "unlocked": "%s 잠금해제됨.",
       "unlocked_for": "%s의 %s 잠금이 해제됩니다."
     },
+    "teapot": {
+      "description": "serenitea pot \uae30\ub2a5\uc744 \uc870\uc791\ud569\ub2c8\ub2e4. \n\tsetLevel<1-10>\uc758 \uac12 \n\tunlockModule<1-4>\uc758 \uac12 \n\tlockModule<1-4>\uc758 \uac12 \n\tgiveAllFurniture<count>\uc758 \uac12 \n\trefreshLimitedShop<none\uc758 \uac12 >",
+      "level_range_error": "Serenitea \ub0c4\ube44 \ub808\ubca8\uc740 1\uc5d0\uc11c 10 \uc0ac\uc774\uc5ec\uc57c \ud569\ub2c8\ub2e4.",
+      "level_success": "Serenitea \ub0c4\ube44 \uc218\uc900\uc774 %s(\uc73c)\ub85c \uc124\uc815\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
+      "invalid_param": "\uc798\ubabb\ub41c \ub9e4\uac1c \ubcc0\uc218.",
+      "module_sumeru_error": "Sumeru \ubaa8\ub4c8\uc740 \ud604\uc7ac \uc9c0\uc6d0\ub418\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.",
+      "module_range_error" : "\ubaa8\ub4c8 \ubc88\ud638\ub294 1 - 4 \uc0ac\uc774\uc5ec\uc57c \ud569\ub2c8\ub2e4.",
+      "unlock_module_contain_error" : "\ubaa8\ub4c8\uc774 \uc774\ubbf8 \uc7a0\uae08 \ud574\uc81c\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
+      "unlock_module_success": "\uc7a0\uae08 \ud574\uc81c\ub41c \ubaa8\ub4c8 %s.",
+      "lock_module_in_scene_error": "\ud65c\uc131 \ubaa8\ub4c8\uc744 \uc7a0\uae08 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
+      "lock_module_contain_error": "\ubaa8\ub4c8\uc774 \uc874\uc7ac\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.",
+      "lock_module_success": "\uc7a0\uae34 \ubaa8\ub4c8 %s.",
+      "give_furniture_success": "\ubaa8\ub4e0 \uac00\uad6c\ub97c \uc81c\uacf5\ud569\ub2c8\ub2e4."
+    },
     "spawn": {
       "success": " %s 개의 %s 를 소환하는데 성공했습니다.",
       "limit_reached": "scene당 소환 엔티티 한계입니다. 대신 %s 개의 엔티티를 소환합니다.",

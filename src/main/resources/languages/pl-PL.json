@@ -334,6 +334,20 @@
       "unlocked": "%s oblokowana.",
       "unlocked_for": "%s odblokowano dla %s."
     },
+    "teapot": {
+      "description": "Manipuluj funkcjami garnka Serenitea. \n\tWarto\u015bci dla setLevel<1-10> \n\tWarto\u015bci dla unlockModule<1-4> \n\tWarto\u015bci dla lockModule<1-4> \n\tWarto\u015bci dla giveAllFurniture<liczba> \n\tWarto\u015bci dla od\u015bwie\u017ceniaLimitedShop<brak >",
+      "level_range_error": "Poziom puli Serenitea musi wynosi\u0107 od 1 do 10.",
+      "level_success": "Poziom puli Serenitea ustawiony na %s.",
+      "invalid_param": "Niew\u0142a\u015bciwy parametr.",
+      "module_sumeru_error": "Modu\u0142 Sumeru nie jest obecnie obs\u0142ugiwany.",
+      "module_range_error" : "Numer modu\u0142u musi zawiera\u0107 si\u0119 w przedziale od 1 do 4.",
+      "unlock_module_contain_error" : "Modu\u0142 ju\u017c odblokowany.",
+      "unlock_module_success": "Odblokowany modu\u0142 %s.",
+      "lock_module_in_scene_error": "Nie mo\u017cna zablokowa\u0107 aktywnego modu\u0142u.",
+      "lock_module_contain_error": "Modu\u0142 nie istnieje.",
+      "lock_module_success": "Zablokowany modu\u0142 %s.",
+      "give_furniture_success": "Da\u0142 wszystkie meble."
+    },
     "spawn": {
       "success": "Stworzono %s obiektów o ID %s.",
       "limit_reached": "Osiągnięto maksymalną ilość obiektów w scenie. Dodane zostaną tylko %s.",
