@@ -666,6 +666,7 @@ public class ScriptLib {
 		}
 
 		// Fallback for scripts that query gadget state during group load before the gadget has actually been spawned as a runtime EntityGadget.
+
 		SceneGroup group = getSceneScriptManager().getGroupById(resolvedGroupId);
 		if (group != null && group.gadgets != null) {
 			var metaGadget = group.gadgets.get(configId);
@@ -1536,6 +1537,42 @@ public class ScriptLib {
         return 0;
     }
 
+    public int ForceUnlockDungeonEntry(int dungeonEntryId) {
+        return updateDungeonEntry(dungeonEntryId);
+    }
+
+    public int RefreshDungeonEntryPrompt(int dungeonEntryId) {
+        return updateDungeonEntry(dungeonEntryId);
+    }
+
+    private int updateDungeonEntry(int dungeonEntryId) {
+        var scriptManager = sceneScriptManager.getIfExists();
+        if (scriptManager == null || scriptManager.getScene() == null) {
+            return 1;
+        }
+
+        var scene = scriptManager.getScene();
+        int sceneId = scene.getId();
+
+        for (var player : scene.getPlayers()) {
+            boolean newlyAdded =
+                    player.getUnlockedScenePoints(sceneId).add(dungeonEntryId);
+
+            player.sendPacket(new PacketGetScenePointRsp(player, sceneId));
+
+            if (newlyAdded) {
+                player.sendPacket(
+                        new PacketScenePointUnlockNotify(sceneId, dungeonEntryId));
+                player.save();
+            }
+
+            player.sendPacket(
+                    new PacketUnfreezeGroupLimitNotify(dungeonEntryId, sceneId));
+        }
+
+        return 0;
+    }
+
     public int UnlockFloatSignal(int groupId, int gadgetSignalId) {
         logger.warn("[LUA] Call unimplemented UnlockFloatSignal with {} {}", groupId, gadgetSignalId);
 
@@ -1760,6 +1797,7 @@ public class ScriptLib {
 		}
 
 		// Scene 3 = main open world. Weather 4014 is the unwanted Chasm/Sumeru script weather.
+
 		return scriptManager.getScene().getId() == 3 && weatherId == 4014;
 	}
 
