@@ -142,20 +142,30 @@ public final class DungeonManager {
         }
 
         // Get and roll rewards.
-        int statueDropId = dungeonData.getStatueDrop();
-        int fallbackStatueDropId = MissingDomainFallbackManager.getStatueDropOverride(dungeonData.getId());
-        if (fallbackStatueDropId != 0) {
-            statueDropId = fallbackStatueDropId;
-        }
-
-        List rewards = player
-                .getServer()
-                .getDropSystem()
-                .handleDungeonRewardDrop(statueDropId, useCondensed);
-        if (rewards.isEmpty()) {
-            // fallback to legacy drop system
-            Grasscutter.getLogger().debug("dungeon drop failed for {}", dungeonData.getId());
+        List<GameItem> rewards;
+        if (usesLegacyLostValleyDrops(dungeonData.getId())) {
             rewards = new ArrayList<>(this.rollRewards(useCondensed));
+        } else {
+            int statueDropId = dungeonData.getStatueDrop();
+
+            int fallbackStatueDropId =
+                    MissingDomainFallbackManager.getStatueDropOverride(dungeonData.getId());
+
+            if (fallbackStatueDropId != 0) {
+                statueDropId = fallbackStatueDropId;
+            }
+
+            rewards =
+                    player.getServer()
+                            .getDropSystem()
+                            .handleDungeonRewardDrop(statueDropId, useCondensed);
+
+            if (rewards.isEmpty()) {
+                // Fallback to legacy drop system.
+                Grasscutter.getLogger().debug("dungeon drop failed for {}", dungeonData.getId());
+
+                rewards = new ArrayList<>(this.rollRewards(useCondensed));
+            }
         }
         // Add rewards to player and send notification.
         player.getInventory().addItems(rewards, ActionReason.DungeonStatueDrop);
@@ -165,6 +175,15 @@ public final class DungeonManager {
 
         scene.getScriptManager().callEvent(new ScriptArgs(groupId, EventType.EVENT_DUNGEON_REWARD_GET));
         return true;
+    }
+	
+    private static boolean usesLegacyLostValleyDrops(int dungeonId) {
+        return switch (dungeonId) {
+            // The Lost Valley / Domain of Blessing: Machine Nest I-IV
+            case 5125, 5126, 5127, 5128 -> true;
+
+            default -> false;
+        };
     }
 
     public boolean handleCost(Player player, boolean useCondensed) {

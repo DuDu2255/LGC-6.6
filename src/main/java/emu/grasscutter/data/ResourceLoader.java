@@ -12,6 +12,7 @@ import emu.grasscutter.data.binout.config.*;
 import emu.grasscutter.data.binout.routes.*;
 import emu.grasscutter.data.common.PointData;
 import emu.grasscutter.data.custom.*;
+import emu.grasscutter.game.dungeons.DungeonDrop;
 import emu.grasscutter.data.excels.trial.TrialAvatarActivityDataData;
 import emu.grasscutter.data.server.*;
 import emu.grasscutter.game.activity.ActivityManager;
@@ -92,7 +93,8 @@ public final class ResourceLoader {
         mergeDynamicAbilitiesIntoEmbryos();
 
         loadResources(true);
-        buildAbilityTalentVarMaps();
+		loadDungeonDropData();
+		buildAbilityTalentVarMaps();
 
         GameDepot.load();
 
@@ -165,6 +167,32 @@ public final class ResourceLoader {
         long ns = (endTime - startTime);
         Grasscutter.getLogger().debug("Loading resources took " + ns + "ns == " + ns / 1000000 + "ms");
     }
+	
+	private static void loadDungeonDropData() {
+		var dungeonDropMap = GameData.getDungeonDropDataMap();
+		dungeonDropMap.clear();
+
+		try {
+			var dungeonDrops =
+					DataLoader.loadList("DungeonDrop.json", DungeonDrop.class);
+
+			for (var dungeonDrop : dungeonDrops) {
+				if (dungeonDrop == null
+						|| dungeonDrop.getDungeonId() <= 0
+						|| dungeonDrop.getDrops() == null
+						|| dungeonDrop.getDrops().isEmpty()) {
+					continue;
+				}
+
+				dungeonDropMap.put(
+						dungeonDrop.getDungeonId(),
+						dungeonDrop.getDrops());
+			}
+		} catch (Exception e) {
+			Grasscutter.getLogger()
+					.error("Unable to load DungeonDrop.json.", e);
+		}
+	}
 
     @SuppressWarnings("rawtypes")
     protected static void loadFromResource(
