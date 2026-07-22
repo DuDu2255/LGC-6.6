@@ -14,7 +14,6 @@ import emu.grasscutter.net.proto.*;
 import emu.grasscutter.server.packet.send.PacketBlossomBriefInfoNotify;
 import emu.grasscutter.utils.Utils;
 import it.unimi.dsi.fastutil.ints.*;
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class BlossomManager {
@@ -24,6 +23,11 @@ public class BlossomManager {
     private final List<EntityGadget> createdEntity = new ArrayList<>();
 
     private final List<SpawnDataEntry> blossomConsumed = new ArrayList<>();
+
+    private static final int[] SCOIN_REWARDS = {4101, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110};
+    private static final int[] EXP_REWARDS   = {4001, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010};
+    private static final int[] DRAGON_A     = {30311, 30312, 30313, 30314, 30315, 30316, 30317, 30318, 30319};
+    private static final int[] DRAGON_B     = {30321, 30322, 30323, 30324, 30325, 30326, 30327, 30328, 30329};
 
     public BlossomManager(Scene scene) {
         this.scene = scene;
@@ -161,9 +165,26 @@ public class BlossomManager {
         return scene.getWorld().getWorldLevel();
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T cast(Object obj) {
-        return (T) obj;
+    private static Integer getFallbackPreviewReward(int blossomChestId, Object data, int worldLevel) {
+        int wl = Math.max(0, Math.min(worldLevel, 8));
+        if (blossomChestId == 1) return SCOIN_REWARDS[wl];
+        if (blossomChestId == 2) return EXP_REWARDS[wl];
+        if (blossomChestId == 3) return DRAGON_A[wl];
+        if (blossomChestId == 4) return DRAGON_B[wl];
+
+        if (data != null) {
+            try {
+                var method = data.getClass().getMethod("getRefreshType");
+                Object typeObj = method.invoke(data);
+                if (typeObj != null) {
+                    String str = typeObj.toString();
+                    if (str.contains("SENTRY_TOWER")) return 31701;
+                    if (str.contains("BOMB")) return 31702;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        return null;
     }
 
     private static Integer getPreviewReward(BlossomType type, int worldLevel) {
@@ -189,15 +210,13 @@ public class BlossomManager {
             if (blossomChestId == data.getBlossomChestId()) {
                 var dropVecList = data.getDropVec();
 
+                // Handles File 1 where "DropVec" was capitalized and GSON skipped deserialization
                 if (dropVecList == null || dropVecList.length == 0) {
-                    try {
-                        Field field = data.getClass().getDeclaredField("DropVec");
-                        field.setAccessible(true);
-                        dropVecList = cast(field.get(data));
-                    } catch (Exception ignored) {}
-                }
+                    Integer fallback = getFallbackPreviewReward(blossomChestId, data, worldLevel);
+                    if (fallback != null) {
+                        return fallback;
+                    }
 
-                if (dropVecList == null || dropVecList.length == 0) {
                     Grasscutter.getLogger()
                             .debug(
                                     "Blossom refresh config has no drop vector: blossomChestId={}, type={}",
