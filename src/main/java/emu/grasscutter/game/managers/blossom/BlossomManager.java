@@ -3,7 +3,6 @@ package emu.grasscutter.game.managers.blossom;
 import emu.grasscutter.Grasscutter;
 import emu.grasscutter.data.*;
 import emu.grasscutter.data.common.ItemParamData;
-import emu.grasscutter.data.excels.BlossomRefreshExcelConfigData;
 import emu.grasscutter.data.excels.RewardPreviewData;
 import emu.grasscutter.game.entity.*;
 import emu.grasscutter.game.entity.gadget.GadgetWorktop;
@@ -162,6 +161,11 @@ public class BlossomManager {
         return scene.getWorld().getWorldLevel();
     }
 
+    @SuppressWarnings("unchecked")
+    private static <T> T cast(Object obj) {
+        return (T) obj;
+    }
+
     private static Integer getPreviewReward(BlossomType type, int worldLevel) {
         // TODO: blossoms should be based on their city
         if (type == null) {
@@ -185,12 +189,11 @@ public class BlossomManager {
             if (blossomChestId == data.getBlossomChestId()) {
                 var dropVecList = data.getDropVec();
 
-                // Fallback: If getDropVec() returns null, read the capitalized "DropVec" field directly via reflection
                 if (dropVecList == null || dropVecList.length == 0) {
                     try {
                         Field field = data.getClass().getDeclaredField("DropVec");
                         field.setAccessible(true);
-                        dropVecList = (BlossomRefreshExcelConfigData.BlossomDropVec[]) field.get(data);
+                        dropVecList = cast(field.get(data));
                     } catch (Exception ignored) {}
                 }
 
