@@ -203,6 +203,65 @@ public final class MissingDomainFallbackManager {
 									{1001, 1002, 1003}
 							})),
 			
+            // Derelict Masonry Dock / Domain of Blessing: Deepfire Construct I
+            Map.entry(
+                    40796,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40796,
+                            Set.of(5022),
+                            240796001,
+                            240796004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003},
+                                    {1004, 1005, 1006}
+                            })),
+
+            // Derelict Masonry Dock / Domain of Blessing: Deepfire Construct II
+            Map.entry(
+                    40797,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40797,
+                            Set.of(5023),
+                            240797001,
+                            240797004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003},
+                                    {1004, 1005, 1006}
+                            })),
+
+            // Derelict Masonry Dock / Domain of Blessing: Deepfire Construct III
+            Map.entry(
+                    40798,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40798,
+                            Set.of(5024),
+                            240798001,
+                            240798004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003},
+                                    {1004, 1005, 1006}
+                            })),
+
+            // Derelict Masonry Dock / Domain of Blessing: Deepfire Construct IV
+            Map.entry(
+                    40799,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40799,
+                            Set.of(5025),
+                            240799001,
+                            240799004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001}
+                            })),
+			
 			// Denouement of Sin / Domain of Blessing: Harmony I
 			Map.entry(
 					40780,
@@ -544,7 +603,298 @@ public final class MissingDomainFallbackManager {
 							new int[][] {
 									{1001, 1002},
 									{1003, 1004}
-							}))
+							})),
+            // Frostladen Machinery / Domain of Blessing: Derivations From the Deep I
+            Map.entry(
+                    40810,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40810,
+                            Set.of(4665),
+                            240810001,
+                            240810004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Frostladen Machinery / Domain of Blessing: Derivations From the Deep II
+            Map.entry(
+                    40811,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40811,
+                            Set.of(4666),
+                            240811001,
+                            240811004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Frostladen Machinery / Domain of Blessing: Derivations From the Deep III
+            Map.entry(
+                    40812,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40812,
+                            Set.of(4667),
+                            240812001,
+                            240812004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002}
+                            })),
+
+            // Frostladen Machinery / Domain of Blessing: Derivations From the Deep IV
+            Map.entry(
+                    40813,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40813,
+                            Set.of(4668),
+                            240813001,
+                            240813004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001}
+                            })),
+            // Moonchild's Treasures / Domain of Blessing: Sacred Vault I
+            Map.entry(
+                    40820,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40820,
+                            Set.of(4683),
+                            240820001,
+                            240820004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Moonchild's Treasures / Domain of Blessing: Sacred Vault II
+            Map.entry(
+                    40821,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40821,
+                            Set.of(4684),
+                            240821001,
+                            240821004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Moonchild's Treasures / Domain of Blessing: Sacred Vault III
+            Map.entry(
+                    40822,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40822,
+                            Set.of(4685),
+                            240822001,
+                            240822004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Moonchild's Treasures / Domain of Blessing: Sacred Vault IV
+            Map.entry(
+                    40823,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40823,
+                            Set.of(4686),
+                            240823001,
+                            240823004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003},
+                                    {1004, 1005, 1006}
+                            })),
+							
+            // Thorny Crown of the Mountain Wind / Domain of Blessing: Minstrel's Peak I
+            Map.entry(
+                    40824,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40824,
+                            Set.of(4687),
+                            240824001,
+                            240824004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002},
+                                    {1003}
+                            })),
+
+            // Thorny Crown of the Mountain Wind / Domain of Blessing: Minstrel's Peak II
+            Map.entry(
+                    40825,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40825,
+                            Set.of(4688),
+                            240825001,
+                            240825004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001}
+                            })),
+
+            // Thorny Crown of the Mountain Wind / Domain of Blessing: Minstrel's Peak III
+            Map.entry(
+                    40826,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40826,
+                            Set.of(4689),
+                            240826001,
+                            240826004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001}
+                            })),
+
+            // Thorny Crown of the Mountain Wind / Domain of Blessing: Minstrel's Peak IV
+            Map.entry(
+                    40827,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40827,
+                            Set.of(4690),
+                            240827001,
+                            240827004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002}
+                            })),
+							
+            // Lightless Capital / Shared difficulty I; weekday rotations use the same scene.
+            Map.entry(
+                    40704,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40704,
+                            Set.of(4651, 4655, 4659),
+                            240704001,
+                            240704004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Lightless Capital / Shared difficulty II; weekday rotations use the same scene.
+            Map.entry(
+                    40705,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40705,
+                            Set.of(4652, 4656, 4660),
+                            240705001,
+                            240705004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Lightless Capital / Shared difficulty III; weekday rotations use the same scene.
+            Map.entry(
+                    40706,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40706,
+                            Set.of(4653, 4657, 4661),
+                            240706001,
+                            240706004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Lightless Capital / Shared difficulty IV; weekday rotations use the same scene.
+            Map.entry(
+                    40707,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40707,
+                            Set.of(4654, 4658, 4662),
+                            240707001,
+                            240707004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003}
+                            })),
+
+            // Lost Mooncourt / Shared difficulty I; weekday rotations use the same scene.
+            Map.entry(
+                    40816,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40816,
+                            Set.of(4671, 4675, 4679),
+                            240816001,
+                            240816004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Lost Mooncourt / Shared difficulty II; weekday rotations use the same scene.
+            Map.entry(
+                    40817,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40817,
+                            Set.of(4672, 4676, 4680),
+                            240817001,
+                            240817004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Lost Mooncourt / Shared difficulty III; weekday rotations use the same scene.
+            Map.entry(
+                    40818,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40818,
+                            Set.of(4673, 4677, 4681),
+                            240818001,
+                            240818004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002, 1003, 1004},
+                                    {1005, 1006, 1007}
+                            })),
+
+            // Lost Mooncourt  Shared difficulty IV; weekday rotations use the same scene.
+            Map.entry(
+                    40819,
+                    FallbackDomainConfig.exactDungeonIds(
+                            40819,
+                            Set.of(4674, 4678, 4682),
+                            240819001,
+                            240819004,
+                            STARTER_KEY_CONFIG_ID,
+                            300,
+                            new int[][] {
+                                    {1001, 1002}
+                            }))
 	);
 
     private MissingDomainFallbackManager() {}

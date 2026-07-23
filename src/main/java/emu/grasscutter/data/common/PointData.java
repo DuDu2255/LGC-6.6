@@ -21,17 +21,17 @@ public final class PointData {
     @Getter private boolean unlocked;
     @Getter private boolean groupLimit;
 
-    @SerializedName(
-            value = "dungeonIds",
-            alternate = {"JHHFPGJNMIN"})
-    @Getter
-    private int[] dungeonIds;
+	@SerializedName(
+			value = "dungeonIds",
+			alternate = {"JHHFPGJNMIN", "PMLKAGFDCEH"})
+	@Getter
+	private int[] dungeonIds;
 
-    @SerializedName(
-            value = "dungeonRandomList",
-            alternate = {"GLEKJMEEOMH"})
-    @Getter
-    private int[] dungeonRandomList;
+	@SerializedName(
+			value = "dungeonRandomList",
+			alternate = {"GLEKJMEEOMH", "FOCEDOLNOLG"})
+	@Getter
+	private int[] dungeonRandomList;
 
     @SerializedName(
             value = "groupIDs",
