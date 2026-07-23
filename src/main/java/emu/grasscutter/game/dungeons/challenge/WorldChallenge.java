@@ -11,6 +11,8 @@ import emu.grasscutter.scripts.constants.EventType;
 import emu.grasscutter.scripts.data.*;
 import emu.grasscutter.server.packet.send.*;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.*;
 
@@ -27,6 +29,7 @@ public class WorldChallenge {
     private final List<ChallengeTrigger> challengeTriggers;
     private final int goal;
     private final AtomicInteger score;
+    private final Set<Integer> processedMonsterDeaths = ConcurrentHashMap.newKeySet();
     private boolean progress;
     private boolean success;
     private int startedAt;
@@ -147,8 +150,12 @@ public class WorldChallenge {
         this.success = success;
         this.finishedTime = (int) ((this.scene.getSceneTimeSeconds() - this.startedAt));
 
-        // Despawn all leftover mobs in this challenge's SceneGroup
-        getScene().getScriptManager().removeMonstersInGroup(group);
+        // Despawn all leftover mobs in this challenge's SceneGroup. Synthetic groups (e.g. the
+        // per-gadget temp group BlossomActivity builds) never have a populated monster map, so
+        // skip this instead of letting removeMonstersInGroup NPE and abort the rest of finish().
+        if (group.monsters != null) {
+            getScene().getScriptManager().removeMonstersInGroup(group);
+        }
 
         getScene().broadcastPacket(new PacketDungeonChallengeFinishNotify(this));
     }
@@ -176,6 +183,12 @@ public class WorldChallenge {
             return;
         }
         if (monster.getGroupId() != getGroup().id) {
+            return;
+        }
+        if (!processedMonsterDeaths.add(monster.getId())) {
+            // Already counted - this can be reported both by the scene's shared active-challenge
+            // callback (when it still points at this challenge) and by a challenge owner's own
+            // direct polling fallback (e.g. BlossomActivity), so guard against double-counting.
             return;
         }
         this.challengeTriggers.forEach(t -> t.onMonsterDeath(this, monster));

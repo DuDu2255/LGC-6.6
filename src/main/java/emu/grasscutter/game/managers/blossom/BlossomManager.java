@@ -24,6 +24,11 @@ public class BlossomManager {
 
     private final List<SpawnDataEntry> blossomConsumed = new ArrayList<>();
 
+    private static final int[] SCOIN_REWARDS = {4101, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110};
+    private static final int[] EXP_REWARDS   = {4001, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010};
+    private static final int[] DRAGON_A     = {30311, 30312, 30313, 30314, 30315, 30316, 30317, 30318, 30319};
+    private static final int[] DRAGON_B     = {30321, 30322, 30323, 30324, 30325, 30326, 30327, 30328, 30329};
+
     public BlossomManager(Scene scene) {
         this.scene = scene;
     }
@@ -137,20 +142,20 @@ public class BlossomManager {
                                                 var type = BlossomType.valueOf(spawn.getGadgetId());
                                                 Integer previewReward = getPreviewReward(type, worldLevel);
 
-												if (previewReward == null) {
-													return;
-												}
+                                                if (previewReward == null) {
+                                                    return;
+                                                }
 
-												blossoms.add(
-														BlossomBriefInfoOuterClass.BlossomBriefInfo.newBuilder()
-																.setSceneId(sceneId)
-																.setPos(spawn.getPos().toProto())
-																.setResin(20)
-																.setMonsterLevel(monsterLevel)
-																.setRewardId(previewReward)
-																.setCircleCampId(type.getCircleCampId())
-																.setRefreshId(type.getBlossomChestId())
-																.build());
+                                                blossoms.add(
+                                                        BlossomBriefInfoOuterClass.BlossomBriefInfo.newBuilder()
+                                                                .setSceneId(sceneId)
+                                                                .setPos(spawn.getPos().toProto())
+                                                                .setResin(20)
+                                                                .setMonsterLevel(monsterLevel)
+                                                                .setRewardId(previewReward)
+                                                                .setCircleCampId(type.getCircleCampId())
+                                                                .setRefreshId(type.getBlossomChestId())
+                                                                .build());
                                             });
                         });
         scene.broadcastPacket(new PacketBlossomBriefInfoNotify(blossoms));
@@ -158,6 +163,28 @@ public class BlossomManager {
 
     public int getWorldLevel() {
         return scene.getWorld().getWorldLevel();
+    }
+
+    private static Integer getFallbackPreviewReward(int blossomChestId, Object data, int worldLevel) {
+        int wl = Math.max(0, Math.min(worldLevel, 8));
+        if (blossomChestId == 1) return SCOIN_REWARDS[wl];
+        if (blossomChestId == 2) return EXP_REWARDS[wl];
+        if (blossomChestId == 3) return DRAGON_A[wl];
+        if (blossomChestId == 4) return DRAGON_B[wl];
+
+        if (data != null) {
+            try {
+                var method = data.getClass().getMethod("getRefreshType");
+                Object typeObj = method.invoke(data);
+                if (typeObj != null) {
+                    String str = typeObj.toString();
+                    if (str.contains("SENTRY_TOWER")) return 31701;
+                    if (str.contains("BOMB")) return 31702;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        return null;
     }
 
     private static Integer getPreviewReward(BlossomType type, int worldLevel) {
@@ -168,58 +195,64 @@ public class BlossomManager {
         }
 
         int blossomChestId = type.getBlossomChestId();
-		var dataMap = GameData.getBlossomRefreshExcelConfigDataMap();
+        var dataMap = GameData.getBlossomRefreshExcelConfigDataMap();
 
-		if (dataMap == null || dataMap.isEmpty()) {
-			Grasscutter.getLogger().debug("Blossom refresh config data is missing.");
-			return null;
-		}
+        if (dataMap == null || dataMap.isEmpty()) {
+            Grasscutter.getLogger().debug("Blossom refresh config data is missing.");
+            return null;
+        }
 
-		for (var data : dataMap.values()) {
-			if (data == null) {
-				continue;
-			}
+        for (var data : dataMap.values()) {
+            if (data == null) {
+                continue;
+            }
 
-			if (blossomChestId == data.getBlossomChestId()) {
-				var dropVecList = data.getDropVec();
+            if (blossomChestId == data.getBlossomChestId()) {
+                var dropVecList = data.getDropVec();
 
-				if (dropVecList == null || dropVecList.length == 0) {
-					Grasscutter.getLogger()
-							.debug(
-									"Blossom refresh config has no drop vector: blossomChestId={}, type={}",
-									blossomChestId,
-									type);
-					return null;
-				}
+                // Handles File 1 where "DropVec" was capitalized and GSON skipped deserialization
+                if (dropVecList == null || dropVecList.length == 0) {
+                    Integer fallback = getFallbackPreviewReward(blossomChestId, data, worldLevel);
+                    if (fallback != null) {
+                        return fallback;
+                    }
 
-				if (worldLevel < 0 || worldLevel >= dropVecList.length) {
-					Grasscutter.getLogger()
-							.debug(
-									"Illegal blossom world level: worldLevel={}, dropVecLength={}, blossomChestId={}, type={}",
-									worldLevel,
-									dropVecList.length,
-									blossomChestId,
-									type);
-					return null;
-				}
+                    Grasscutter.getLogger()
+                            .debug(
+                                    "Blossom refresh config has no drop vector: blossomChestId={}, type={}",
+                                    blossomChestId,
+                                    type);
+                    return null;
+                }
 
-				if (dropVecList[worldLevel] == null) {
-					Grasscutter.getLogger()
-							.debug(
-									"Blossom drop vector entry is null: worldLevel={}, blossomChestId={}, type={}",
-									worldLevel,
-									blossomChestId,
-									type);
-					return null;
-				}
+                if (worldLevel < 0 || worldLevel >= dropVecList.length) {
+                    Grasscutter.getLogger()
+                            .debug(
+                                    "Illegal blossom world level: worldLevel={}, dropVecLength={}, blossomChestId={}, type={}",
+                                    worldLevel,
+                                    dropVecList.length,
+                                    blossomChestId,
+                                    type);
+                    return null;
+                }
 
-				return dropVecList[worldLevel].getPreviewReward();
-			}
-		}
+                if (dropVecList[worldLevel] == null) {
+                    Grasscutter.getLogger()
+                            .debug(
+                                    "Blossom drop vector entry is null: worldLevel={}, blossomChestId={}, type={}",
+                                    worldLevel,
+                                    blossomChestId,
+                                    type);
+                    return null;
+                }
 
-		Grasscutter.getLogger().debug("Cannot find blossom type {}", type);
-		return null;
-	}
+                return dropVecList[worldLevel].getPreviewReward();
+            }
+        }
+
+        Grasscutter.getLogger().debug("Cannot find blossom type {}", type);
+        return null;
+    }
 
     private static RewardPreviewData getRewardList(BlossomType type, int worldLevel) {
         Integer previewReward = getPreviewReward(type, worldLevel);
