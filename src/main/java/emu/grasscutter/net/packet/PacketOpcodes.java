@@ -168,7 +168,7 @@ public final class PacketOpcodes {
     public static final int DoGachaRsp = 4034;
     public static final int UnlockNameCardNotify = 21597;
     public static final int GetAllUnlockNameCardReq = 29849;
-    public static final int GetAllUnlockNameCardRsp = 9926;
+    public static final int GetAllUnlockNameCardRsp = 24599;
     public static final int SetNameCardReq = 22222;
     public static final int SetNameCardRsp = 26152;
     public static final int UpdatePlayerShowNameCardListReq = 2551;
@@ -250,9 +250,9 @@ public final class PacketOpcodes {
     public static final int WidgetCoolDownNotify = 9914;
     public static final int AllWidgetDataNotify = 20049;
     public static final int WidgetGadgetDataNotify = 21068;
-    public static final int DoSetPlayerBornDataNotify = 1;
+    public static final int DoSetPlayerBornDataNotify = 27996;
     public static final int SetPlayerBornDataReq = 29815;
-    public static final int SetPlayerBornDataRsp = 1;
+    public static final int SetPlayerBornDataRsp = 26559;
     public static final int ScenePlayerLocationNotify = 5023;
     public static final int WorldPlayerLocationNotify = 26209;
     public static final int SetPlayerPropReq = 23467;
@@ -362,6 +362,7 @@ public final class PacketOpcodes {
     public static final int ReliquaryDecomposeRsp = 4930;
     public static final int ReliquaryUpgradeReq = 22964;
     public static final int ReliquaryUpgradeRsp = 22562;
+	public static final int ReliquaryPromoteRsp = 6019;
     public static final int SceneAudioNotify = 7732;
     public static final int SceneEntityMoveNotify = 7802;
     public static final int SceneEntityUpdateNotify = 1;
