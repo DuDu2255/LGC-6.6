@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import lombok.val;
+import java.nio.charset.StandardCharsets;
 
 public class DataLoader {
 
@@ -32,15 +33,15 @@ public class DataLoader {
      * @throws FileNotFoundException
      * @see #load(String, boolean)
      */
-    public static InputStreamReader loadReader(String resourcePath)
-            throws IOException, FileNotFoundException {
-        try {
-            InputStream is = load(resourcePath, true);
-            return new InputStreamReader(is);
-        } catch (FileNotFoundException exception) {
-            throw exception;
-        }
-    }
+	public static InputStreamReader loadReader(String resourcePath)
+			throws IOException, FileNotFoundException {
+		try {
+			InputStream is = load(resourcePath, true);
+			return new InputStreamReader(is, StandardCharsets.UTF_8);
+		} catch (FileNotFoundException exception) {
+			throw exception;
+		}
+	}
 
     /**
      * Load a data file by its name.

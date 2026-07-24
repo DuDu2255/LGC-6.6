@@ -32,14 +32,23 @@ public class BossChestInteractHandler implements ChestInteractHandler {
             return true;
         }
 
-        var worldDataManager = chest.getGadget().getScene().getWorld().getServer().getWorldDataSystem();
+        var metaGadget = chest.getGadget().getMetaGadget();
         var monster =
-                chest
-                        .getGadget()
-                        .getMetaGadget()
-                        .group
-                        .monsters
-                        .get(chest.getGadget().getMetaGadget().boss_chest.monster_config_id);
+                metaGadget.group.monsters.get(metaGadget.boss_chest.monster_config_id);
+
+        var nativeRewards =
+                player
+                        .getServer()
+                        .getDropSystem()
+                        .generatePre33BossChestRewards(
+                                metaGadget.drop_tag, monster.monster_id, player.getWorldLevel());
+        if (!nativeRewards.isEmpty()) {
+            player.getInventory().addItems(nativeRewards, ActionReason.OpenWorldBossChest);
+            player.sendPacket(new PacketGadgetAutoPickDropInfoNotify(nativeRewards));
+            return true;
+        }
+
+        var worldDataManager = chest.getGadget().getScene().getWorld().getServer().getWorldDataSystem();
         var reward = worldDataManager.getRewardByBossId(monster.monster_id);
 
         if (reward == null) {

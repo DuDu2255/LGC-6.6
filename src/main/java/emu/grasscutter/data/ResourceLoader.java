@@ -953,13 +953,17 @@ public final class ResourceLoader {
 
         try {
             val dropTableExcelConfigDataMap = GameData.getDropTableExcelConfigDataMap();
-            try {
-                JsonUtils.loadToList(
-                                getResourcePath("Server/DropTableExcelConfigData.json"),
-                                DropTableExcelConfigData.class)
-                        .forEach(entry -> dropTableExcelConfigDataMap.put(entry.getId(), entry));
-                ;
-            } catch (IOException | NullPointerException ignored) {
+            for (String fileName :
+                    new String[] {
+                        "Server/DropTableExcelConfigData.json",
+                        "Server/DropSubTableExcelConfigData.json"
+                    }) {
+                try {
+                    JsonUtils.loadToList(
+                                    getResourcePath(fileName), DropTableExcelConfigData.class)
+                            .forEach(entry -> dropTableExcelConfigDataMap.put(entry.getId(), entry));
+                } catch (IOException | NullPointerException ignored) {
+                }
             }
             Grasscutter.getLogger()
                     .debug("Loaded {} drop table configs.", dropTableExcelConfigDataMap.size());

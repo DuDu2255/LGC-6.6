@@ -45,8 +45,18 @@ public class GadgetChest extends GadgetContent {
                 // TODO:check for take_num.(some boss rewards can only be claimed once a week.). Handle boss
                 // respawn.
                 // TODO:should return Retcode.RET_RESIN_NOT_ENOUGH ?
+                int bossMonsterId = 0;
+                if (chest.group != null && chest.group.monsters != null) {
+                    var bossMonster =
+                            chest.group.monsters.get(chest.boss_chest.monster_config_id);
+                    if (bossMonster != null) {
+                        bossMonsterId = bossMonster.monster_id;
+                    }
+                }
+
                 if (player.getResinManager().useResin(chest.boss_chest.resin)
-                        && dropSystem.handleBossChestDrop(chest.drop_tag, player)) {
+                        && dropSystem.handleBossChestDrop(
+                                chest.drop_tag, bossMonsterId, player)) {
                     // Is it correct?
                     player
                             .getBattlePassManager()
