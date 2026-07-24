@@ -20,6 +20,20 @@ public class WorldDataSystem extends BaseGameSystem {
 	private static final int BATHYSMAL_VISHAP_HERD_INVESTIGATION_ID = 37;
 	private static final int BATHYSMAL_VISHAP_HERD_GROUP_ID = 155005095;
 
+	// Verified fallback spawn locations for bosses whose original 5.5+ scene groups are not
+	// available in the current resources. Keyed by InvestigationMonsterConfigData id.
+	private static final Map<Integer, Position> BOSS_MARKER_POSITION_OVERRIDES =
+			Map.ofEntries(
+					Map.entry(79, new Position(-2251.9714f, 49.476456f, 9916.862f)),
+					Map.entry(81, new Position(-3727.111f, 200.8754f, 11969.676f)),
+					Map.entry(87, new Position(1471.1244f, 202.01233f, 10044.031f)),
+					Map.entry(88, new Position(2504.9219f, 188.9483f, 9299.773f)),
+					Map.entry(89, new Position(2327.8179f, 200.41061f, 10755.111f)),
+					Map.entry(90, new Position(3423.3567f, 102.921936f, 9508.739f)),
+					Map.entry(92, new Position(6406.6543f, 200.07468f, 10363.549f)),
+					Map.entry(93, new Position(5792.5312f, 183.56174f, 9684.56f)),
+					Map.entry(94, new Position(4200.399f, 91.27003f, -258.2993f)));
+
     public WorldDataSystem(GameServer server) {
         super(server);
         this.chestInteractHandlerMap = new HashMap<>();
@@ -217,8 +231,7 @@ public class WorldDataSystem extends BaseGameSystem {
 		if (imd.getGroupIdList() == null
 				|| imd.getGroupIdList().isEmpty()
 				|| imd.getMonsterIdList() == null
-				|| imd.getMonsterIdList().isEmpty()
-				|| !imd.hasMapMarkerPosition()) {
+				|| imd.getMonsterIdList().isEmpty()) {
 			return null;
 		}
 
@@ -343,6 +356,11 @@ public class WorldDataSystem extends BaseGameSystem {
 
     private Position getInvestigationMonsterMarkerPosition(
             InvestigationMonsterData imd, int sceneId, int groupId, int monsterId) {
+        var override = BOSS_MARKER_POSITION_OVERRIDES.get(imd.getId());
+        if (override != null) {
+            return override.clone();
+        }
+
         var group = getInvestigationGroup(sceneId, groupId);
 
         if (group != null && group.monsters != null) {

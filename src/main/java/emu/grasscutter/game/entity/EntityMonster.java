@@ -523,6 +523,12 @@ public class EntityMonster extends GameEntity {
                         .setTitleId(data.getDescribeData().getTitleId())
                         .setSpecialNameId(data.getSpecialNameId());
             }
+        } else if (data.getType() == MonsterType.MONSTER_BOSS && data.getDescribeData() != null) {
+            // Static fallback bosses do not have SceneMonster Lua metadata. Populate their
+            // normal title metadata from MonsterData so the client can render the boss bar.
+            monsterInfo
+                    .setTitleId(data.getDescribeData().getTitleId())
+                    .setSpecialNameId(data.getSpecialNameId());
         }
 
         if (this.getMonsterWeaponId() > 0) {
