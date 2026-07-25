@@ -25,6 +25,7 @@ import emu.grasscutter.server.packet.send.PacketAvatarFightPropNotify;
 import emu.grasscutter.server.packet.send.PacketEntityFightPropChangeReasonNotify;
 import emu.grasscutter.server.packet.send.PacketEntityFightPropUpdateNotify;
 import it.unimi.dsi.fastutil.ints.*;
+import emu.grasscutter.utils.Utils;
 import emu.grasscutter.*;
 import emu.grasscutter.data.GameData;
 
@@ -463,37 +464,36 @@ public abstract class GameEntity {
         if (dropTableEntry == null) return false;
 
         Int2ObjectMap<Integer> itemsToDrop = new Int2ObjectOpenHashMap<>();
+
         switch (dropTableEntry.getRandomType()) {
-            case 0:
-                {
-                    int weightCount = 0;
-                    for (var entry : dropTableEntry.getDropVec()) weightCount += entry.getWeight();
+            case 0 -> { // Weighted Random Selection (selects exactly 1 item)
+                int weightCount = 0;
+                for (var entry : dropTableEntry.getDropVec()) {
+                    weightCount += entry.getWeight();
+                }
+                if (weightCount <= 0) break;
 
-                    int randomValue = new Random().nextInt(weightCount);
-
-                    weightCount = 0;
-                    for (var entry : dropTableEntry.getDropVec()) {
-                        if (randomValue >= weightCount && randomValue < (weightCount + entry.getWeight())) {
-                            var countRange = parseCountRange(entry.getCountRange());
-                            itemsToDrop.put(
-                                    entry.getItemId(),
-                                    Integer.valueOf((new Random().nextBoolean() ? countRange[0] : countRange[1])));
-                        }
+                int randomValue = Utils.random.nextInt(weightCount);
+                int currentWeight = 0;
+                for (var entry : dropTableEntry.getDropVec()) {
+                    currentWeight += entry.getWeight();
+                    if (randomValue < currentWeight) {
+                        var countRange = parseCountRange(entry.getCountRange());
+                        int amount = Utils.randomRange(countRange[0], countRange[1]);
+                        itemsToDrop.put(entry.getItemId(), Integer.valueOf(amount));
+                        break; // Stop as soon as 1 item is selected
                     }
                 }
-                break;
-            case 1:
-                {
-                    for (var entry : dropTableEntry.getDropVec()) {
-                        if (entry.getWeight() < new Random().nextInt(10000)) {
-                            var countRange = parseCountRange(entry.getCountRange());
-                            itemsToDrop.put(
-                                    entry.getItemId(),
-                                    Integer.valueOf((new Random().nextBoolean() ? countRange[0] : countRange[1])));
-                        }
+            }
+            case 1 -> { // Independent Chance Roll per item
+                for (var entry : dropTableEntry.getDropVec()) {
+                    if (Utils.random.nextInt(10000) < entry.getWeight()) {
+                        var countRange = parseCountRange(entry.getCountRange());
+                        int amount = Utils.randomRange(countRange[0], countRange[1]);
+                        itemsToDrop.put(entry.getItemId(), Integer.valueOf(amount));
                     }
                 }
-                break;
+            }
         }
 
         for (var entry : itemsToDrop.int2ObjectEntrySet()) {
@@ -505,10 +505,8 @@ public abstract class GameEntity {
                             getPosition().nearby2d(1f).addY(0.5f),
                             entry.getValue(),
                             true);
-
             scene.addEntity(item);
         }
-
         return true;
     }
 
