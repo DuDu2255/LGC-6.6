@@ -8,11 +8,9 @@ import emu.grasscutter.server.packet.send.*;
 
 @Opcodes(PacketOpcodes.SceneInitFinishReq)
 public class HandlerSceneInitFinishReq extends PacketHandler {
-
     @Override
     public void handle(GameSession session, byte[] header, byte[] payload) throws Exception {
         SceneInitFinishReq req = SceneInitFinishReq.parseFrom(payload);
-
         var player = session.getPlayer();
         var world = player.getWorld();
 
@@ -20,13 +18,13 @@ public class HandlerSceneInitFinishReq extends PacketHandler {
         session.send(new PacketWorldPlayerInfoNotify(world));
         session.send(new PacketWorldDataNotify(world));
         session.send(new PacketPlayerWorldSceneInfoListNotify(player));
-        session.send(new PacketSceneForceUnlockNotify(1, true));
+        // Removed PacketSceneForceUnlockNotify call
         session.send(new PacketHostPlayerNotify(world));
         session.send(new PacketSceneDataNotify(player.getSceneId()));
-
         session.send(new PacketSceneTimeNotify(player));
         session.send(new PacketPlayerGameTimeNotify(player));
         session.send(new PacketPlayerEnterSceneInfoNotify(player));
+        
         int moonPhaseCount = (int) player.getTeamManager().getActiveTeam().stream()
                 .filter(e -> PacketPlayerEnterSceneInfoNotify.getMoonphaseIds().contains(e.getAvatar().getAvatarId()))
                 .count();
@@ -38,15 +36,11 @@ public class HandlerSceneInitFinishReq extends PacketHandler {
         session.send(new PacketSceneAreaWeatherNotify(player));
         session.send(new PacketScenePlayerInfoNotify(world));
         session.send(new PacketSceneTeamUpdateNotify(player));
-
         session.send(new PacketSyncTeamEntityNotify(player));
         session.send(new PacketSyncScenePlayTeamEntityNotify(player));
-
         session.send(new PacketSceneInitFinishRsp(player));
         session.send((BasePacket)new PacketWindSeedUID());
-
         player.setSceneLoadState(SceneLoadState.INIT);
-
         player.getScene().playerSceneInitialized(player);
     }
 }
