@@ -521,7 +521,7 @@ public final class GetParentQuestVideoKeyRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setParentQuestId(int value) {
-        
+
         parentQuestId_ = value;
         onChanged();
         return this;
@@ -531,7 +531,7 @@ public final class GetParentQuestVideoKeyRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearParentQuestId() {
-        
+
         parentQuestId_ = 0;
         onChanged();
         return this;
@@ -552,7 +552,7 @@ public final class GetParentQuestVideoKeyRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setRetcode(int value) {
-        
+
         retcode_ = value;
         onChanged();
         return this;
@@ -562,7 +562,7 @@ public final class GetParentQuestVideoKeyRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearRetcode() {
-        
+
         retcode_ = 0;
         onChanged();
         return this;
@@ -583,7 +583,7 @@ public final class GetParentQuestVideoKeyRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setVideoKey(long value) {
-        
+
         videoKey_ = value;
         onChanged();
         return this;
@@ -593,7 +593,7 @@ public final class GetParentQuestVideoKeyRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearVideoKey() {
-        
+
         videoKey_ = 0L;
         onChanged();
         return this;
@@ -653,7 +653,7 @@ public final class GetParentQuestVideoKeyRspOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_GetParentQuestVideoKeyRsp_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_GetParentQuestVideoKeyRsp_fieldAccessorTable;
 

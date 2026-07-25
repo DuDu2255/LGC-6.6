@@ -104,7 +104,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
               parentQuestId_ = input.readUInt32();
               break;
             }
-            case 48: {
+            case 112: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 questVar_ = newIntList();
                 mutable_bitField0_ |= 0x00000001;
@@ -112,7 +112,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
               questVar_.addInt(input.readInt32());
               break;
             }
-            case 50: {
+            case 114: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
@@ -234,7 +234,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
         output.writeUInt32(13, parentQuestId_);
       }
       if (getQuestVarList().size() > 0) {
-        output.writeUInt32NoTag(50);
+        output.writeUInt32NoTag(114);
         output.writeUInt32NoTag(questVarMemoizedSerializedSize);
       }
       for (int i = 0; i < questVar_.size(); i++) {
@@ -601,7 +601,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder setParentQuestId(int value) {
-        
+
         parentQuestId_ = value;
         onChanged();
         return this;
@@ -611,7 +611,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearParentQuestId() {
-        
+
         parentQuestId_ = 0;
         onChanged();
         return this;
@@ -711,7 +711,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder setParentQuestVarSeq(int value) {
-        
+
         parentQuestVarSeq_ = value;
         onChanged();
         return this;
@@ -721,7 +721,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearParentQuestVarSeq() {
-        
+
         parentQuestVarSeq_ = 0;
         onChanged();
         return this;
@@ -781,7 +781,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_QuestUpdateQuestVarNotify_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_QuestUpdateQuestVarNotify_fieldAccessorTable;
 

@@ -21,7 +21,7 @@ public final class HomeMarkPointNotifyOuterClass {
     /**
      * <code>repeated .HomeMarkPointSceneData mark_point_data_list = 2;</code>
      */
-    java.util.List<emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData> 
+    java.util.List<emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData>
         getMarkPointDataListList();
     /**
      * <code>repeated .HomeMarkPointSceneData mark_point_data_list = 2;</code>
@@ -34,7 +34,7 @@ public final class HomeMarkPointNotifyOuterClass {
     /**
      * <code>repeated .HomeMarkPointSceneData mark_point_data_list = 2;</code>
      */
-    java.util.List<? extends emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneDataOrBuilder> 
+    java.util.List<? extends emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneDataOrBuilder>
         getMarkPointDataListOrBuilderList();
     /**
      * <code>repeated .HomeMarkPointSceneData mark_point_data_list = 2;</code>
@@ -44,7 +44,7 @@ public final class HomeMarkPointNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 23013
+   * CmdId: 5650
    * Obf: GKDFNALJFOI
    * </pre>
    *
@@ -94,7 +94,7 @@ public final class HomeMarkPointNotifyOuterClass {
             case 0:
               done = true;
               break;
-            case 18: {
+            case 90: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 markPointDataList_ = new java.util.ArrayList<emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData>();
                 mutable_bitField0_ |= 0x00000001;
@@ -151,7 +151,7 @@ public final class HomeMarkPointNotifyOuterClass {
      * <code>repeated .HomeMarkPointSceneData mark_point_data_list = 2;</code>
      */
     @java.lang.Override
-    public java.util.List<? extends emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneDataOrBuilder> 
+    public java.util.List<? extends emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneDataOrBuilder>
         getMarkPointDataListOrBuilderList() {
       return markPointDataList_;
     }
@@ -337,7 +337,7 @@ public final class HomeMarkPointNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 23013
+     * CmdId: 5650
      * Obf: GKDFNALJFOI
      * </pre>
      *
@@ -487,7 +487,7 @@ public final class HomeMarkPointNotifyOuterClass {
               markPointDataListBuilder_ = null;
               markPointDataList_ = other.markPointDataList_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              markPointDataListBuilder_ = 
+              markPointDataListBuilder_ =
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getMarkPointDataListFieldBuilder() : null;
             } else {
@@ -720,7 +720,7 @@ public final class HomeMarkPointNotifyOuterClass {
       /**
        * <code>repeated .HomeMarkPointSceneData mark_point_data_list = 2;</code>
        */
-      public java.util.List<? extends emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneDataOrBuilder> 
+      public java.util.List<? extends emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneDataOrBuilder>
            getMarkPointDataListOrBuilderList() {
         if (markPointDataListBuilder_ != null) {
           return markPointDataListBuilder_.getMessageOrBuilderList();
@@ -746,12 +746,12 @@ public final class HomeMarkPointNotifyOuterClass {
       /**
        * <code>repeated .HomeMarkPointSceneData mark_point_data_list = 2;</code>
        */
-      public java.util.List<emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData.Builder> 
+      public java.util.List<emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData.Builder>
            getMarkPointDataListBuilderList() {
         return getMarkPointDataListFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilderV3<
-          emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData, emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData.Builder, emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneDataOrBuilder> 
+          emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData, emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneData.Builder, emu.grasscutter.net.proto.HomeMarkPointSceneDataOuterClass.HomeMarkPointSceneDataOrBuilder>
           getMarkPointDataListFieldBuilder() {
         if (markPointDataListBuilder_ == null) {
           markPointDataListBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
@@ -819,7 +819,7 @@ public final class HomeMarkPointNotifyOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeMarkPointNotify_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeMarkPointNotify_fieldAccessorTable;
 

@@ -43,7 +43,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 28859
+   * CmdId: 28558
    * Obf: FPPEJACMKOJ
    * </pre>
    *
@@ -98,7 +98,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
               isAll_ = input.readBool();
               break;
             }
-            case 120: {
+            case 24: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 furnitureIdList_ = newIntList();
                 mutable_bitField0_ |= 0x00000001;
@@ -106,7 +106,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
               furnitureIdList_.addInt(input.readUInt32());
               break;
             }
-            case 122: {
+            case 26: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
@@ -165,7 +165,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
       return isAll_;
     }
 
-    public static final int FURNITURE_ID_LIST_FIELD_NUMBER = 15;
+    public static final int FURNITURE_ID_LIST_FIELD_NUMBER = 3;
     private com.google.protobuf.Internal.IntList furnitureIdList_;
     /**
      * <code>repeated uint32 furniture_id_list = 15;</code>
@@ -212,7 +212,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
         output.writeBool(4, isAll_);
       }
       if (getFurnitureIdListList().size() > 0) {
-        output.writeUInt32NoTag(122);
+        output.writeUInt32NoTag(26);
         output.writeUInt32NoTag(furnitureIdListMemoizedSerializedSize);
       }
       for (int i = 0; i < furnitureIdList_.size(); i++) {
@@ -379,7 +379,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 28859
+     * CmdId: 28558
      * Obf: FPPEJACMKOJ
      * </pre>
      *
@@ -563,7 +563,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder setIsAll(boolean value) {
-        
+
         isAll_ = value;
         onChanged();
         return this;
@@ -573,7 +573,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearIsAll() {
-        
+
         isAll_ = false;
         onChanged();
         return this;
@@ -712,7 +712,7 @@ public final class UnlockedFurnitureFormulaDataNotifyOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_UnlockedFurnitureFormulaDataNotify_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_UnlockedFurnitureFormulaDataNotify_fieldAccessorTable;
 

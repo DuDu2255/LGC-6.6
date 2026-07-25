@@ -26,7 +26,7 @@ public final class HomeChangeBgmNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 2031
+   * CmdId: 24731
    * Obf: HIJFHJEALCJ
    * </pre>
    *
@@ -74,7 +74,7 @@ public final class HomeChangeBgmNotifyOuterClass {
             case 0:
               done = true;
               break;
-            case 16: {
+            case 104: {
 
               bgmId_ = input.readUInt32();
               break;
@@ -111,7 +111,7 @@ public final class HomeChangeBgmNotifyOuterClass {
               emu.grasscutter.net.proto.HomeChangeBgmNotifyOuterClass.HomeChangeBgmNotify.class, emu.grasscutter.net.proto.HomeChangeBgmNotifyOuterClass.HomeChangeBgmNotify.Builder.class);
     }
 
-    public static final int BGM_ID_FIELD_NUMBER = 2;
+    public static final int BGM_ID_FIELD_NUMBER = 13;
     private int bgmId_;
     /**
      * <code>uint32 bgm_id = 2;</code>
@@ -137,7 +137,7 @@ public final class HomeChangeBgmNotifyOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (bgmId_ != 0) {
-        output.writeUInt32(2, bgmId_);
+        output.writeUInt32(13, bgmId_);
       }
       unknownFields.writeTo(output);
     }
@@ -150,7 +150,7 @@ public final class HomeChangeBgmNotifyOuterClass {
       size = 0;
       if (bgmId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(2, bgmId_);
+          .computeUInt32Size(13, bgmId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -279,7 +279,7 @@ public final class HomeChangeBgmNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 2031
+     * CmdId: 24731
      * Obf: HIJFHJEALCJ
      * </pre>
      *
@@ -444,7 +444,7 @@ public final class HomeChangeBgmNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder setBgmId(int value) {
-        
+
         bgmId_ = value;
         onChanged();
         return this;
@@ -454,7 +454,7 @@ public final class HomeChangeBgmNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearBgmId() {
-        
+
         bgmId_ = 0;
         onChanged();
         return this;
@@ -514,7 +514,7 @@ public final class HomeChangeBgmNotifyOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeChangeBgmNotify_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeChangeBgmNotify_fieldAccessorTable;
 

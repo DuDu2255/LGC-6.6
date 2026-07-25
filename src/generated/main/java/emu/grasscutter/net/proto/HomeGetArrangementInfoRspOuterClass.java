@@ -21,7 +21,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
     /**
      * <code>repeated .HomeSceneArrangementInfo scene_arrangement_info_list = 4;</code>
      */
-    java.util.List<emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo> 
+    java.util.List<emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo>
         getSceneArrangementInfoListList();
     /**
      * <code>repeated .HomeSceneArrangementInfo scene_arrangement_info_list = 4;</code>
@@ -34,7 +34,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
     /**
      * <code>repeated .HomeSceneArrangementInfo scene_arrangement_info_list = 4;</code>
      */
-    java.util.List<? extends emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfoOrBuilder> 
+    java.util.List<? extends emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfoOrBuilder>
         getSceneArrangementInfoListOrBuilderList();
     /**
      * <code>repeated .HomeSceneArrangementInfo scene_arrangement_info_list = 4;</code>
@@ -50,7 +50,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 24303
+   * CmdId: 22920
    * Obf: BHJNKKACMMH
    * </pre>
    *
@@ -100,7 +100,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
             case 0:
               done = true;
               break;
-            case 34: {
+            case 98: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 sceneArrangementInfoList_ = new java.util.ArrayList<emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo>();
                 mutable_bitField0_ |= 0x00000001;
@@ -109,7 +109,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
                   input.readMessage(emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo.parser(), extensionRegistry));
               break;
             }
-            case 96: {
+            case 40: {
 
               retcode_ = input.readInt32();
               break;
@@ -162,7 +162,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
      * <code>repeated .HomeSceneArrangementInfo scene_arrangement_info_list = 4;</code>
      */
     @java.lang.Override
-    public java.util.List<? extends emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfoOrBuilder> 
+    public java.util.List<? extends emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfoOrBuilder>
         getSceneArrangementInfoListOrBuilderList() {
       return sceneArrangementInfoList_;
     }
@@ -370,7 +370,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 24303
+     * CmdId: 22920
      * Obf: BHJNKKACMMH
      * </pre>
      *
@@ -523,7 +523,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
               sceneArrangementInfoListBuilder_ = null;
               sceneArrangementInfoList_ = other.sceneArrangementInfoList_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              sceneArrangementInfoListBuilder_ = 
+              sceneArrangementInfoListBuilder_ =
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getSceneArrangementInfoListFieldBuilder() : null;
             } else {
@@ -759,7 +759,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
       /**
        * <code>repeated .HomeSceneArrangementInfo scene_arrangement_info_list = 4;</code>
        */
-      public java.util.List<? extends emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfoOrBuilder> 
+      public java.util.List<? extends emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfoOrBuilder>
            getSceneArrangementInfoListOrBuilderList() {
         if (sceneArrangementInfoListBuilder_ != null) {
           return sceneArrangementInfoListBuilder_.getMessageOrBuilderList();
@@ -785,12 +785,12 @@ public final class HomeGetArrangementInfoRspOuterClass {
       /**
        * <code>repeated .HomeSceneArrangementInfo scene_arrangement_info_list = 4;</code>
        */
-      public java.util.List<emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo.Builder> 
+      public java.util.List<emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo.Builder>
            getSceneArrangementInfoListBuilderList() {
         return getSceneArrangementInfoListFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilderV3<
-          emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo, emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo.Builder, emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfoOrBuilder> 
+          emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo, emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfo.Builder, emu.grasscutter.net.proto.HomeSceneArrangementInfoOuterClass.HomeSceneArrangementInfoOrBuilder>
           getSceneArrangementInfoListFieldBuilder() {
         if (sceneArrangementInfoListBuilder_ == null) {
           sceneArrangementInfoListBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
@@ -819,7 +819,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setRetcode(int value) {
-        
+
         retcode_ = value;
         onChanged();
         return this;
@@ -829,7 +829,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearRetcode() {
-        
+
         retcode_ = 0;
         onChanged();
         return this;
@@ -889,7 +889,7 @@ public final class HomeGetArrangementInfoRspOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeGetArrangementInfoRsp_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeGetArrangementInfoRsp_fieldAccessorTable;
 

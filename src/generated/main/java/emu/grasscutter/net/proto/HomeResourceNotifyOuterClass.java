@@ -50,7 +50,7 @@ public final class HomeResourceNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 5204
+   * CmdId: 2007
    * Obf: MCCGNBOJCCK
    * </pre>
    *
@@ -386,7 +386,7 @@ public final class HomeResourceNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 5204
+     * CmdId: 2007
      * Obf: MCCGNBOJCCK
      * </pre>
      *
@@ -645,7 +645,7 @@ public final class HomeResourceNotifyOuterClass {
        * <code>.HomeResource fetter_exp = 1;</code>
        */
       public emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource.Builder getFetterExpBuilder() {
-        
+
         onChanged();
         return getFetterExpFieldBuilder().getBuilder();
       }
@@ -664,7 +664,7 @@ public final class HomeResourceNotifyOuterClass {
        * <code>.HomeResource fetter_exp = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource, emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource.Builder, emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResourceOrBuilder> 
+          emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource, emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource.Builder, emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResourceOrBuilder>
           getFetterExpFieldBuilder() {
         if (fetterExpBuilder_ == null) {
           fetterExpBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -764,7 +764,7 @@ public final class HomeResourceNotifyOuterClass {
        * <code>.HomeResource home_coin = 12;</code>
        */
       public emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource.Builder getHomeCoinBuilder() {
-        
+
         onChanged();
         return getHomeCoinFieldBuilder().getBuilder();
       }
@@ -783,7 +783,7 @@ public final class HomeResourceNotifyOuterClass {
        * <code>.HomeResource home_coin = 12;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource, emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource.Builder, emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResourceOrBuilder> 
+          emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource, emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResource.Builder, emu.grasscutter.net.proto.HomeResourceOuterClass.HomeResourceOrBuilder>
           getHomeCoinFieldBuilder() {
         if (homeCoinBuilder_ == null) {
           homeCoinBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -850,7 +850,7 @@ public final class HomeResourceNotifyOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeResourceNotify_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeResourceNotify_fieldAccessorTable;
 

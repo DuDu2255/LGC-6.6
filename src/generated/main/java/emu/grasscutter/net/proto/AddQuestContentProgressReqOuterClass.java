@@ -69,17 +69,17 @@ public final class AddQuestContentProgressReqOuterClass {
             case 0:
               done = true;
               break;
-            case 16: {
+            case 96: {
 
               contentType_ = input.readUInt32();
               break;
             }
-            case 24: {
+            case 80: {
 
               addProgress_ = input.readUInt32();
               break;
             }
-            case 40: {
+            case 32: {
 
               param_ = input.readUInt32();
               break;
@@ -116,7 +116,7 @@ public final class AddQuestContentProgressReqOuterClass {
               emu.grasscutter.net.proto.AddQuestContentProgressReqOuterClass.AddQuestContentProgressReq.class, emu.grasscutter.net.proto.AddQuestContentProgressReqOuterClass.AddQuestContentProgressReq.Builder.class);
     }
 
-    public static final int CONTENT_TYPE_FIELD_NUMBER = 2;
+    public static final int CONTENT_TYPE_FIELD_NUMBER = 12;
     private int contentType_;
 
     @java.lang.Override
@@ -124,7 +124,7 @@ public final class AddQuestContentProgressReqOuterClass {
       return contentType_;
     }
 
-    public static final int ADD_PROGRESS_FIELD_NUMBER = 3;
+    public static final int ADD_PROGRESS_FIELD_NUMBER = 10;
     private int addProgress_;
 
     @java.lang.Override
@@ -132,7 +132,7 @@ public final class AddQuestContentProgressReqOuterClass {
       return addProgress_;
     }
 
-    public static final int PARAM_FIELD_NUMBER = 5;
+    public static final int PARAM_FIELD_NUMBER = 4;
     private int param_;
 
     @java.lang.Override
@@ -155,13 +155,13 @@ public final class AddQuestContentProgressReqOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (contentType_ != 0) {
-        output.writeUInt32(2, contentType_);
+        output.writeUInt32(12, contentType_);
       }
       if (addProgress_ != 0) {
-        output.writeUInt32(3, addProgress_);
+        output.writeUInt32(10, addProgress_);
       }
       if (param_ != 0) {
-        output.writeUInt32(5, param_);
+        output.writeUInt32(4, param_);
       }
       unknownFields.writeTo(output);
     }
@@ -174,15 +174,15 @@ public final class AddQuestContentProgressReqOuterClass {
       size = 0;
       if (contentType_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(2, contentType_);
+          .computeUInt32Size(12, contentType_);
       }
       if (addProgress_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(3, addProgress_);
+          .computeUInt32Size(10, addProgress_);
       }
       if (param_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(5, param_);
+          .computeUInt32Size(4, param_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;

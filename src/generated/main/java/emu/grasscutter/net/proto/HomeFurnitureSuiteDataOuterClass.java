@@ -119,7 +119,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
             case 0:
               done = true;
               break;
-            case 24: {
+            case 64: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 includedFurnitureIndexList_ = newIntList();
                 mutable_bitField0_ |= 0x00000001;
@@ -127,7 +127,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
               includedFurnitureIndexList_.addInt(input.readInt32());
               break;
             }
-            case 26: {
+            case 66: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
@@ -140,22 +140,22 @@ public final class HomeFurnitureSuiteDataOuterClass {
               input.popLimit(limit);
               break;
             }
-            case 56: {
+            case 48: {
 
               isAllowSummon_ = input.readBool();
               break;
             }
-            case 64: {
+            case 104: {
 
               suiteId_ = input.readUInt32();
               break;
             }
-            case 80: {
+            case 120: {
 
               guid_ = input.readUInt32();
               break;
             }
-            case 114: {
+            case 82: {
               emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder subBuilder = null;
               if (spawnPos_ != null) {
                 subBuilder = spawnPos_.toBuilder();
@@ -306,7 +306,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
                         throws java.io.IOException {
       getSerializedSize();
       if (getIncludedFurnitureIndexListList().size() > 0) {
-        output.writeUInt32NoTag(26);
+        output.writeUInt32NoTag(66);
         output.writeUInt32NoTag(includedFurnitureIndexListMemoizedSerializedSize);
       }
       for (int i = 0; i < includedFurnitureIndexList_.size(); i++) {
@@ -322,7 +322,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
         output.writeUInt32(15, guid_);
       }
       if (spawnPos_ != null) {
-        output.writeMessage(14, getSpawnPos());
+        output.writeMessage(10, getSpawnPos());
       }
       unknownFields.writeTo(output);
     }
@@ -361,7 +361,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
       }
       if (spawnPos_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(14, getSpawnPos());
+          .computeMessageSize(10, getSpawnPos());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -795,7 +795,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
        * <code>.Vector spawn_pos = 14;</code>
        */
       public emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder getSpawnPosBuilder() {
-        
+
         onChanged();
         return getSpawnPosFieldBuilder().getBuilder();
       }
@@ -814,7 +814,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
        * <code>.Vector spawn_pos = 14;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder> 
+          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder>
           getSpawnPosFieldBuilder() {
         if (spawnPosBuilder_ == null) {
           spawnPosBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -842,7 +842,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
        * @return This builder for chaining.
        */
       public Builder setGuid(int value) {
-        
+
         guid_ = value;
         onChanged();
         return this;
@@ -852,7 +852,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearGuid() {
-        
+
         guid_ = 0;
         onChanged();
         return this;
@@ -873,7 +873,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
        * @return This builder for chaining.
        */
       public Builder setSuiteId(int value) {
-        
+
         suiteId_ = value;
         onChanged();
         return this;
@@ -883,7 +883,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearSuiteId() {
-        
+
         suiteId_ = 0;
         onChanged();
         return this;
@@ -983,7 +983,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
        * @return This builder for chaining.
        */
       public Builder setIsAllowSummon(boolean value) {
-        
+
         isAllowSummon_ = value;
         onChanged();
         return this;
@@ -993,7 +993,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearIsAllowSummon() {
-        
+
         isAllowSummon_ = false;
         onChanged();
         return this;
@@ -1053,7 +1053,7 @@ public final class HomeFurnitureSuiteDataOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeFurnitureSuiteData_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeFurnitureSuiteData_fieldAccessorTable;
 

@@ -26,7 +26,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 2521
+   * CmdId: 28563
    * Obf: GPHNPONJLKO
    * </pre>
    *
@@ -74,7 +74,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
             case 0:
               done = true;
               break;
-            case 8: {
+            case 32: {
 
               sceneId_ = input.readUInt32();
               break;
@@ -111,7 +111,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
               emu.grasscutter.net.proto.HomeSaveArrangementNoChangeReqOuterClass.HomeSaveArrangementNoChangeReq.class, emu.grasscutter.net.proto.HomeSaveArrangementNoChangeReqOuterClass.HomeSaveArrangementNoChangeReq.Builder.class);
     }
 
-    public static final int SCENE_ID_FIELD_NUMBER = 1;
+    public static final int SCENE_ID_FIELD_NUMBER = 4;
     private int sceneId_;
     /**
      * <code>uint32 scene_id = 1;</code>
@@ -137,7 +137,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (sceneId_ != 0) {
-        output.writeUInt32(1, sceneId_);
+        output.writeUInt32(4, sceneId_);
       }
       unknownFields.writeTo(output);
     }
@@ -150,7 +150,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
       size = 0;
       if (sceneId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, sceneId_);
+          .computeUInt32Size(4, sceneId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -279,7 +279,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 2521
+     * CmdId: 28563
      * Obf: GPHNPONJLKO
      * </pre>
      *
@@ -444,7 +444,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder setSceneId(int value) {
-        
+
         sceneId_ = value;
         onChanged();
         return this;
@@ -454,7 +454,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearSceneId() {
-        
+
         sceneId_ = 0;
         onChanged();
         return this;
@@ -514,7 +514,7 @@ public final class HomeSaveArrangementNoChangeReqOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeSaveArrangementNoChangeReq_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeSaveArrangementNoChangeReq_fieldAccessorTable;
 

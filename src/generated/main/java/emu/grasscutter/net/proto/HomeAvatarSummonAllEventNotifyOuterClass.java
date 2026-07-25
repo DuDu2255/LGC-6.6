@@ -21,7 +21,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
     /**
      * <code>repeated .HomeAvatarSummonEventInfo summon_event_list = 15;</code>
      */
-    java.util.List<emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo> 
+    java.util.List<emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo>
         getSummonEventListList();
     /**
      * <code>repeated .HomeAvatarSummonEventInfo summon_event_list = 15;</code>
@@ -34,7 +34,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
     /**
      * <code>repeated .HomeAvatarSummonEventInfo summon_event_list = 15;</code>
      */
-    java.util.List<? extends emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfoOrBuilder> 
+    java.util.List<? extends emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfoOrBuilder>
         getSummonEventListOrBuilderList();
     /**
      * <code>repeated .HomeAvatarSummonEventInfo summon_event_list = 15;</code>
@@ -44,7 +44,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 6401
+   * CmdId: 23983
    * Obf: BPCEHNJGDLB
    * </pre>
    *
@@ -94,7 +94,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
             case 0:
               done = true;
               break;
-            case 122: {
+            case 58: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 summonEventList_ = new java.util.ArrayList<emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo>();
                 mutable_bitField0_ |= 0x00000001;
@@ -138,7 +138,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
               emu.grasscutter.net.proto.HomeAvatarSummonAllEventNotifyOuterClass.HomeAvatarSummonAllEventNotify.class, emu.grasscutter.net.proto.HomeAvatarSummonAllEventNotifyOuterClass.HomeAvatarSummonAllEventNotify.Builder.class);
     }
 
-    public static final int SUMMON_EVENT_LIST_FIELD_NUMBER = 15;
+    public static final int SUMMON_EVENT_LIST_FIELD_NUMBER = 7;
     private java.util.List<emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo> summonEventList_;
     /**
      * <code>repeated .HomeAvatarSummonEventInfo summon_event_list = 15;</code>
@@ -151,7 +151,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
      * <code>repeated .HomeAvatarSummonEventInfo summon_event_list = 15;</code>
      */
     @java.lang.Override
-    public java.util.List<? extends emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfoOrBuilder> 
+    public java.util.List<? extends emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfoOrBuilder>
         getSummonEventListOrBuilderList() {
       return summonEventList_;
     }
@@ -193,7 +193,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < summonEventList_.size(); i++) {
-        output.writeMessage(15, summonEventList_.get(i));
+        output.writeMessage(7, summonEventList_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -206,7 +206,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
       size = 0;
       for (int i = 0; i < summonEventList_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(15, summonEventList_.get(i));
+          .computeMessageSize(7, summonEventList_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -337,7 +337,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 6401
+     * CmdId: 23983
      * Obf: BPCEHNJGDLB
      * </pre>
      *
@@ -487,7 +487,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
               summonEventListBuilder_ = null;
               summonEventList_ = other.summonEventList_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              summonEventListBuilder_ = 
+              summonEventListBuilder_ =
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getSummonEventListFieldBuilder() : null;
             } else {
@@ -720,7 +720,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
       /**
        * <code>repeated .HomeAvatarSummonEventInfo summon_event_list = 15;</code>
        */
-      public java.util.List<? extends emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfoOrBuilder> 
+      public java.util.List<? extends emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfoOrBuilder>
            getSummonEventListOrBuilderList() {
         if (summonEventListBuilder_ != null) {
           return summonEventListBuilder_.getMessageOrBuilderList();
@@ -746,12 +746,12 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
       /**
        * <code>repeated .HomeAvatarSummonEventInfo summon_event_list = 15;</code>
        */
-      public java.util.List<emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo.Builder> 
+      public java.util.List<emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo.Builder>
            getSummonEventListBuilderList() {
         return getSummonEventListFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilderV3<
-          emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo, emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo.Builder, emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfoOrBuilder> 
+          emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo, emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfo.Builder, emu.grasscutter.net.proto.HomeAvatarSummonEventInfoOuterClass.HomeAvatarSummonEventInfoOrBuilder>
           getSummonEventListFieldBuilder() {
         if (summonEventListBuilder_ == null) {
           summonEventListBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
@@ -819,7 +819,7 @@ public final class HomeAvatarSummonAllEventNotifyOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeAvatarSummonAllEventNotify_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeAvatarSummonAllEventNotify_fieldAccessorTable;
 

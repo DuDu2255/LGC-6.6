@@ -83,32 +83,32 @@ public final class FurnitureMakeDataOuterClass {
             case 0:
               done = true;
               break;
-            case 16: {
+            case 104: {
 
               avatarId_ = input.readUInt32();
               break;
             }
-            case 37: {
+            case 93: {
 
               beginTime_ = input.readFixed32();
               break;
             }
-            case 72: {
+            case 8: {
 
               index_ = input.readUInt32();
               break;
             }
-            case 104: {
+            case 120: {
 
               durTime_ = input.readUInt32();
               break;
             }
-            case 112: {
+            case 56: {
 
               makeId_ = input.readUInt32();
               break;
             }
-            case 133: {
+            case 85: {
 
               accelerateTime_ = input.readFixed32();
               break;
@@ -153,7 +153,7 @@ public final class FurnitureMakeDataOuterClass {
       return beginTime_;
     }
 
-    public static final int DURTIME_FIELD_NUMBER = 13;
+    public static final int DURTIME_FIELD_NUMBER = 15;
     private int durTime_;
     /**
      * <code>uint32 durTime = 13;</code>
@@ -164,7 +164,7 @@ public final class FurnitureMakeDataOuterClass {
       return durTime_;
     }
 
-    public static final int ACCELERATETIME_FIELD_NUMBER = 16;
+    public static final int ACCELERATETIME_FIELD_NUMBER = 10;
     private int accelerateTime_;
     /**
      * <code>fixed32 accelerateTime = 16;</code>
@@ -223,13 +223,13 @@ public final class FurnitureMakeDataOuterClass {
         output.writeUInt32(1, index_);
       }
       if (durTime_ != 0) {
-        output.writeUInt32(13, durTime_);
+        output.writeUInt32(15, durTime_);
       }
       if (makeId_ != 0) {
         output.writeUInt32(7, makeId_);
       }
       if (accelerateTime_ != 0) {
-        output.writeFixed32(16, accelerateTime_);
+        output.writeFixed32(10, accelerateTime_);
       }
       unknownFields.writeTo(output);
     }
@@ -254,7 +254,7 @@ public final class FurnitureMakeDataOuterClass {
       }
       if (durTime_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(13, durTime_);
+          .computeUInt32Size(15, durTime_);
       }
       if (makeId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -262,7 +262,7 @@ public final class FurnitureMakeDataOuterClass {
       }
       if (accelerateTime_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFixed32Size(16, accelerateTime_);
+          .computeFixed32Size(10, accelerateTime_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;

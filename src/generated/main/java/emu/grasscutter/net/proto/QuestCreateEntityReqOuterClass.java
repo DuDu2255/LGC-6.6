@@ -71,12 +71,12 @@ public final class QuestCreateEntityReqOuterClass {
             case 0:
               done = true;
               break;
-            case 24: {
+            case 56: {
 
               questId_ = input.readUInt32();
               break;
             }
-            case 34: {
+            case 90: {
               emu.grasscutter.net.proto.CreateEntityInfoOuterClass.CreateEntityInfo.Builder subBuilder = null;
               if (entity_ != null) {
                 subBuilder = entity_.toBuilder();
@@ -89,12 +89,12 @@ public final class QuestCreateEntityReqOuterClass {
 
               break;
             }
-            case 56: {
+            case 24: {
 
               isRewind_ = input.readBool();
               break;
             }
-            case 80: {
+            case 64: {
 
               parentQuestId_ = input.readUInt32();
               break;
@@ -191,7 +191,7 @@ public final class QuestCreateEntityReqOuterClass {
         output.writeUInt32(7, questId_);
       }
       if (entity_ != null) {
-        output.writeMessage(4, getEntity());
+        output.writeMessage(11, getEntity());
       }
       if (isRewind_ != false) {
         output.writeBool(3, isRewind_);
@@ -214,7 +214,7 @@ public final class QuestCreateEntityReqOuterClass {
       }
       if (entity_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getEntity());
+          .computeMessageSize(11, getEntity());
       }
       if (isRewind_ != false) {
         size += com.google.protobuf.CodedOutputStream

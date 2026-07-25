@@ -32,7 +32,7 @@ public final class HomeAvatarCostumeChangeNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 28208
+   * CmdId: 21432
    * Obf: BKMJMAFFLFP
    * </pre>
    *
@@ -312,7 +312,7 @@ public final class HomeAvatarCostumeChangeNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 28208
+     * CmdId: 21432
      * Obf: BKMJMAFFLFP
      * </pre>
      *
@@ -483,7 +483,7 @@ public final class HomeAvatarCostumeChangeNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder setCostumeId(int value) {
-        
+
         costumeId_ = value;
         onChanged();
         return this;
@@ -493,7 +493,7 @@ public final class HomeAvatarCostumeChangeNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearCostumeId() {
-        
+
         costumeId_ = 0;
         onChanged();
         return this;
@@ -514,7 +514,7 @@ public final class HomeAvatarCostumeChangeNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder setAvatarId(int value) {
-        
+
         avatarId_ = value;
         onChanged();
         return this;
@@ -524,7 +524,7 @@ public final class HomeAvatarCostumeChangeNotifyOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearAvatarId() {
-        
+
         avatarId_ = 0;
         onChanged();
         return this;
@@ -584,7 +584,7 @@ public final class HomeAvatarCostumeChangeNotifyOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeAvatarCostumeChangeNotify_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeAvatarCostumeChangeNotify_fieldAccessorTable;
 

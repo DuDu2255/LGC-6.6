@@ -38,7 +38,7 @@ public final class HomeTransferReqOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 28287
+   * CmdId: 29761
    * Obf: LEOKBBDBAKN
    * </pre>
    *
@@ -347,7 +347,7 @@ public final class HomeTransferReqOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 28287
+     * CmdId: 29761
      * Obf: LEOKBBDBAKN
      * </pre>
      *
@@ -524,7 +524,7 @@ public final class HomeTransferReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder setGuid(int value) {
-        
+
         guid_ = value;
         onChanged();
         return this;
@@ -534,7 +534,7 @@ public final class HomeTransferReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearGuid() {
-        
+
         guid_ = 0;
         onChanged();
         return this;
@@ -555,7 +555,7 @@ public final class HomeTransferReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder setIsTransferToMainHousePoint(boolean value) {
-        
+
         isTransferToMainHousePoint_ = value;
         onChanged();
         return this;
@@ -565,7 +565,7 @@ public final class HomeTransferReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearIsTransferToMainHousePoint() {
-        
+
         isTransferToMainHousePoint_ = false;
         onChanged();
         return this;
@@ -586,7 +586,7 @@ public final class HomeTransferReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder setIsTransferToSafePoint(boolean value) {
-        
+
         isTransferToSafePoint_ = value;
         onChanged();
         return this;
@@ -596,7 +596,7 @@ public final class HomeTransferReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearIsTransferToSafePoint() {
-        
+
         isTransferToSafePoint_ = false;
         onChanged();
         return this;
@@ -656,7 +656,7 @@ public final class HomeTransferReqOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeTransferReq_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeTransferReq_fieldAccessorTable;
 

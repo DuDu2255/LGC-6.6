@@ -32,7 +32,7 @@ public final class HomeAvatarTalkReqOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 22316
+   * CmdId: 5535
    * Obf: APHEBEHHMEL
    * </pre>
    *
@@ -80,12 +80,12 @@ public final class HomeAvatarTalkReqOuterClass {
             case 0:
               done = true;
               break;
-            case 48: {
+            case 120: {
 
               talkId_ = input.readUInt32();
               break;
             }
-            case 56: {
+            case 88: {
 
               avatarId_ = input.readUInt32();
               break;
@@ -122,7 +122,7 @@ public final class HomeAvatarTalkReqOuterClass {
               emu.grasscutter.net.proto.HomeAvatarTalkReqOuterClass.HomeAvatarTalkReq.class, emu.grasscutter.net.proto.HomeAvatarTalkReqOuterClass.HomeAvatarTalkReq.Builder.class);
     }
 
-    public static final int AVATAR_ID_FIELD_NUMBER = 7;
+    public static final int AVATAR_ID_FIELD_NUMBER = 11;
     private int avatarId_;
     /**
      * <code>uint32 avatar_id = 7;</code>
@@ -133,7 +133,7 @@ public final class HomeAvatarTalkReqOuterClass {
       return avatarId_;
     }
 
-    public static final int TALK_ID_FIELD_NUMBER = 6;
+    public static final int TALK_ID_FIELD_NUMBER = 15;
     private int talkId_;
     /**
      * <code>uint32 talk_id = 6;</code>
@@ -159,10 +159,10 @@ public final class HomeAvatarTalkReqOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (talkId_ != 0) {
-        output.writeUInt32(6, talkId_);
+        output.writeUInt32(15, talkId_);
       }
       if (avatarId_ != 0) {
-        output.writeUInt32(7, avatarId_);
+        output.writeUInt32(11, avatarId_);
       }
       unknownFields.writeTo(output);
     }
@@ -175,11 +175,11 @@ public final class HomeAvatarTalkReqOuterClass {
       size = 0;
       if (talkId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(6, talkId_);
+          .computeUInt32Size(15, talkId_);
       }
       if (avatarId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(7, avatarId_);
+          .computeUInt32Size(11, avatarId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -312,7 +312,7 @@ public final class HomeAvatarTalkReqOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 22316
+     * CmdId: 5535
      * Obf: APHEBEHHMEL
      * </pre>
      *
@@ -483,7 +483,7 @@ public final class HomeAvatarTalkReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder setAvatarId(int value) {
-        
+
         avatarId_ = value;
         onChanged();
         return this;
@@ -493,7 +493,7 @@ public final class HomeAvatarTalkReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearAvatarId() {
-        
+
         avatarId_ = 0;
         onChanged();
         return this;
@@ -514,7 +514,7 @@ public final class HomeAvatarTalkReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder setTalkId(int value) {
-        
+
         talkId_ = value;
         onChanged();
         return this;
@@ -524,7 +524,7 @@ public final class HomeAvatarTalkReqOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearTalkId() {
-        
+
         talkId_ = 0;
         onChanged();
         return this;
@@ -584,7 +584,7 @@ public final class HomeAvatarTalkReqOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeAvatarTalkReq_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeAvatarTalkReq_fieldAccessorTable;
 

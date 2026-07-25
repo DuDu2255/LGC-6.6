@@ -97,7 +97,7 @@ public final class HomeBlockSubFieldDataOuterClass {
             case 0:
               done = true;
               break;
-            case 18: {
+            case 82: {
               emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder subBuilder = null;
               if (rot_ != null) {
                 subBuilder = rot_.toBuilder();
@@ -110,7 +110,7 @@ public final class HomeBlockSubFieldDataOuterClass {
 
               break;
             }
-            case 66: {
+            case 50: {
               emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder subBuilder = null;
               if (pos_ != null) {
                 subBuilder = pos_.toBuilder();
@@ -222,10 +222,10 @@ public final class HomeBlockSubFieldDataOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (rot_ != null) {
-        output.writeMessage(2, getRot());
+        output.writeMessage(10, getRot());
       }
       if (pos_ != null) {
-        output.writeMessage(8, getPos());
+        output.writeMessage(6, getPos());
       }
       unknownFields.writeTo(output);
     }
@@ -238,11 +238,11 @@ public final class HomeBlockSubFieldDataOuterClass {
       size = 0;
       if (rot_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getRot());
+          .computeMessageSize(10, getRot());
       }
       if (pos_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, getPos());
+          .computeMessageSize(6, getPos());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -643,7 +643,7 @@ public final class HomeBlockSubFieldDataOuterClass {
        * <code>.Vector rot = 2;</code>
        */
       public emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder getRotBuilder() {
-        
+
         onChanged();
         return getRotFieldBuilder().getBuilder();
       }
@@ -662,7 +662,7 @@ public final class HomeBlockSubFieldDataOuterClass {
        * <code>.Vector rot = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder> 
+          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder>
           getRotFieldBuilder() {
         if (rotBuilder_ == null) {
           rotBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -762,7 +762,7 @@ public final class HomeBlockSubFieldDataOuterClass {
        * <code>.Vector pos = 8;</code>
        */
       public emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder getPosBuilder() {
-        
+
         onChanged();
         return getPosFieldBuilder().getBuilder();
       }
@@ -781,7 +781,7 @@ public final class HomeBlockSubFieldDataOuterClass {
        * <code>.Vector pos = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder> 
+          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder>
           getPosFieldBuilder() {
         if (posBuilder_ == null) {
           posBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -848,7 +848,7 @@ public final class HomeBlockSubFieldDataOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeBlockSubFieldData_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeBlockSubFieldData_fieldAccessorTable;
 

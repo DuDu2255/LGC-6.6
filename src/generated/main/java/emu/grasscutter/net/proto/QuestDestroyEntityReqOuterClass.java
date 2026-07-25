@@ -65,17 +65,17 @@ public final class QuestDestroyEntityReqOuterClass {
             case 0:
               done = true;
               break;
-            case 8: {
+            case 64: {
 
               entityId_ = input.readUInt32();
               break;
             }
-            case 48: {
+            case 96: {
 
               questId_ = input.readUInt32();
               break;
             }
-            case 112: {
+            case 24: {
 
               sceneId_ = input.readUInt32();
               break;

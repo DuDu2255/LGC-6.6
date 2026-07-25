@@ -98,12 +98,12 @@ public final class ParentQuestRandomInfoOuterClass {
             case 0:
               done = true;
               break;
-            case 24: {
+            case 96: {
 
               entranceId_ = input.readUInt32();
               break;
             }
-            case 72: {
+            case 48: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 factorList_ = newIntList();
                 mutable_bitField0_ |= 0x00000001;
@@ -111,7 +111,7 @@ public final class ParentQuestRandomInfoOuterClass {
               factorList_.addInt(input.readUInt32());
               break;
             }
-            case 74: {
+            case 50: {
               int length = input.readRawVarint32();
               int limit = input.pushLimit(length);
               if (!((mutable_bitField0_ & 0x00000001) != 0) && input.getBytesUntilLimit() > 0) {
@@ -124,7 +124,7 @@ public final class ParentQuestRandomInfoOuterClass {
               input.popLimit(limit);
               break;
             }
-            case 80: {
+            case 16: {
 
               templateId_ = input.readUInt32();
               break;
@@ -233,7 +233,7 @@ public final class ParentQuestRandomInfoOuterClass {
         output.writeUInt32(12, entranceId_);
       }
       if (getFactorListList().size() > 0) {
-        output.writeUInt32NoTag(74);
+        output.writeUInt32NoTag(50);
         output.writeUInt32NoTag(factorListMemoizedSerializedSize);
       }
       for (int i = 0; i < factorList_.size(); i++) {
@@ -599,7 +599,7 @@ public final class ParentQuestRandomInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setTemplateId(int value) {
-        
+
         templateId_ = value;
         onChanged();
         return this;
@@ -609,7 +609,7 @@ public final class ParentQuestRandomInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearTemplateId() {
-        
+
         templateId_ = 0;
         onChanged();
         return this;
@@ -709,7 +709,7 @@ public final class ParentQuestRandomInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setEntranceId(int value) {
-        
+
         entranceId_ = value;
         onChanged();
         return this;
@@ -719,7 +719,7 @@ public final class ParentQuestRandomInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearEntranceId() {
-        
+
         entranceId_ = 0;
         onChanged();
         return this;
@@ -779,7 +779,7 @@ public final class ParentQuestRandomInfoOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ParentQuestRandomInfo_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_ParentQuestRandomInfo_fieldAccessorTable;
 

@@ -121,7 +121,7 @@ public final class HomeLimitedShopInfoOuterClass {
             case 0:
               done = true;
               break;
-            case 16: {
+            case 40: {
 
               uid_ = input.readUInt32();
               break;
@@ -131,7 +131,7 @@ public final class HomeLimitedShopInfoOuterClass {
               startTime_ = input.readFixed32();
               break;
             }
-            case 58: {
+            case 122: {
               emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder subBuilder = null;
               if (djinnRot_ != null) {
                 subBuilder = djinnRot_.toBuilder();
@@ -144,7 +144,7 @@ public final class HomeLimitedShopInfoOuterClass {
 
               break;
             }
-            case 66: {
+            case 50: {
               emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder subBuilder = null;
               if (djinnPos_ != null) {
                 subBuilder = djinnPos_.toBuilder();
@@ -232,7 +232,7 @@ public final class HomeLimitedShopInfoOuterClass {
       return lMJPHDCDAJK_;
     }
 
-    public static final int DJINN_ROT_FIELD_NUMBER = 7;
+    public static final int DJINN_ROT_FIELD_NUMBER = 15;
     private emu.grasscutter.net.proto.VectorOuterClass.Vector djinnRot_;
     /**
      * <code>.Vector djinn_rot = 7;</code>
@@ -258,7 +258,7 @@ public final class HomeLimitedShopInfoOuterClass {
       return getDjinnRot();
     }
 
-    public static final int DJINN_POS_FIELD_NUMBER = 8;
+    public static final int DJINN_POS_FIELD_NUMBER = 6;
     private emu.grasscutter.net.proto.VectorOuterClass.Vector djinnPos_;
     /**
      * <code>.Vector djinn_pos = 8;</code>
@@ -316,10 +316,10 @@ public final class HomeLimitedShopInfoOuterClass {
         output.writeFixed32(6, startTime_);
       }
       if (djinnRot_ != null) {
-        output.writeMessage(7, getDjinnRot());
+        output.writeMessage(15, getDjinnRot());
       }
       if (djinnPos_ != null) {
-        output.writeMessage(8, getDjinnPos());
+        output.writeMessage(6, getDjinnPos());
       }
       if (endTime_ != 0) {
         output.writeFixed32(13, endTime_);
@@ -346,11 +346,11 @@ public final class HomeLimitedShopInfoOuterClass {
       }
       if (djinnRot_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, getDjinnRot());
+          .computeMessageSize(15, getDjinnRot());
       }
       if (djinnPos_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, getDjinnPos());
+          .computeMessageSize(6, getDjinnPos());
       }
       if (endTime_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -727,7 +727,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setEndTime(int value) {
-        
+
         endTime_ = value;
         onChanged();
         return this;
@@ -737,7 +737,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearEndTime() {
-        
+
         endTime_ = 0;
         onChanged();
         return this;
@@ -758,7 +758,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setStartTime(int value) {
-        
+
         startTime_ = value;
         onChanged();
         return this;
@@ -768,7 +768,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearStartTime() {
-        
+
         startTime_ = 0;
         onChanged();
         return this;
@@ -789,7 +789,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setLMJPHDCDAJK(int value) {
-        
+
         lMJPHDCDAJK_ = value;
         onChanged();
         return this;
@@ -799,7 +799,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearLMJPHDCDAJK() {
-        
+
         lMJPHDCDAJK_ = 0;
         onChanged();
         return this;
@@ -892,7 +892,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * <code>.Vector djinn_rot = 7;</code>
        */
       public emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder getDjinnRotBuilder() {
-        
+
         onChanged();
         return getDjinnRotFieldBuilder().getBuilder();
       }
@@ -911,7 +911,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * <code>.Vector djinn_rot = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder> 
+          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder>
           getDjinnRotFieldBuilder() {
         if (djinnRotBuilder_ == null) {
           djinnRotBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1011,7 +1011,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * <code>.Vector djinn_pos = 8;</code>
        */
       public emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder getDjinnPosBuilder() {
-        
+
         onChanged();
         return getDjinnPosFieldBuilder().getBuilder();
       }
@@ -1030,7 +1030,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * <code>.Vector djinn_pos = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder> 
+          emu.grasscutter.net.proto.VectorOuterClass.Vector, emu.grasscutter.net.proto.VectorOuterClass.Vector.Builder, emu.grasscutter.net.proto.VectorOuterClass.VectorOrBuilder>
           getDjinnPosFieldBuilder() {
         if (djinnPosBuilder_ == null) {
           djinnPosBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1058,7 +1058,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setUid(int value) {
-        
+
         uid_ = value;
         onChanged();
         return this;
@@ -1068,7 +1068,7 @@ public final class HomeLimitedShopInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearUid() {
-        
+
         uid_ = 0;
         onChanged();
         return this;
@@ -1128,7 +1128,7 @@ public final class HomeLimitedShopInfoOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeLimitedShopInfo_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeLimitedShopInfo_fieldAccessorTable;
 

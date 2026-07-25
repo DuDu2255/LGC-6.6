@@ -32,7 +32,7 @@ public final class HomeChangeModuleRspOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 20550
+   * CmdId: 6735
    * Obf: HNJKLHOOECE
    * </pre>
    *
@@ -85,7 +85,7 @@ public final class HomeChangeModuleRspOuterClass {
               retcode_ = input.readInt32();
               break;
             }
-            case 80: {
+            case 112: {
 
               targetModuleId_ = input.readUInt32();
               break;
@@ -133,7 +133,7 @@ public final class HomeChangeModuleRspOuterClass {
       return retcode_;
     }
 
-    public static final int TARGET_MODULE_ID_FIELD_NUMBER = 10;
+    public static final int TARGET_MODULE_ID_FIELD_NUMBER = 14;
     private int targetModuleId_;
     /**
      * <code>uint32 target_module_id = 10;</code>
@@ -162,7 +162,7 @@ public final class HomeChangeModuleRspOuterClass {
         output.writeInt32(1, retcode_);
       }
       if (targetModuleId_ != 0) {
-        output.writeUInt32(10, targetModuleId_);
+        output.writeUInt32(14, targetModuleId_);
       }
       unknownFields.writeTo(output);
     }
@@ -179,7 +179,7 @@ public final class HomeChangeModuleRspOuterClass {
       }
       if (targetModuleId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(10, targetModuleId_);
+          .computeUInt32Size(14, targetModuleId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -312,7 +312,7 @@ public final class HomeChangeModuleRspOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 20550
+     * CmdId: 6735
      * Obf: HNJKLHOOECE
      * </pre>
      *
@@ -483,7 +483,7 @@ public final class HomeChangeModuleRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setRetcode(int value) {
-        
+
         retcode_ = value;
         onChanged();
         return this;
@@ -493,7 +493,7 @@ public final class HomeChangeModuleRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearRetcode() {
-        
+
         retcode_ = 0;
         onChanged();
         return this;
@@ -514,7 +514,7 @@ public final class HomeChangeModuleRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setTargetModuleId(int value) {
-        
+
         targetModuleId_ = value;
         onChanged();
         return this;
@@ -524,7 +524,7 @@ public final class HomeChangeModuleRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearTargetModuleId() {
-        
+
         targetModuleId_ = 0;
         onChanged();
         return this;
@@ -584,7 +584,7 @@ public final class HomeChangeModuleRspOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeChangeModuleRsp_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeChangeModuleRsp_fieldAccessorTable;
 

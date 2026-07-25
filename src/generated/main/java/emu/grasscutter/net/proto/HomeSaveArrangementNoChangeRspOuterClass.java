@@ -32,7 +32,7 @@ public final class HomeSaveArrangementNoChangeRspOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 20696
+   * CmdId: 482
    * Obf: BMFLMFIECOG
    * </pre>
    *
@@ -312,7 +312,7 @@ public final class HomeSaveArrangementNoChangeRspOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 20696
+     * CmdId: 482
      * Obf: BMFLMFIECOG
      * </pre>
      *
@@ -483,7 +483,7 @@ public final class HomeSaveArrangementNoChangeRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setRetcode(int value) {
-        
+
         retcode_ = value;
         onChanged();
         return this;
@@ -493,7 +493,7 @@ public final class HomeSaveArrangementNoChangeRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearRetcode() {
-        
+
         retcode_ = 0;
         onChanged();
         return this;
@@ -514,7 +514,7 @@ public final class HomeSaveArrangementNoChangeRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setSceneId(int value) {
-        
+
         sceneId_ = value;
         onChanged();
         return this;
@@ -524,7 +524,7 @@ public final class HomeSaveArrangementNoChangeRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearSceneId() {
-        
+
         sceneId_ = 0;
         onChanged();
         return this;
@@ -584,7 +584,7 @@ public final class HomeSaveArrangementNoChangeRspOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeSaveArrangementNoChangeRsp_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeSaveArrangementNoChangeRsp_fieldAccessorTable;
 

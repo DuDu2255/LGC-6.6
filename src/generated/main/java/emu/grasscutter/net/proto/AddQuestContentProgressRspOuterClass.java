@@ -67,12 +67,12 @@ public final class AddQuestContentProgressRspOuterClass {
             case 0:
               done = true;
               break;
-            case 48: {
+            case 80: {
 
               retcode_ = input.readInt32();
               break;
             }
-            case 72: {
+            case 16: {
 
               contentType_ = input.readUInt32();
               break;
@@ -109,7 +109,7 @@ public final class AddQuestContentProgressRspOuterClass {
               emu.grasscutter.net.proto.AddQuestContentProgressRspOuterClass.AddQuestContentProgressRsp.class, emu.grasscutter.net.proto.AddQuestContentProgressRspOuterClass.AddQuestContentProgressRsp.Builder.class);
     }
 
-    public static final int RETCODE_FIELD_NUMBER = 6;
+    public static final int RETCODE_FIELD_NUMBER = 10;
     private int retcode_;
 
     @java.lang.Override
@@ -117,7 +117,7 @@ public final class AddQuestContentProgressRspOuterClass {
       return retcode_;
     }
 
-    public static final int CONTENT_TYPE_FIELD_NUMBER = 9;
+    public static final int CONTENT_TYPE_FIELD_NUMBER = 2;
     private int contentType_;
 
     @java.lang.Override
@@ -140,10 +140,10 @@ public final class AddQuestContentProgressRspOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (retcode_ != 0) {
-        output.writeInt32(6, retcode_);
+        output.writeInt32(10, retcode_);
       }
       if (contentType_ != 0) {
-        output.writeUInt32(9, contentType_);
+        output.writeUInt32(2, contentType_);
       }
       unknownFields.writeTo(output);
     }
@@ -156,11 +156,11 @@ public final class AddQuestContentProgressRspOuterClass {
       size = 0;
       if (retcode_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, retcode_);
+          .computeInt32Size(10, retcode_);
       }
       if (contentType_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(9, contentType_);
+          .computeUInt32Size(2, contentType_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;

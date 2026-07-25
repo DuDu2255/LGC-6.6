@@ -78,7 +78,7 @@ public final class FurnitureMakeSlotOuterClass {
             case 0:
               done = true;
               break;
-            case 106: {
+            case 66: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 furnitureMakeDataList_ = new java.util.ArrayList<emu.grasscutter.net.proto.FurnitureMakeDataOuterClass.FurnitureMakeData>();
                 mutable_bitField0_ |= 0x00000001;

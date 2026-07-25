@@ -67,22 +67,22 @@ public final class QuestDestroyEntityRspOuterClass {
             case 0:
               done = true;
               break;
-            case 24: {
+            case 16: {
 
               entityId_ = input.readUInt32();
               break;
             }
-            case 56: {
+            case 72: {
 
               retcode_ = input.readInt32();
               break;
             }
-            case 80: {
+            case 88: {
 
               questId_ = input.readUInt32();
               break;
             }
-            case 112: {
+            case 120: {
 
               sceneId_ = input.readUInt32();
               break;

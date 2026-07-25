@@ -131,38 +131,38 @@ public final class HomeBasicInfoOuterClass {
             case 0:
               done = true;
               break;
-            case 42: {
+            case 114: {
               java.lang.String s = input.readStringRequireUtf8();
 
               ownerNickName_ = s;
               break;
             }
-            case 64: {
+            case 104: {
 
               curModuleId_ = input.readUInt32();
               break;
             }
-            case 72: {
+            case 16: {
 
               isInEditMode_ = input.readBool();
               break;
             }
-            case 80: {
+            case 88: {
 
               exp_ = input.readUInt64();
               break;
             }
-            case 88: {
+            case 8: {
 
               level_ = input.readUInt32();
               break;
             }
-            case 104: {
+            case 64: {
 
               curRoomSceneId_ = input.readUInt32();
               break;
             }
-            case 112: {
+            case 48: {
 
               homeOwnerUid_ = input.readUInt32();
               break;
@@ -235,7 +235,7 @@ public final class HomeBasicInfoOuterClass {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
+        com.google.protobuf.ByteString bs =
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         ownerNickName_ = s;
@@ -251,7 +251,7 @@ public final class HomeBasicInfoOuterClass {
         getOwnerNickNameBytes() {
       java.lang.Object ref = ownerNickName_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
+        com.google.protobuf.ByteString b =
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         ownerNickName_ = b;
@@ -272,7 +272,7 @@ public final class HomeBasicInfoOuterClass {
       return isInEditMode_;
     }
 
-    public static final int CUR_ROOM_SCENE_ID_FIELD_NUMBER = 13;
+    public static final int CUR_ROOM_SCENE_ID_FIELD_NUMBER = 8;
     private int curRoomSceneId_;
     /**
      * <code>uint32 cur_room_scene_id = 13;</code>
@@ -283,7 +283,7 @@ public final class HomeBasicInfoOuterClass {
       return curRoomSceneId_;
     }
 
-    public static final int CUR_MODULE_ID_FIELD_NUMBER = 8;
+    public static final int CUR_MODULE_ID_FIELD_NUMBER = 13;
     private int curModuleId_;
     /**
      * <code>uint32 cur_module_id = 8;</code>
@@ -305,7 +305,7 @@ public final class HomeBasicInfoOuterClass {
       return exp_;
     }
 
-    public static final int HOME_OWNER_UID_FIELD_NUMBER = 14;
+    public static final int HOME_OWNER_UID_FIELD_NUMBER = 6;
     private int homeOwnerUid_;
     /**
      * <code>uint32 home_owner_uid = 14;</code>
@@ -357,10 +357,10 @@ public final class HomeBasicInfoOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(ownerNickName_)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, ownerNickName_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 14, ownerNickName_);
       }
       if (curModuleId_ != 0) {
-        output.writeUInt32(8, curModuleId_);
+        output.writeUInt32(13, curModuleId_);
       }
       if (isInEditMode_ != false) {
         output.writeBool(2, isInEditMode_);
@@ -372,10 +372,10 @@ public final class HomeBasicInfoOuterClass {
         output.writeUInt32(1, level_);
       }
       if (curRoomSceneId_ != 0) {
-        output.writeUInt32(13, curRoomSceneId_);
+        output.writeUInt32(8, curRoomSceneId_);
       }
       if (homeOwnerUid_ != 0) {
-        output.writeUInt32(14, homeOwnerUid_);
+        output.writeUInt32(6, homeOwnerUid_);
       }
       if (limitedShopInfo_ != null) {
         output.writeMessage(15, getLimitedShopInfo());
@@ -394,7 +394,7 @@ public final class HomeBasicInfoOuterClass {
       }
       if (curModuleId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(8, curModuleId_);
+          .computeUInt32Size(13, curModuleId_);
       }
       if (isInEditMode_ != false) {
         size += com.google.protobuf.CodedOutputStream
@@ -410,11 +410,11 @@ public final class HomeBasicInfoOuterClass {
       }
       if (curRoomSceneId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(13, curRoomSceneId_);
+          .computeUInt32Size(8, curRoomSceneId_);
       }
       if (homeOwnerUid_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(14, homeOwnerUid_);
+          .computeUInt32Size(6, homeOwnerUid_);
       }
       if (limitedShopInfo_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -797,7 +797,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setLevel(int value) {
-        
+
         level_ = value;
         onChanged();
         return this;
@@ -807,7 +807,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearLevel() {
-        
+
         level_ = 0;
         onChanged();
         return this;
@@ -838,7 +838,7 @@ public final class HomeBasicInfoOuterClass {
           getOwnerNickNameBytes() {
         java.lang.Object ref = ownerNickName_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString b =
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           ownerNickName_ = b;
@@ -857,7 +857,7 @@ public final class HomeBasicInfoOuterClass {
         if (value == null) {
     throw new NullPointerException();
   }
-  
+
         ownerNickName_ = value;
         onChanged();
         return this;
@@ -867,7 +867,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearOwnerNickName() {
-        
+
         ownerNickName_ = getDefaultInstance().getOwnerNickName();
         onChanged();
         return this;
@@ -883,7 +883,7 @@ public final class HomeBasicInfoOuterClass {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        
+
         ownerNickName_ = value;
         onChanged();
         return this;
@@ -904,7 +904,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setIsInEditMode(boolean value) {
-        
+
         isInEditMode_ = value;
         onChanged();
         return this;
@@ -914,7 +914,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearIsInEditMode() {
-        
+
         isInEditMode_ = false;
         onChanged();
         return this;
@@ -935,7 +935,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setCurRoomSceneId(int value) {
-        
+
         curRoomSceneId_ = value;
         onChanged();
         return this;
@@ -945,7 +945,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearCurRoomSceneId() {
-        
+
         curRoomSceneId_ = 0;
         onChanged();
         return this;
@@ -966,7 +966,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setCurModuleId(int value) {
-        
+
         curModuleId_ = value;
         onChanged();
         return this;
@@ -976,7 +976,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearCurModuleId() {
-        
+
         curModuleId_ = 0;
         onChanged();
         return this;
@@ -997,7 +997,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setExp(long value) {
-        
+
         exp_ = value;
         onChanged();
         return this;
@@ -1007,7 +1007,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearExp() {
-        
+
         exp_ = 0L;
         onChanged();
         return this;
@@ -1028,7 +1028,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder setHomeOwnerUid(int value) {
-        
+
         homeOwnerUid_ = value;
         onChanged();
         return this;
@@ -1038,7 +1038,7 @@ public final class HomeBasicInfoOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearHomeOwnerUid() {
-        
+
         homeOwnerUid_ = 0;
         onChanged();
         return this;
@@ -1131,7 +1131,7 @@ public final class HomeBasicInfoOuterClass {
        * <code>.HomeLimitedShopInfo limited_shop_info = 15;</code>
        */
       public emu.grasscutter.net.proto.HomeLimitedShopInfoOuterClass.HomeLimitedShopInfo.Builder getLimitedShopInfoBuilder() {
-        
+
         onChanged();
         return getLimitedShopInfoFieldBuilder().getBuilder();
       }
@@ -1150,7 +1150,7 @@ public final class HomeBasicInfoOuterClass {
        * <code>.HomeLimitedShopInfo limited_shop_info = 15;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.HomeLimitedShopInfoOuterClass.HomeLimitedShopInfo, emu.grasscutter.net.proto.HomeLimitedShopInfoOuterClass.HomeLimitedShopInfo.Builder, emu.grasscutter.net.proto.HomeLimitedShopInfoOuterClass.HomeLimitedShopInfoOrBuilder> 
+          emu.grasscutter.net.proto.HomeLimitedShopInfoOuterClass.HomeLimitedShopInfo, emu.grasscutter.net.proto.HomeLimitedShopInfoOuterClass.HomeLimitedShopInfo.Builder, emu.grasscutter.net.proto.HomeLimitedShopInfoOuterClass.HomeLimitedShopInfoOrBuilder>
           getLimitedShopInfoFieldBuilder() {
         if (limitedShopInfoBuilder_ == null) {
           limitedShopInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -1217,7 +1217,7 @@ public final class HomeBasicInfoOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeBasicInfo_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeBasicInfo_fieldAccessorTable;
 

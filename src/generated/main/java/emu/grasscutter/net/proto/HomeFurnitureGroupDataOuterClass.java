@@ -27,7 +27,7 @@ public final class HomeFurnitureGroupDataOuterClass {
     /**
      * <code>repeated .HomeFurnitureData virtual_furniure_list = 15;</code>
      */
-    java.util.List<emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData> 
+    java.util.List<emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData>
         getVirtualFurniureListList();
     /**
      * <code>repeated .HomeFurnitureData virtual_furniure_list = 15;</code>
@@ -40,7 +40,7 @@ public final class HomeFurnitureGroupDataOuterClass {
     /**
      * <code>repeated .HomeFurnitureData virtual_furniure_list = 15;</code>
      */
-    java.util.List<? extends emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureDataOrBuilder> 
+    java.util.List<? extends emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureDataOrBuilder>
         getVirtualFurniureListOrBuilderList();
     /**
      * <code>repeated .HomeFurnitureData virtual_furniure_list = 15;</code>
@@ -104,7 +104,7 @@ public final class HomeFurnitureGroupDataOuterClass {
               groupFurnitureIndex_ = input.readUInt32();
               break;
             }
-            case 122: {
+            case 82: {
               if (!((mutable_bitField0_ & 0x00000001) != 0)) {
                 virtualFurniureList_ = new java.util.ArrayList<emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData>();
                 mutable_bitField0_ |= 0x00000001;
@@ -172,7 +172,7 @@ public final class HomeFurnitureGroupDataOuterClass {
      * <code>repeated .HomeFurnitureData virtual_furniure_list = 15;</code>
      */
     @java.lang.Override
-    public java.util.List<? extends emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureDataOrBuilder> 
+    public java.util.List<? extends emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureDataOrBuilder>
         getVirtualFurniureListOrBuilderList() {
       return virtualFurniureList_;
     }
@@ -524,7 +524,7 @@ public final class HomeFurnitureGroupDataOuterClass {
               virtualFurniureListBuilder_ = null;
               virtualFurniureList_ = other.virtualFurniureList_;
               bitField0_ = (bitField0_ & ~0x00000001);
-              virtualFurniureListBuilder_ = 
+              virtualFurniureListBuilder_ =
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getVirtualFurniureListFieldBuilder() : null;
             } else {
@@ -577,7 +577,7 @@ public final class HomeFurnitureGroupDataOuterClass {
        * @return This builder for chaining.
        */
       public Builder setGroupFurnitureIndex(int value) {
-        
+
         groupFurnitureIndex_ = value;
         onChanged();
         return this;
@@ -587,7 +587,7 @@ public final class HomeFurnitureGroupDataOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearGroupFurnitureIndex() {
-        
+
         groupFurnitureIndex_ = 0;
         onChanged();
         return this;
@@ -788,7 +788,7 @@ public final class HomeFurnitureGroupDataOuterClass {
       /**
        * <code>repeated .HomeFurnitureData virtual_furniure_list = 15;</code>
        */
-      public java.util.List<? extends emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureDataOrBuilder> 
+      public java.util.List<? extends emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureDataOrBuilder>
            getVirtualFurniureListOrBuilderList() {
         if (virtualFurniureListBuilder_ != null) {
           return virtualFurniureListBuilder_.getMessageOrBuilderList();
@@ -814,12 +814,12 @@ public final class HomeFurnitureGroupDataOuterClass {
       /**
        * <code>repeated .HomeFurnitureData virtual_furniure_list = 15;</code>
        */
-      public java.util.List<emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData.Builder> 
+      public java.util.List<emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData.Builder>
            getVirtualFurniureListBuilderList() {
         return getVirtualFurniureListFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilderV3<
-          emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData, emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData.Builder, emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureDataOrBuilder> 
+          emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData, emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureData.Builder, emu.grasscutter.net.proto.HomeFurnitureDataOuterClass.HomeFurnitureDataOrBuilder>
           getVirtualFurniureListFieldBuilder() {
         if (virtualFurniureListBuilder_ == null) {
           virtualFurniureListBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
@@ -887,7 +887,7 @@ public final class HomeFurnitureGroupDataOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeFurnitureGroupData_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeFurnitureGroupData_fieldAccessorTable;
 

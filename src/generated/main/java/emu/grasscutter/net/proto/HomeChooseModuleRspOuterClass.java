@@ -32,7 +32,7 @@ public final class HomeChooseModuleRspOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 20087
+   * CmdId: 24344
    * Obf: JHDBAFEAKGO
    * </pre>
    *
@@ -312,7 +312,7 @@ public final class HomeChooseModuleRspOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 20087
+     * CmdId: 24344
      * Obf: JHDBAFEAKGO
      * </pre>
      *
@@ -483,7 +483,7 @@ public final class HomeChooseModuleRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setModuleId(int value) {
-        
+
         moduleId_ = value;
         onChanged();
         return this;
@@ -493,7 +493,7 @@ public final class HomeChooseModuleRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearModuleId() {
-        
+
         moduleId_ = 0;
         onChanged();
         return this;
@@ -514,7 +514,7 @@ public final class HomeChooseModuleRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder setRetcode(int value) {
-        
+
         retcode_ = value;
         onChanged();
         return this;
@@ -524,7 +524,7 @@ public final class HomeChooseModuleRspOuterClass {
        * @return This builder for chaining.
        */
       public Builder clearRetcode() {
-        
+
         retcode_ = 0;
         onChanged();
         return this;
@@ -584,7 +584,7 @@ public final class HomeChooseModuleRspOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_HomeChooseModuleRsp_descriptor;
-  private static final 
+  private static final
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_HomeChooseModuleRsp_fieldAccessorTable;
 
