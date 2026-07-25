@@ -14,18 +14,59 @@ import java.nio.file.*;
 import java.util.*;
 
 public final class JsonUtils {
-    static final Gson gson =
-            new GsonBuilder()
-                    .setPrettyPrinting()
-                    .registerTypeAdapter(DynamicFloat.class, new DynamicFloatAdapter())
-                    .registerTypeAdapter(IntList.class, new IntListAdapter())
-                    .registerTypeAdapter(Position.class, new PositionAdapter())
-                    .registerTypeAdapter(GridPosition.class, new GridPositionAdapter())
-                    .registerTypeAdapter(byte[].class, new ByteArrayAdapter())
-                    .registerTypeAdapter(JObject.class, new JObject.Adapter())
-                    .registerTypeAdapterFactory(new EnumTypeAdapterFactory())
-                    .disableHtmlEscaping()
-                    .create();
+	/*
+	 * Resource classes use Morphia's @Transient annotation for fields that
+	 * contain derived or runtime-only data.
+	 *
+	 * Gson does not recognize that annotation automatically, so the resource
+	 * cache needs an explicit exclusion strategy.
+	 */
+	private static final ExclusionStrategy RESOURCE_CACHE_EXCLUSION_STRATEGY =
+			new ExclusionStrategy() {
+				@Override
+				public boolean shouldSkipField(FieldAttributes field) {
+					return field.getAnnotation(dev.morphia.annotations.Transient.class) != null;
+				}
+
+				@Override
+				public boolean shouldSkipClass(Class<?> clazz) {
+					return false;
+				}
+			};
+
+	private static GsonBuilder createGsonBuilder() {
+		return new GsonBuilder()
+				.setPrettyPrinting()
+				.registerTypeAdapter(DynamicFloat.class, new DynamicFloatAdapter().nullSafe())
+				.registerTypeAdapter(IntList.class, new IntListAdapter().nullSafe())
+				.registerTypeAdapter(Position.class, new PositionAdapter().nullSafe())
+				.registerTypeAdapter(GridPosition.class, new GridPositionAdapter().nullSafe())
+				.registerTypeAdapter(byte[].class, new ByteArrayAdapter().nullSafe())
+				.registerTypeAdapter(JObject.class, new JObject.Adapter())
+				.registerTypeAdapterFactory(new EnumTypeAdapterFactory())
+				.disableHtmlEscaping();
+	}
+
+	/*
+	 * Normal LunaGC JSON parser.
+	 *
+	 * Keep this separate so the cache implementation does not silently change
+	 * the behavior of unrelated configuration, database or command JSON.
+	 */
+	static final Gson gson =
+			createGsonBuilder().create();
+
+	/*
+	 * Cache-only parser.
+	 *
+	 * Morphia @Transient fields are omitted during both writing and reading.
+	 */
+	private static final Gson resourceCacheGson =
+			createGsonBuilder().addSerializationExclusionStrategy(
+							RESOURCE_CACHE_EXCLUSION_STRATEGY)
+					.addDeserializationExclusionStrategy(
+							RESOURCE_CACHE_EXCLUSION_STRATEGY)
+					.create();
 
     /**
      * Converts the given object to a JsonElement.
@@ -43,6 +84,25 @@ public final class JsonUtils {
     public static String encode(Object object) {
         return gson.toJson(object);
     }
+	
+	/**
+	 * Serializes resource-cache data while excluding Morphia @Transient
+	 * runtime and derived fields.
+	 */
+	public static String encodeResourceCache(Object object) {
+		return resourceCacheGson.toJson(object);
+	}
+
+	/**
+	 * Deserializes one normalized cache section using the same exclusion
+	 * rules that were applied by encodeResourceCache().
+	 */
+	public static <T> List<T> loadResourceCacheList(
+			Reader reader,
+			Class<T> classType)
+			throws IOException {
+		return resourceCacheGson.fromJson(reader, TypeToken.getParameterized(List.class, classType).getType());
+	}
 
     public static <T> T decode(JsonElement jsonElement, Class<T> classType)
             throws JsonSyntaxException {

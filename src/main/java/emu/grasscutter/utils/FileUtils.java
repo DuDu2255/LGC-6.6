@@ -2,6 +2,7 @@ package emu.grasscutter.utils;
 
 import emu.grasscutter.Grasscutter;
 import java.io.*;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -18,6 +19,8 @@ public final class FileUtils {
     private static final Path CACHE_PATH = Path.of(Grasscutter.config.folderStructure.cache);
     private static final Path RESOURCES_PATH;
     private static final Path SCRIPTS_PATH;
+	@SuppressWarnings("unused")
+	private static final FileSystem RESOURCE_ARCHIVE_FILE_SYSTEM;
     private static final String[] TSJ_JSON_TSV = {"tsj", "json", "tsv"};
 
     static {
@@ -52,46 +55,71 @@ public final class FileUtils {
             Grasscutter.getLogger().debug("Setting path for default data: " + path.toAbsolutePath());
         }
 
-        // Setup Resources path
-        final String resources = Grasscutter.config.folderStructure.resources;
-        fs = null;
-        path = Path.of(resources);
-        if (resources.endsWith(
-                ".zip")) { // Would be nice to support .tar.gz too at some point, but it doesn't come for
-            // free in Java
-            try {
-                fs = FileSystems.newFileSystem(path);
-            } catch (IOException e) {
-                Grasscutter.getLogger().error("Failed to load resources zip \"" + resources + "\"");
-            }
-        }
+		// Setup Resources path.
+		final String configuredResources = Grasscutter.config.folderStructure.resources;
 
-        if (fs != null) {
-            var root = fs.getPath("");
-            try (Stream<Path> pathStream =
-                    Files.find(
-                            root,
-                            3,
-                            (p, a) -> {
-                                var filename = p.getFileName();
-                                if (filename == null) return false;
-                                return filename.toString().equals("ExcelBinOutput");
-                            })) {
-                var excelBinOutput = pathStream.findFirst();
-                if (excelBinOutput.isPresent()) {
-                    path = excelBinOutput.get().getParent();
-                    if (path == null) path = root;
-                    Grasscutter.getLogger()
-                            .debug("Resources will be loaded from \"" + resources + "/" + path + "\"");
-                } else {
-                    Grasscutter.getLogger()
-                            .error("Failed to find ExcelBinOutput in resources zip \"" + resources + "\"");
-                }
-            } catch (IOException e) {
-                Grasscutter.getLogger().error("Failed to scan resources zip \"" + resources + "\"");
-            }
-        }
-        RESOURCES_PATH = path;
+		FileSystem mountedResourceFileSystem = null;
+		Path resolvedResourcesPath;
+
+		if (isResourceArchive(configuredResources)) {
+			Path archivePath =
+					Path.of(configuredResources)
+							.toAbsolutePath()
+							.normalize();
+
+			try {
+				URI archiveUri =
+						URI.create(
+								"jar:"
+										+ archivePath.toUri());
+
+				mountedResourceFileSystem =
+						FileSystems.newFileSystem(
+								archiveUri,
+								Map.of());
+
+				resolvedResourcesPath =
+						findResourcesRoot(
+								mountedResourceFileSystem);
+
+				if (resolvedResourcesPath == null) {
+					throw new IOException(
+							"ExcelBinOutput was not found inside "
+									+ archivePath);
+				}
+
+				Grasscutter.getLogger()
+						.info(
+								"Resources will be loaded from archive {} at {}",
+								archivePath,
+								resolvedResourcesPath);
+			} catch (Exception exception) {
+				Grasscutter.getLogger()
+						.error(
+								"Failed to mount resource archive \""
+										+ archivePath
+										+ "\". Falling back to ./resources/.",
+								exception);
+
+				if (mountedResourceFileSystem != null) {
+					try {
+						mountedResourceFileSystem.close();
+					} catch (IOException ignored) {
+					}
+				}
+
+				mountedResourceFileSystem = null;
+				resolvedResourcesPath =
+						Path.of("./resources/");
+			}
+		} else {
+			resolvedResourcesPath =
+					Path.of(configuredResources);
+		}
+
+		RESOURCE_ARCHIVE_FILE_SYSTEM = mountedResourceFileSystem;
+
+		RESOURCES_PATH = resolvedResourcesPath;
 
         // Setup Scripts path
         final String scripts = Grasscutter.config.folderStructure.scripts;
@@ -120,6 +148,66 @@ public final class FileUtils {
                 ? DATA_USER_PATH.resolve(name + ".tsj")
                 : null; // Maybe they want to write to a new file
     }
+	
+	private static boolean isResourceArchive(
+			String resourcePath) {
+		if (resourcePath == null) {
+			return false;
+		}
+
+		String normalized =
+				resourcePath.toLowerCase(
+						Locale.ROOT);
+
+		return normalized.endsWith(".zip")
+				|| normalized.endsWith(".cache");
+	}
+
+	private static Path findResourcesRoot(
+			FileSystem fileSystem)
+			throws IOException {
+		Path root =
+				fileSystem.getPath("/");
+
+		/*
+		 * Supports:
+		 *
+		 * /ExcelBinOutput
+		 * /some-folder/ExcelBinOutput
+		 * /raw/ExcelBinOutput
+		 */
+		try (Stream<Path> paths =
+				Files.find(
+						root,
+						4,
+						(candidate, attributes) -> {
+							if (!attributes.isDirectory()) {
+								return false;
+							}
+
+							Path filename =
+									candidate.getFileName();
+
+							return filename != null
+									&& "ExcelBinOutput"
+											.equals(
+													filename.toString());
+						})) {
+			Optional<Path> excelDirectory =
+					paths.findFirst();
+
+			if (excelDirectory.isEmpty()) {
+				return null;
+			}
+
+			Path parent =
+					excelDirectory.get().getParent();
+
+			return parent != null
+					? parent
+					: root;
+		}
+	}
 
     public static Path getDataPath(String path) {
         Path userPath = DATA_USER_PATH.resolve(path);

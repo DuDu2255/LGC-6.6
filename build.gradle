@@ -162,6 +162,56 @@ application {
     getMainClass().set('emu.grasscutter.Grasscutter')
 }
 
+tasks.register('buildResourceCache', JavaExec) {
+    group = 'LunaGC'
+    description = 'Builds the LunaGC annotated-resource cache.'
+
+    dependsOn classes
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'emu.grasscutter.tools.ResourceCacheCompiler'
+
+    def resourcesPath =
+            project.findProperty('resourcesDir')
+                    ?: '../LunaGC-6.6-res'
+
+    def outputPath =
+            project.findProperty('cacheOutput')
+                    ?: 'LunaGC-6.6-resources.cache'
+
+    args(
+            '--resources',
+            file(resourcesPath).absolutePath,
+            '--output',
+            file(outputPath).absolutePath,
+            '--resources-commit',
+            project.findProperty('resourcesCommit')
+                    ?: 'unknown',
+            '--server-commit',
+            project.findProperty('serverCommit')
+                    ?: 'unknown'
+    )
+}
+
+tasks.register('validateResourceCache', JavaExec) {
+    group = 'LunaGC'
+    description = 'Validates a LunaGC resource cache.'
+
+    dependsOn classes
+
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'emu.grasscutter.tools.ResourceCacheValidator'
+
+    def inputPath =
+            project.findProperty('cacheInput')
+                    ?: 'LunaGC-6.6-resources.cache'
+
+    args(
+            '--input',
+            file(inputPath).absolutePath
+    )
+}
+
 jar {
     exclude '*.proto'
 

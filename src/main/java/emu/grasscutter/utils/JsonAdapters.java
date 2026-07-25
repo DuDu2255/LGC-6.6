@@ -51,8 +51,78 @@ public interface JsonAdapters {
             }
         }
 
-        @Override
-        public void write(JsonWriter writer, DynamicFloat f) {}
+		@Override
+		public void write(
+				JsonWriter writer,
+				DynamicFloat dynamicFloat)
+				throws IOException {
+
+			/*
+			 * Constant DynamicFloat values are represented as an ordinary
+			 * JSON number.
+			 */
+			if (!dynamicFloat.isDynamic()) {
+				writer.value(dynamicFloat.getConstant());
+				return;
+			}
+
+			var operations = dynamicFloat.getOps();
+
+			if (operations == null || operations.isEmpty()) {
+				/*
+				 * A dynamic value without operations is malformed. Do not
+				 * silently produce broken JSON.
+				 */
+				throw new IOException(
+						"DynamicFloat is marked dynamic but contains no operations.");
+			}
+
+			/*
+			 * Dynamic values are normalized into the array representation
+			 * already accepted by DynamicFloatAdapter.read().
+			 */
+			writer.beginArray();
+
+			for (var operation : operations) {
+				if (operation == null || operation.op == null) {
+					throw new IOException(
+							"DynamicFloat contains an invalid null operation.");
+				}
+
+				String operationName =
+						String.valueOf(operation.op);
+
+				switch (operationName) {
+					case "CONSTANT" ->
+							writer.value(operation.fValue);
+
+					case "KEY" -> {
+						String key =
+								operation.sValue != null
+										? operation.sValue
+										: "";
+
+						writer.value(
+								operation.negative
+										? "-%" + key
+										: "%" + key);
+					}
+
+					case "ADD", "SUB", "MUL", "DIV" ->
+							writer.value(operationName);
+
+					case "NEXBOOLEAN" ->
+							writer.value(operation.bValue);
+
+					default ->
+							throw new IOException(
+									"Unsupported DynamicFloat operation: "
+											+ operationName);
+				}
+			}
+
+			writer.endArray();
+		}
     }
 
     class IntListAdapter extends TypeAdapter<IntList> {
@@ -185,19 +255,22 @@ public interface JsonAdapters {
                 }
             }
 
-            return new TypeAdapter<>() {
-                public T read(JsonReader reader) throws IOException {
-                    return switch (reader.peek()) {
-                        case STRING -> map.get(reader.nextString());
-                        case NUMBER -> map.get(String.valueOf(reader.nextInt()));
-                        default -> throw new IOException("Invalid Enum definition - " + reader.peek().name());
-                    };
-                }
+			return new TypeAdapter<T>() {
+				@Override
+				public T read(JsonReader reader) throws IOException {
+					return switch (reader.peek()) {
+						case STRING -> map.get(reader.nextString());
 
-                public void write(JsonWriter writer, T value) throws IOException {
-                    writer.value(value.toString());
-                }
-            };
+						case NUMBER -> map.get(String.valueOf(reader.nextInt()));
+
+						default -> throw new IOException("Invalid Enum definition - " + reader.peek().name());
+					};
+				}
+				@Override
+				public void write(JsonWriter writer, T value) throws IOException {
+					writer.value(value.toString());
+				}
+			}.nullSafe();
         }
     }
 }
