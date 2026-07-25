@@ -44,7 +44,7 @@ public final class QuestGlobalVarNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 23502
+   * CmdId: 25356
    * Obf: JGINEENLNCF
    * </pre>
    *
@@ -337,7 +337,7 @@ public final class QuestGlobalVarNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 23502
+     * CmdId: 25356
      * Obf: JGINEENLNCF
      * </pre>
      *

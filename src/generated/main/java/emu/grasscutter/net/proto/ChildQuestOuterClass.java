@@ -74,12 +74,12 @@ public final class ChildQuestOuterClass {
               questId_ = input.readUInt32();
               break;
             }
-            case 88: {
+            case 24: {
 
               questConfigId_ = input.readUInt32();
               break;
             }
-            case 112: {
+            case 40: {
 
               state_ = input.readUInt32();
               break;
@@ -124,7 +124,7 @@ public final class ChildQuestOuterClass {
       return questId_;
     }
 
-    public static final int QUEST_CONFIG_ID_FIELD_NUMBER = 11;
+    public static final int QUEST_CONFIG_ID_FIELD_NUMBER = 3;
     private int questConfigId_;
 
     @java.lang.Override
@@ -132,7 +132,7 @@ public final class ChildQuestOuterClass {
       return questConfigId_;
     }
 
-    public static final int STATE_FIELD_NUMBER = 14;
+    public static final int STATE_FIELD_NUMBER = 5;
     private int state_;
 
     @java.lang.Override
@@ -158,10 +158,10 @@ public final class ChildQuestOuterClass {
         output.writeUInt32(9, questId_);
       }
       if (questConfigId_ != 0) {
-        output.writeUInt32(11, questConfigId_);
+        output.writeUInt32(3, questConfigId_);
       }
       if (state_ != 0) {
-        output.writeUInt32(14, state_);
+        output.writeUInt32(5, state_);
       }
       unknownFields.writeTo(output);
     }
@@ -178,11 +178,11 @@ public final class ChildQuestOuterClass {
       }
       if (questConfigId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(11, questConfigId_);
+          .computeUInt32Size(3, questConfigId_);
       }
       if (state_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(14, state_);
+          .computeUInt32Size(5, state_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;

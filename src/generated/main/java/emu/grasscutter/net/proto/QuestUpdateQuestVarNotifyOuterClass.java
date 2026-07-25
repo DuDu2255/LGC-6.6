@@ -49,7 +49,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 1753
+   * CmdId: 28591
    * Obf: OEEFAJLMMNF
    * </pre>
    *
@@ -99,7 +99,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
             case 0:
               done = true;
               break;
-            case 24: {
+            case 104: {
 
               parentQuestId_ = input.readUInt32();
               break;
@@ -125,7 +125,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
               input.popLimit(limit);
               break;
             }
-            case 72: {
+            case 120: {
 
               parentQuestVarSeq_ = input.readUInt32();
               break;
@@ -165,7 +165,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
               emu.grasscutter.net.proto.QuestUpdateQuestVarNotifyOuterClass.QuestUpdateQuestVarNotify.class, emu.grasscutter.net.proto.QuestUpdateQuestVarNotifyOuterClass.QuestUpdateQuestVarNotify.Builder.class);
     }
 
-    public static final int PARENT_QUEST_ID_FIELD_NUMBER = 3;
+    public static final int PARENT_QUEST_ID_FIELD_NUMBER = 13;
     private int parentQuestId_;
     /**
      * <code>uint32 parent_quest_id = 3;</code>
@@ -204,7 +204,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
     }
     private int questVarMemoizedSerializedSize = -1;
 
-    public static final int PARENT_QUEST_VAR_SEQ_FIELD_NUMBER = 9;
+    public static final int PARENT_QUEST_VAR_SEQ_FIELD_NUMBER = 15;
     private int parentQuestVarSeq_;
     /**
      * <code>uint32 parent_quest_var_seq = 9;</code>
@@ -231,7 +231,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
                         throws java.io.IOException {
       getSerializedSize();
       if (parentQuestId_ != 0) {
-        output.writeUInt32(3, parentQuestId_);
+        output.writeUInt32(13, parentQuestId_);
       }
       if (getQuestVarList().size() > 0) {
         output.writeUInt32NoTag(50);
@@ -241,7 +241,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
         output.writeInt32NoTag(questVar_.getInt(i));
       }
       if (parentQuestVarSeq_ != 0) {
-        output.writeUInt32(9, parentQuestVarSeq_);
+        output.writeUInt32(15, parentQuestVarSeq_);
       }
       unknownFields.writeTo(output);
     }
@@ -254,7 +254,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
       size = 0;
       if (parentQuestId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(3, parentQuestId_);
+          .computeUInt32Size(13, parentQuestId_);
       }
       {
         int dataSize = 0;
@@ -272,7 +272,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
       }
       if (parentQuestVarSeq_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(9, parentQuestVarSeq_);
+          .computeUInt32Size(15, parentQuestVarSeq_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -411,7 +411,7 @@ public final class QuestUpdateQuestVarNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 1753
+     * CmdId: 28591
      * Obf: OEEFAJLMMNF
      * </pre>
      *

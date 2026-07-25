@@ -26,7 +26,7 @@ public final class QuestDestroyNpcRspOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 3683
+   * CmdId: 26970
    * </pre>
    *
    * Protobuf type {@code QuestDestroyNpcRsp}
@@ -323,7 +323,7 @@ public final class QuestDestroyNpcRspOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 3683
+     * CmdId: 26970
      * </pre>
      *
      * Protobuf type {@code QuestDestroyNpcRsp}

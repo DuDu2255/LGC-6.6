@@ -44,7 +44,7 @@ public final class FinishedParentQuestUpdateNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 455
+   * CmdId: 6675
    * Obf: JCGNAICEEND
    * </pre>
    *
@@ -337,7 +337,7 @@ public final class FinishedParentQuestUpdateNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 455
+     * CmdId: 6675
      * Obf: JCGNAICEEND
      * </pre>
      *

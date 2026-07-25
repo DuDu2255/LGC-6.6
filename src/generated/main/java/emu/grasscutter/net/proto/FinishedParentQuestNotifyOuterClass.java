@@ -44,7 +44,7 @@ public final class FinishedParentQuestNotifyOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 27820
+   * CmdId: 6359
    * Obf: EPOAAKIMMFB
    * </pre>
    *
@@ -337,7 +337,7 @@ public final class FinishedParentQuestNotifyOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 27820
+     * CmdId: 6359
      * Obf: EPOAAKIMMFB
      * </pre>
      *

@@ -24,7 +24,7 @@ public final class QuestDestroyNpcReqOuterClass {
   }
   /**
    * <pre>
-   * CmdId: 3683
+   * CmdId: 5071
    * </pre>
    *
    * Protobuf type {@code QuestDestroyNpcReq}
@@ -297,7 +297,7 @@ public final class QuestDestroyNpcReqOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 3683
+     * CmdId: 5071
      * </pre>
      *
      * Protobuf type {@code QuestDestroyNpcReq}

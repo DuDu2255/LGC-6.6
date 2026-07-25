@@ -19,26 +19,32 @@ public final class QuestTransmitReqOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>uint32 quest_id = 2;</code>
+     * <code>uint32 quest_id = 10;</code>
      * @return The questId.
      */
     int getQuestId();
 
     /**
-     * <code>uint32 point_id = 1;</code>
+     * <code>uint32 point_id = 4;</code>
      * @return The pointId.
      */
     int getPointId();
 
     /**
-     * <code>uint32 LAJGLCIFKCP = 10;</code>
+     * <code>uint32 LAJGLCIFKCP = 1;</code>
      * @return The lAJGLCIFKCP.
      */
     int getLAJGLCIFKCP();
+
+    /**
+     * <code>uint32 template_loading_id = 15;</code>
+     * @return The templateLoadingId.
+     */
+    int getTemplateLoadingId();
   }
   /**
    * <pre>
-   * CmdId: 2854
+   * CmdId: 8106
    * Obf: FGDGCAJEJPM
    * </pre>
    *
@@ -88,17 +94,22 @@ public final class QuestTransmitReqOuterClass {
               break;
             case 8: {
 
-              pointId_ = input.readUInt32();
+              lAJGLCIFKCP_ = input.readUInt32();
               break;
             }
-            case 16: {
+            case 32: {
 
-              questId_ = input.readUInt32();
+              pointId_ = input.readUInt32();
               break;
             }
             case 80: {
 
-              lAJGLCIFKCP_ = input.readUInt32();
+              questId_ = input.readUInt32();
+              break;
+            }
+            case 120: {
+
+              templateLoadingId_ = input.readUInt32();
               break;
             }
             default: {
@@ -133,37 +144,36 @@ public final class QuestTransmitReqOuterClass {
               emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq.class, emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq.Builder.class);
     }
 
-    public static final int QUEST_ID_FIELD_NUMBER = 2;
-    private int questId_;
-    /**
-     * <code>uint32 quest_id = 2;</code>
-     * @return The questId.
-     */
+    public static final int LAJGLCIFKCP_FIELD_NUMBER = 1;
+    private int lAJGLCIFKCP_;
+
     @java.lang.Override
-    public int getQuestId() {
-      return questId_;
+    public int getLAJGLCIFKCP() {
+      return lAJGLCIFKCP_;
     }
 
-    public static final int POINT_ID_FIELD_NUMBER = 1;
+    public static final int POINT_ID_FIELD_NUMBER = 4;
     private int pointId_;
-    /**
-     * <code>uint32 point_id = 1;</code>
-     * @return The pointId.
-     */
+
     @java.lang.Override
     public int getPointId() {
       return pointId_;
     }
 
-    public static final int LAJGLCIFKCP_FIELD_NUMBER = 10;
-    private int lAJGLCIFKCP_;
-    /**
-     * <code>uint32 LAJGLCIFKCP = 10;</code>
-     * @return The lAJGLCIFKCP.
-     */
+    public static final int QUEST_ID_FIELD_NUMBER = 10;
+    private int questId_;
+
     @java.lang.Override
-    public int getLAJGLCIFKCP() {
-      return lAJGLCIFKCP_;
+    public int getQuestId() {
+      return questId_;
+    }
+
+    public static final int TEMPLATE_LOADING_ID_FIELD_NUMBER = 15;
+    private int templateLoadingId_;
+
+    @java.lang.Override
+    public int getTemplateLoadingId() {
+      return templateLoadingId_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -180,14 +190,17 @@ public final class QuestTransmitReqOuterClass {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (lAJGLCIFKCP_ != 0) {
+        output.writeUInt32(1, lAJGLCIFKCP_);
+      }
       if (pointId_ != 0) {
-        output.writeUInt32(1, pointId_);
+        output.writeUInt32(4, pointId_);
       }
       if (questId_ != 0) {
-        output.writeUInt32(2, questId_);
+        output.writeUInt32(10, questId_);
       }
-      if (lAJGLCIFKCP_ != 0) {
-        output.writeUInt32(10, lAJGLCIFKCP_);
+      if (templateLoadingId_ != 0) {
+        output.writeUInt32(15, templateLoadingId_);
       }
       unknownFields.writeTo(output);
     }
@@ -198,17 +211,21 @@ public final class QuestTransmitReqOuterClass {
       if (size != -1) return size;
 
       size = 0;
+      if (lAJGLCIFKCP_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(1, lAJGLCIFKCP_);
+      }
       if (pointId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, pointId_);
+          .computeUInt32Size(4, pointId_);
       }
       if (questId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(2, questId_);
+          .computeUInt32Size(10, questId_);
       }
-      if (lAJGLCIFKCP_ != 0) {
+      if (templateLoadingId_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(10, lAJGLCIFKCP_);
+          .computeUInt32Size(15, templateLoadingId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -225,12 +242,14 @@ public final class QuestTransmitReqOuterClass {
       }
       emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq other = (emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq) obj;
 
-      if (getQuestId()
-          != other.getQuestId()) return false;
-      if (getPointId()
-          != other.getPointId()) return false;
       if (getLAJGLCIFKCP()
           != other.getLAJGLCIFKCP()) return false;
+      if (getPointId()
+          != other.getPointId()) return false;
+      if (getQuestId()
+          != other.getQuestId()) return false;
+      if (getTemplateLoadingId()
+          != other.getTemplateLoadingId()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -242,12 +261,14 @@ public final class QuestTransmitReqOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + QUEST_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getQuestId();
-      hash = (37 * hash) + POINT_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getPointId();
       hash = (37 * hash) + LAJGLCIFKCP_FIELD_NUMBER;
       hash = (53 * hash) + getLAJGLCIFKCP();
+      hash = (37 * hash) + POINT_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getPointId();
+      hash = (37 * hash) + QUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getQuestId();
+      hash = (37 * hash) + TEMPLATE_LOADING_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getTemplateLoadingId();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -345,7 +366,7 @@ public final class QuestTransmitReqOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 2854
+     * CmdId: 8106
      * Obf: FGDGCAJEJPM
      * </pre>
      *
@@ -368,7 +389,6 @@ public final class QuestTransmitReqOuterClass {
                 emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq.class, emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq.Builder.class);
       }
 
-      // Construct using emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -386,11 +406,13 @@ public final class QuestTransmitReqOuterClass {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        questId_ = 0;
+        lAJGLCIFKCP_ = 0;
 
         pointId_ = 0;
 
-        lAJGLCIFKCP_ = 0;
+        questId_ = 0;
+
+        templateLoadingId_ = 0;
 
         return this;
       }
@@ -418,9 +440,10 @@ public final class QuestTransmitReqOuterClass {
       @java.lang.Override
       public emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq buildPartial() {
         emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq result = new emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq(this);
-        result.questId_ = questId_;
-        result.pointId_ = pointId_;
         result.lAJGLCIFKCP_ = lAJGLCIFKCP_;
+        result.pointId_ = pointId_;
+        result.questId_ = questId_;
+        result.templateLoadingId_ = templateLoadingId_;
         onBuilt();
         return result;
       }
@@ -469,14 +492,17 @@ public final class QuestTransmitReqOuterClass {
 
       public Builder mergeFrom(emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq other) {
         if (other == emu.grasscutter.net.proto.QuestTransmitReqOuterClass.QuestTransmitReq.getDefaultInstance()) return this;
-        if (other.getQuestId() != 0) {
-          setQuestId(other.getQuestId());
+        if (other.getLAJGLCIFKCP() != 0) {
+          setLAJGLCIFKCP(other.getLAJGLCIFKCP());
         }
         if (other.getPointId() != 0) {
           setPointId(other.getPointId());
         }
-        if (other.getLAJGLCIFKCP() != 0) {
-          setLAJGLCIFKCP(other.getLAJGLCIFKCP());
+        if (other.getQuestId() != 0) {
+          setQuestId(other.getQuestId());
+        }
+        if (other.getTemplateLoadingId() != 0) {
+          setTemplateLoadingId(other.getTemplateLoadingId());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -507,95 +533,78 @@ public final class QuestTransmitReqOuterClass {
         return this;
       }
 
-      private int questId_ ;
-      /**
-       * <code>uint32 quest_id = 2;</code>
-       * @return The questId.
-       */
+      private int lAJGLCIFKCP_ ;
+
       @java.lang.Override
-      public int getQuestId() {
-        return questId_;
+      public int getLAJGLCIFKCP() {
+        return lAJGLCIFKCP_;
       }
-      /**
-       * <code>uint32 quest_id = 2;</code>
-       * @param value The questId to set.
-       * @return This builder for chaining.
-       */
-      public Builder setQuestId(int value) {
-        
-        questId_ = value;
+
+      public Builder setLAJGLCIFKCP(int value) {
+        lAJGLCIFKCP_ = value;
         onChanged();
         return this;
       }
-      /**
-       * <code>uint32 quest_id = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearQuestId() {
-        
-        questId_ = 0;
+
+      public Builder clearLAJGLCIFKCP() {
+        lAJGLCIFKCP_ = 0;
         onChanged();
         return this;
       }
 
       private int pointId_ ;
-      /**
-       * <code>uint32 point_id = 1;</code>
-       * @return The pointId.
-       */
+
       @java.lang.Override
       public int getPointId() {
         return pointId_;
       }
-      /**
-       * <code>uint32 point_id = 1;</code>
-       * @param value The pointId to set.
-       * @return This builder for chaining.
-       */
+
       public Builder setPointId(int value) {
-        
         pointId_ = value;
         onChanged();
         return this;
       }
-      /**
-       * <code>uint32 point_id = 1;</code>
-       * @return This builder for chaining.
-       */
+
       public Builder clearPointId() {
-        
         pointId_ = 0;
         onChanged();
         return this;
       }
 
-      private int lAJGLCIFKCP_ ;
-      /**
-       * <code>uint32 LAJGLCIFKCP = 10;</code>
-       * @return The lAJGLCIFKCP.
-       */
+      private int questId_ ;
+
       @java.lang.Override
-      public int getLAJGLCIFKCP() {
-        return lAJGLCIFKCP_;
+      public int getQuestId() {
+        return questId_;
       }
-      /**
-       * <code>uint32 LAJGLCIFKCP = 10;</code>
-       * @param value The lAJGLCIFKCP to set.
-       * @return This builder for chaining.
-       */
-      public Builder setLAJGLCIFKCP(int value) {
-        
-        lAJGLCIFKCP_ = value;
+
+      public Builder setQuestId(int value) {
+        questId_ = value;
         onChanged();
         return this;
       }
-      /**
-       * <code>uint32 LAJGLCIFKCP = 10;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearLAJGLCIFKCP() {
-        
-        lAJGLCIFKCP_ = 0;
+
+      public Builder clearQuestId() {
+        questId_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int templateLoadingId_ ;
+
+      @java.lang.Override
+      public int getTemplateLoadingId() {
+        return templateLoadingId_;
+      }
+
+      public Builder setTemplateLoadingId(int value) {
+        templateLoadingId_ = value;
+        onChanged();
+        return this;
+      }
+
+      public Builder clearTemplateLoadingId() {
+        templateLoadingId_ = 0;
         onChanged();
         return this;
       }
@@ -610,7 +619,6 @@ public final class QuestTransmitReqOuterClass {
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
       }
-
 
       // @@protoc_insertion_point(builder_scope:QuestTransmitReq)
     }
@@ -666,10 +674,11 @@ public final class QuestTransmitReqOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\026QuestTransmitReq.proto\"K\n\020QuestTransmi" +
-      "tReq\022\020\n\010quest_id\030\002 \001(\r\022\020\n\010point_id\030\001 \001(\r" +
-      "\022\023\n\013LAJGLCIFKCP\030\n \001(\rB\033\n\031emu.grasscutter" +
-      ".net.protob\006proto3"
+      "\n\026QuestTransmitReq.proto\"h\n\020QuestTransmi" +
+      "tReq\022\023\n\013LAJGLCIFKCP\030\001 \001(\r\022\020\n\010point_id\030\004 " +
+      "\001(\r\022\020\n\010quest_id\030\n \001(\r\022\033\n\023template_loadin" +
+      "g_id\030\017 \001(\rB\033\n\031emu.grasscutter.net.protob" +
+      "\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -680,7 +689,7 @@ public final class QuestTransmitReqOuterClass {
     internal_static_QuestTransmitReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_QuestTransmitReq_descriptor,
-        new java.lang.String[] { "QuestId", "PointId", "LAJGLCIFKCP", });
+        new java.lang.String[] { "LAJGLCIFKCP", "PointId", "QuestId", "TemplateLoadingId", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
