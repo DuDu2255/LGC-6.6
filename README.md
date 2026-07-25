@@ -1,4 +1,4 @@
-# LunaGC-6.6.0 WIP
+# LunaGC-6.6.0
 
 ## Important note
 This is an experimental 6.6 branch containing changes catered to fix some gameplay aspects related to farming and building characters for the heck of it.
@@ -21,11 +21,15 @@ This is possibly the only public PS with updated mob and gadget spawns! (Up to V
 - Get game version [REL6.6.0](https://archive.heavens-era.com/Tenshi's%20Archive/Live%20Service/miHoYo/Genshin%20Impact/Game%20Files/OS/6.6.0)
 - Make sure to install java and set the environment variables.
 - Build the server (refer to "Compile the actual server" in this guide.)
-- Download the [Resources](https://github.com/Rafs-kk/LunaGC-6.6-res), make a new folder called `resources` in the downloaded LunaGC folder and then extract the resources in that new folder.
-- Set useEncryption, Questing and useInRouting to false (it should be false by default, if not then change it)
+
+- Install the resources using one of these methods:
+-  **Regular method:** Download the [Resources](https://github.com/Rafs-kk/LunaGC-6.6-res), create a folder named `resources` inside the LunaGC folder, and extract the resources into it.
+-  **Resource cache method:** Download `LunaGC-6.6-resources.cache` from the [latest Resource Cache release](https://github.com/Rafs-kk/LunaGC-6.6-res/releases/tag/latest-cache), create a folder named `cache` inside the LunaGC folder, and place the file inside it without extracting or renaming it.
+-  The server will automatically use a valid resource cache when available and fall back to the normal `resources` folder otherwise.
+- Set useEncryption, Questing and useInRouting to false (it should be false by default, if not then change it).
 - [Patch the game](#patching-the-game)
-- Start the server and the game, make sure to also create an account in the LunaGC console!
-- Have fun (or don't)
+- Start the server and the game, make sure to also create an account in the LunaGC console.
+- Have fun!
 
 ### Patching the game
 - Put [Astrolabe.dll](https://github.com/Rafs-kk/LunaGC-6.6/blob/6.6.0/patch/Astrolabe.dll) in the game folder at `GenshinImpact_Data/Plugins`. Make sure you back up the old `Astrolabe.dll` in the plugins folder.
