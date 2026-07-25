@@ -165,6 +165,8 @@ public class Scene {
 	private static final int SEIRAI_WEATHER_SEIRAIMARU = 3165;
 	private static final int SEIRAI_WEATHER_INITIAL_ISLAND = 3165;
 
+	private static final int SANGONOMIYA_WEATHER_GENERAL = 3067;
+
 	private static final Position THUNDER_MANIFESTATION_ARENA_POS =
 			new Position(-4707.378f, 479.99323f, -4258.842f);
 
@@ -294,6 +296,49 @@ public class Scene {
 			{646.4743, -621.7398},
 			{613.2624, -694.8876},
 			{571.9562, -773.13544}
+	};
+
+	/*
+	 * Sangonomiya Shrine perimeter in the X/Z plane.
+	 *
+	 * These points are already arranged continuously around the boundary.
+	 * Y is intentionally ignored so the same horizontal perimeter applies at
+	 * every elevation around the shrine, waterfalls, cliffs, and lower paths.
+	 */
+	private static final double[][] SANGONOMIYA_WEATHER_PERIMETER_XZ = {
+			{-3945.285, -1056.3728},
+			{-3897.814, -1065.2528},
+			{-3858.6768, -1052.088},
+			{-3810.4138, -1038.7576},
+			{-3777.267, -1032.6497},
+			{-3733.0571, -1004.1456},
+			{-3690.243, -979.49835},
+			{-3645.9495, -952.5349},
+			{-3647.7095, -946.2949},
+			{-3638.323, -930.9094},
+			{-3611.2878, -878.5145},
+			{-3593.1438, -831.94977},
+			{-3566.8086, -767.417},
+			{-3574.542, -738.89374},
+			{-3594.4153, -686.7346},
+			{-3618.0378, -644.9324},
+			{-3644.0693, -612.40765},
+			{-3641.6382, -590.1775},
+			{-3676.3137, -573.8977},
+			{-3698.9832, -587.8092},
+			{-3759.7224, -583.33984},
+			{-3777.6543, -606.3279},
+			{-3834.4744, -614.4811},
+			{-3903.8596, -620.0091},
+			{-3949.2917, -660.18994},
+			{-3970.977, -717.8509},
+			{-3992.4358, -769.68384},
+			{-3987.752, -821.4353},
+			{-3994.314, -860.78925},
+			{-3984.6733, -909.70215},
+			{-3981.5112, -938.4824},
+			{-3976.57, -977.2434},
+			{-3967.6797, -1023.8548}
 	};
 
 	/*
@@ -2656,6 +2701,14 @@ public class Scene {
 			return SEIRAI_WEATHER_DEFAULT;
 		}
 
+		 /*
+		 * Watatsumi Island is geographically separate from every Seirai zone,
+		 * so this can safely participate in the same Scene 3 regional resolver.
+		 */
+		if (this.isInSangonomiyaWeatherZone(pos)) {
+			return SANGONOMIYA_WEATHER_GENERAL;
+		}
+
 		if (this.isInThunderManifestationWeatherZone(pos)) {
 			return SEIRAI_WEATHER_THUNDER_MANIFESTATION;
 		}
@@ -2705,6 +2758,45 @@ public class Scene {
 						pos,
 						SEIRAI_ASASE_SHRINE_CLEAR_POS,
 						SEIRAI_ASASE_SHRINE_CLEAR_RADIUS);
+	}
+
+	private boolean isInSangonomiyaWeatherZone(Position pos) {
+		if (pos == null) {
+			return false;
+		}
+
+		/*
+		 * Only X and Z are evaluated. The player's Y coordinate is deliberately
+		 * ignored so caves, elevated shrine platforms, waterfalls, and lower
+		 * terrain inside the horizontal boundary receive the same weather.
+		 */
+		double x = pos.getX();
+		double z = pos.getZ();
+		boolean inside = false;
+
+		for (int i = 0, j = SANGONOMIYA_WEATHER_PERIMETER_XZ.length - 1;
+				i < SANGONOMIYA_WEATHER_PERIMETER_XZ.length;
+				j = i++) {
+
+			double xi = SANGONOMIYA_WEATHER_PERIMETER_XZ[i][0];
+			double zi = SANGONOMIYA_WEATHER_PERIMETER_XZ[i][1];
+
+			double xj = SANGONOMIYA_WEATHER_PERIMETER_XZ[j][0];
+			double zj = SANGONOMIYA_WEATHER_PERIMETER_XZ[j][1];
+
+			boolean crossesZ = (zi > z) != (zj > z);
+
+			if (crossesZ) {
+				double edgeX =
+						(xj - xi) * (z - zi) / (zj - zi) + xi;
+
+				if (x < edgeX) {
+					inside = !inside;
+				}
+			}
+		}
+
+		return inside;
 	}
 
 	private boolean isNear2d(Position pos, Position center, float radius) {
@@ -2777,8 +2869,9 @@ public class Scene {
 			}
 
 			/*
-			 * Preserve the existing behavior that resets the weather to
-			 * ID 0 when the player travels away from Seirai Island.
+			 * Reset to weather ID 0 when the player leaves every region owned by
+			 * this Scene 3 regional-weather fallback, including Seirai Island and
+			 * the Sangonomiya Shrine perimeter.
 			 */
 			if (allowDefaultReset && hadFallbackWeather) {
 				player.setWeather(
