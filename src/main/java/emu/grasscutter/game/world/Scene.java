@@ -19,6 +19,7 @@ import emu.grasscutter.game.dungeons.challenge.WorldChallenge;
 import emu.grasscutter.game.dungeons.enums.DungeonPassConditionType;
 import emu.grasscutter.game.entity.*;
 import emu.grasscutter.game.entity.gadget.GadgetGatherObject;
+import emu.grasscutter.game.entity.gadget.GadgetGatherPoint;
 import emu.grasscutter.game.entity.gadget.GadgetWorktop;
 import emu.grasscutter.game.inventory.GameItem;
 import emu.grasscutter.game.managers.blossom.BlossomManager;
@@ -68,6 +69,7 @@ public class Scene {
     @Getter private final Map<Integer, GameEntity> weaponEntities;
     @Getter private final Set<SpawnDataEntry> spawnedEntities;
     @Getter private final Set<SpawnDataEntry> deadSpawnedEntities;
+	private final Set<SpawnDataEntry> pendingStaticRespawns;
     @Getter private final Set<SceneBlock> loadedBlocks;
     @Getter private final Set<SceneGroup> loadedGroups;
     @Getter private final BlossomManager blossomManager;
@@ -401,6 +403,7 @@ public class Scene {
 
         this.spawnedEntities = ConcurrentHashMap.newKeySet();
         this.deadSpawnedEntities = ConcurrentHashMap.newKeySet();
+		this.pendingStaticRespawns = ConcurrentHashMap.newKeySet();
         this.loadedBlocks = ConcurrentHashMap.newKeySet();
         this.loadedGroups = ConcurrentHashMap.newKeySet();
         this.loadedGridBlocks = new HashSet<>();
@@ -965,14 +968,15 @@ public class Scene {
             }
         }
 
-        this.removeEntity(target);
+		this.removeEntity(target);
 
-        if (target instanceof EntityClientGadget cg && cg.getOwner() != null) {
-            cg.getOwner().getTeamManager().getGadgets().remove(cg);
-        }
+		if (target instanceof EntityClientGadget cg && cg.getOwner() != null) {
+			cg.getOwner().getTeamManager().getGadgets().remove(cg);
+		}
 
-        target.onDeath(attackerId);
-		
+		target.onDeath(attackerId);
+		this.markStaticSpawnForRespawn(target);
+
 		if (target instanceof EntityMonster monster) {
 			this.handleOceanidFallbackMonsterDeath(monster, attackerId);
 		}
@@ -980,6 +984,62 @@ public class Scene {
         this.triggerDungeonEvent(
                 DungeonPassConditionType.DUNGEON_COND_KILL_MONSTER_COUNT, ++killedMonsterCount);
     }
+
+	private void markStaticSpawnForRespawn(GameEntity entity) {
+		if (entity == null) {
+			return;
+		}
+
+		SpawnDataEntry spawnEntry = entity.getSpawnEntry();
+
+		/*
+		 * Lua monsters, manually spawned entities, summons and other
+		 * non-static entities have no SpawnDataEntry.
+		 */
+		if (spawnEntry == null) {
+			return;
+		}
+
+		/*
+		 * Icewind Suite has its own reset and spawning system.
+		 */
+		if (this.isIcewindSuiteStaticSpawn(spawnEntry)) {
+			return;
+		}
+
+		/*
+		 * Every static monster is allowed to respawn after being killed.
+		 */
+		if (entity instanceof EntityMonster) {
+			this.pendingStaticRespawns.add(spawnEntry);
+			return;
+		}
+
+		/*
+		 * Only collectible static gadgets are allowed to respawn.
+		 *
+		 * Chests, worktops, reward blossoms, quest gadgets and ordinary
+		 * interactables are deliberately excluded.
+		 */
+		if (entity instanceof EntityGadget gadget
+				&& (gadget.getContent() instanceof GadgetGatherObject
+						|| gadget.getContent() instanceof GadgetGatherPoint)) {
+			this.pendingStaticRespawns.add(spawnEntry);
+		}
+	}
+
+	private boolean isIcewindSuiteStaticSpawn(SpawnDataEntry spawnEntry) {
+		if (spawnEntry == null || this.getId() != ICEWIND_SCENE_ID) {
+			return false;
+		}
+
+		if (ICEWIND_FALLBACK_MONSTER_IDS.contains(spawnEntry.getMonsterId())) {
+			return true;
+		}
+
+		return spawnEntry.getGroup() != null
+				&& spawnEntry.getGroup().getGroupId() == ICEWIND_GROUP_ID;
+	}
 
     public void onTick() {
 
@@ -1202,7 +1262,36 @@ public class Scene {
 		leavingBlocks.removeAll(loadedGridBlocks);
 
 		if (!leavingBlocks.isEmpty()) {
-			this.getDeadSpawnedEntities().removeIf(entry -> leavingBlocks.contains(entry.getBlockId()));
+			/*
+			 * Select only entries that:
+			 *
+			 * 1. Were genuinely killed or collected.
+			 * 2. Were explicitly approved for static respawning.
+			 * 3. Belong to a grid block that is no longer loaded.
+			 */
+			Set<SpawnDataEntry> entriesToRelease =
+					this.pendingStaticRespawns.stream()
+							.filter(entry -> leavingBlocks.contains(entry.getBlockId()))
+							.collect(Collectors.toSet());
+
+			if (!entriesToRelease.isEmpty()) {
+				/*
+				 * Release ownership only now, after the block has unloaded.
+				 * This prevents checkSpawns() from creating another instance
+				 * while the old block is still active.
+				 */
+				this.getSpawnedEntities().removeAll(entriesToRelease);
+				this.pendingStaticRespawns.removeAll(entriesToRelease);
+			}
+
+			/*
+			 * Preserve LunaGC's existing dead-entry cleanup.
+			 *
+			 * Non-respawnable entries such as chests remain in spawnedEntities,
+			 * so clearing their dead flag does not make them spawn again.
+			 */
+			this.getDeadSpawnedEntities()
+					.removeIf(entry -> leavingBlocks.contains(entry.getBlockId()));
 		}
 
 		if (previousLoadedGridBlocks.containsAll(loadedGridBlocks)) {
@@ -1246,8 +1335,19 @@ public class Scene {
 
 		var spawnedEntities = this.getSpawnedEntities();
 
+		/*
+		 * Defensive snapshot of entries that still have a live entity in the
+		 * scene. Even if the bookkeeping sets become temporarily inconsistent,
+		 * an existing static entity must never be created a second time.
+		 */
+		Set<SpawnDataEntry> activeStaticEntries =
+				this.getEntities().values().stream()
+						.map(GameEntity::getSpawnEntry)
+						.filter(Objects::nonNull)
+						.collect(Collectors.toSet());
+
 		for (SpawnDataEntry entry : visible) {
-			if (!spawnedEntities.contains(entry) && !this.getDeadSpawnedEntities().contains(entry)) {
+			if (!spawnedEntities.contains(entry) && !this.getDeadSpawnedEntities().contains(entry) && !activeStaticEntries.contains(entry)) {
 				GameEntity entity = null;
 
 				if (entry.getMonsterId() > 0) {
@@ -1306,6 +1406,7 @@ public class Scene {
 
 				toAdd.add(entity);
 				spawnedEntities.add(entry);
+				activeStaticEntries.add(entry);
 			}
 		}
 
