@@ -1,15 +1,20 @@
 package emu.grasscutter.server.packet.send;
 
-import emu.grasscutter.net.packet.*;
-import emu.grasscutter.net.proto.*;
+import emu.grasscutter.net.packet.BasePacket;
+import emu.grasscutter.net.packet.PacketOpcodes;
+import emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData;
+import emu.grasscutter.net.proto.SetUpLunchBoxWidgetRspOuterClass.SetUpLunchBoxWidgetRsp;
 
 public class PacketSetUpLunchBoxWidgetRsp extends BasePacket {
 
-    public PacketSetUpLunchBoxWidgetRsp(LunchBoxDataOuterClass.LunchBoxData lunchBoxData) {
+    public PacketSetUpLunchBoxWidgetRsp(
+            LunchBoxData lunchBoxData) {
         super(PacketOpcodes.SetUpLunchBoxWidgetRsp);
-        var rsp = SetUpLunchBoxWidgetRspOuterClass.SetUpLunchBoxWidgetRsp.newBuilder();
-        rsp.setLunchBoxData(lunchBoxData);
 
-        setData(rsp.build());
+        setData(
+                SetUpLunchBoxWidgetRsp.newBuilder()
+                        .setRetcode(0)
+                        .setLunchBoxData(lunchBoxData)
+                        .build());
     }
 }

@@ -97,6 +97,8 @@ public class Player implements PlayerHook, FieldFetch {
     @Getter @Setter private int currentRealmId;
     @Getter @Setter private transient boolean isInEditMode;
     @Getter @Setter private int widgetId;
+	@Getter @Setter
+	private Map<Integer, Integer> lunchBoxSlotMaterialMap = new HashMap<>();
     @Getter @Setter private int sceneId;
     @Getter @Setter private int regionId;
     @Getter private int mainCharacterId;
@@ -1310,12 +1312,16 @@ public class Player implements PlayerHook, FieldFetch {
         this.nextSendPlayerLocTime = System.currentTimeMillis() + 5000;
     }
 
-    @PostLoad
-    private void onLoad() {
-        this.getCodex().setPlayer(this);
-        this.getProgressManager().setPlayer(this);
-        this.getTeamManager().setPlayer(this);
-    }
+	@PostLoad
+	private void onLoad() {
+		// Players saved before NRE persistence was added will not have this field.
+		if (this.lunchBoxSlotMaterialMap == null) {
+			this.lunchBoxSlotMaterialMap = new HashMap<>();
+		}
+		this.getCodex().setPlayer(this);
+		this.getProgressManager().setPlayer(this);
+		this.getTeamManager().setPlayer(this);
+	}
 
     public void save() {
         DatabaseHelper.savePlayer(this);
@@ -1391,10 +1397,13 @@ public class Player implements PlayerHook, FieldFetch {
         session.send(new PacketQuestListNotify(this));
         session.send(new PacketQuestGlobalVarNotify(this));
         session.send(new PacketCodexDataFullNotify(this));
-        // REL6.6 quick-use widget slot sync.
-		// PacketAllWidgetDataNotify is still incomplete/stale for slot data.
 		session.send(new PacketGetWidgetSlotRsp(this));
 		session.send(new PacketGetWidgetQuickSlotListRsp(this));
+		
+		if (this.getLunchBoxSlotMaterialMap() != null
+				&& !this.getLunchBoxSlotMaterialMap().isEmpty()) {
+			session.send(new PacketNreLunchBoxDataNotify(this));
+		}
 
         this.achievements.onLogin(this);
 

@@ -16,7 +16,6 @@ public class PacketAllWidgetDataNotify extends BasePacket {
         AllWidgetDataNotify.Builder proto =
                 AllWidgetDataNotify.newBuilder()
                         // If you want to implement this, feel free to do so. :)
-                        .setLunchBoxData(LunchBoxDataOuterClass.LunchBoxData.newBuilder().build())
                         // Maybe it's a little difficult, or it makes you upset :(
                         .addAllOneoffGatherPointDetectorDataList(List.of())
                         // So, goodbye, and hopefully sometime in the future o(*￣▽￣*)ブ
