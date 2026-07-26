@@ -1,90 +1,101 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Java CI with Gradle
+name: Build and Release
 
 on:
   push:
-    branches: [ "6.6.0" ]
-
+    branches: [ "6.6.0" ]      # 分支推送：构建但不发布
+    tags:                       # 标签推送：构建并自动发布 Release
+      - '*'                     # 匹配所有标签
   pull_request:
-    branches: [ "6.6.0" ]
-
-  workflow_dispatch:
-
-concurrency:
-  group: lunagc-6.6-development-build
-  cancel-in-progress: true
+    branches: [ "6.6.0" ]      # PR 验证：构建但不发布
+  workflow_dispatch:            # 手动触发：可选择版本和是否发布
+    inputs:
+      version:
+        description: '版本号（例如：6.6.0）'
+        required: true
+        default: '6.6.0'
+        type: string
+      release:
+        description: '是否发布 Release'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
+      release: ${{ steps.set_version.outputs.release }}
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 1
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0   # 确保获取所有标签
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: 'temurin'
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
-      with:
-        cache-read-only: ${{ github.event_name != 'push' || github.ref != 'refs/heads/6.6.0' }}
+      - name: Make gradlew executable
+        run: chmod +x gradlew
 
-    - name: Build with Gradle Wrapper
-      run: ./gradlew jar --build-cache -PskipHandbook=1
+      - name: Get version and release flag
+        id: set_version
+        run: |
+          # 根据不同事件类型设置 version 和 release
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # 手动触发：直接使用用户输入的版本号
+            VERSION="${{ inputs.version }}"
+            RELEASE="${{ inputs.release }}"
+          elif [ "${{ github.event_name }}" == "push" ] && [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            # 标签推送：从标签名获取版本号（标签名就是纯数字版本，例如 6.6.0）
+            VERSION="${GITHUB_REF#refs/tags/}"
+            RELEASE="true"
+          else
+            # 分支推送 或 PR：从 build.gradle 读取现有版本号
+            VERSION=$(grep '^version =' build.gradle | sed "s/version = '\(.*\)'/\1/")
+            RELEASE="false"
+          fi
 
-    - name: Rename compiled JAR
-      run: |
-        if [ -f "LunaGC-6.6.0.jar" ]; then
-          mv "LunaGC-6.6.0.jar" "LunaGC6.6.0.jar"
-        else
-          echo "错误：找不到 LunaGC-6.6.0.jar"
-          exit 1
-        fi
+          # 如果没读到版本号，使用默认值并警告
+          if [ -z "$VERSION" ]; then
+            VERSION="6.6.0"
+            echo "Warning: Failed to read version from build.gradle, using 6.6.0"
+          fi
 
-    - name: Verify compiled JAR
-      run: |
-        test -f LunaGC6.6.0.jar
-        ls -lh LunaGC6.6.0.jar
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "release=${RELEASE}" >> $GITHUB_OUTPUT
 
-    - name: Archive Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: LunaGC6.6.0-${{ github.sha }}
-        path: LunaGC6.6.0.jar
-        if-no-files-found: error
-        retention-days: 30
-        compression-level: 0
+      - name: Set version in build.gradle
+        run: |
+          sed -i "s/version = '.*'/version = '${{ steps.set_version.outputs.version }}'/" build.gradle
 
-    - name: Publish rolling development release
-      if: github.event_name == 'push' && github.ref == 'refs/heads/6.6.0'
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        gh release delete latest-dev \
-          --cleanup-tag \
-          --yes || true
+      - name: Create empty proto directory (if needed)
+        run: |
+          mkdir -p proto
+          touch proto/.gitkeep
 
-        gh release create latest-dev \
-          LunaGC6.6.0.jar \
-          --target "${GITHUB_SHA}" \
-          --title "Latest LunaGC 6.6 Development Build" \
-          --notes "Automatically compiled from commit ${GITHUB_SHA}." \
-          --prerelease \
-          --latest=false
+      - name: Build with Gradle
+        run: |
+          ./gradlew injectGitHash jar -x generateProto -PskipHandbook=1 --no-daemon
 
-    - name: Generate and submit dependency graph
-      if: github.event_name == 'push' && github.ref == 'refs/heads/6.6.0'
-      uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            LunaGC-*.jar
+          if-no-files-found: error
+
+      - name: Upload assets to release
+        if: steps.set_version.outputs.release == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.set_version.outputs.version }}
+          files: |
+            LunaGC-*.jar
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
