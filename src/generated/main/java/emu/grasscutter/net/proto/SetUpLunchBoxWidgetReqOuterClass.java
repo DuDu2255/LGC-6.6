@@ -18,15 +18,26 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
       // @@protoc_insertion_point(interface_extends:SetUpLunchBoxWidgetReq)
       com.google.protobuf.MessageOrBuilder {
 
+    /**
+     * <code>.LunchBoxData lunch_box_data = 14;</code>
+     * @return Whether the lunchBoxData field is set.
+     */
     boolean hasLunchBoxData();
-
+    /**
+     * <code>.LunchBoxData lunch_box_data = 14;</code>
+     * @return The lunchBoxData.
+     */
     emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData getLunchBoxData();
-
+    /**
+     * <code>.LunchBoxData lunch_box_data = 14;</code>
+     */
     emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxDataOrBuilder getLunchBoxDataOrBuilder();
   }
   /**
    * <pre>
-   * CmdId: 2551
+   * REL6.6
+   * CmdId: 5228
+   * Obf: FHNOBLLLLJH
    * </pre>
    *
    * Protobuf type {@code SetUpLunchBoxWidgetReq}
@@ -73,7 +84,7 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
             case 0:
               done = true;
               break;
-            case 58: {
+            case 114: {
               emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.Builder subBuilder = null;
               if (lunchBoxData_ != null) {
                 subBuilder = lunchBoxData_.toBuilder();
@@ -118,19 +129,27 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
               emu.grasscutter.net.proto.SetUpLunchBoxWidgetReqOuterClass.SetUpLunchBoxWidgetReq.class, emu.grasscutter.net.proto.SetUpLunchBoxWidgetReqOuterClass.SetUpLunchBoxWidgetReq.Builder.class);
     }
 
-    public static final int LUNCH_BOX_DATA_FIELD_NUMBER = 7;
+    public static final int LUNCH_BOX_DATA_FIELD_NUMBER = 14;
     private emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData lunchBoxData_;
-
+    /**
+     * <code>.LunchBoxData lunch_box_data = 14;</code>
+     * @return Whether the lunchBoxData field is set.
+     */
     @java.lang.Override
     public boolean hasLunchBoxData() {
       return lunchBoxData_ != null;
     }
-
+    /**
+     * <code>.LunchBoxData lunch_box_data = 14;</code>
+     * @return The lunchBoxData.
+     */
     @java.lang.Override
     public emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData getLunchBoxData() {
       return lunchBoxData_ == null ? emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.getDefaultInstance() : lunchBoxData_;
     }
-
+    /**
+     * <code>.LunchBoxData lunch_box_data = 14;</code>
+     */
     @java.lang.Override
     public emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxDataOrBuilder getLunchBoxDataOrBuilder() {
       return getLunchBoxData();
@@ -151,7 +170,7 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (lunchBoxData_ != null) {
-        output.writeMessage(7, getLunchBoxData());
+        output.writeMessage(14, getLunchBoxData());
       }
       unknownFields.writeTo(output);
     }
@@ -164,7 +183,7 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
       size = 0;
       if (lunchBoxData_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, getLunchBoxData());
+          .computeMessageSize(14, getLunchBoxData());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -298,7 +317,9 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
     }
     /**
      * <pre>
-     * CmdId: 2551
+     * REL6.6
+     * CmdId: 5228
+     * Obf: FHNOBLLLLJH
      * </pre>
      *
      * Protobuf type {@code SetUpLunchBoxWidgetReq}
@@ -458,11 +479,17 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
       private emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData lunchBoxData_;
       private com.google.protobuf.SingleFieldBuilderV3<
           emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData, emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.Builder, emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxDataOrBuilder> lunchBoxDataBuilder_;
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       * @return Whether the lunchBoxData field is set.
+       */
       public boolean hasLunchBoxData() {
         return lunchBoxDataBuilder_ != null || lunchBoxData_ != null;
       }
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       * @return The lunchBoxData.
+       */
       public emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData getLunchBoxData() {
         if (lunchBoxDataBuilder_ == null) {
           return lunchBoxData_ == null ? emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.getDefaultInstance() : lunchBoxData_;
@@ -470,7 +497,9 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
           return lunchBoxDataBuilder_.getMessage();
         }
       }
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       */
       public Builder setLunchBoxData(emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData value) {
         if (lunchBoxDataBuilder_ == null) {
           if (value == null) {
@@ -484,7 +513,9 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
 
         return this;
       }
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       */
       public Builder setLunchBoxData(
           emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.Builder builderForValue) {
         if (lunchBoxDataBuilder_ == null) {
@@ -496,7 +527,9 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
 
         return this;
       }
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       */
       public Builder mergeLunchBoxData(emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData value) {
         if (lunchBoxDataBuilder_ == null) {
           if (lunchBoxData_ != null) {
@@ -512,7 +545,9 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
 
         return this;
       }
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       */
       public Builder clearLunchBoxData() {
         if (lunchBoxDataBuilder_ == null) {
           lunchBoxData_ = null;
@@ -524,13 +559,17 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
 
         return this;
       }
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       */
       public emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.Builder getLunchBoxDataBuilder() {
-
+        
         onChanged();
         return getLunchBoxDataFieldBuilder().getBuilder();
       }
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       */
       public emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxDataOrBuilder getLunchBoxDataOrBuilder() {
         if (lunchBoxDataBuilder_ != null) {
           return lunchBoxDataBuilder_.getMessageOrBuilder();
@@ -539,9 +578,11 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
               emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.getDefaultInstance() : lunchBoxData_;
         }
       }
-
+      /**
+       * <code>.LunchBoxData lunch_box_data = 14;</code>
+       */
       private com.google.protobuf.SingleFieldBuilderV3<
-          emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData, emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.Builder, emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxDataOrBuilder>
+          emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData, emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxData.Builder, emu.grasscutter.net.proto.LunchBoxDataOuterClass.LunchBoxDataOrBuilder> 
           getLunchBoxDataFieldBuilder() {
         if (lunchBoxDataBuilder_ == null) {
           lunchBoxDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -564,6 +605,7 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
       }
+
 
       // @@protoc_insertion_point(builder_scope:SetUpLunchBoxWidgetReq)
     }
@@ -607,7 +649,7 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_SetUpLunchBoxWidgetReq_descriptor;
-  private static final
+  private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_SetUpLunchBoxWidgetReq_fieldAccessorTable;
 
@@ -621,8 +663,9 @@ public final class SetUpLunchBoxWidgetReqOuterClass {
     java.lang.String[] descriptorData = {
       "\n\034SetUpLunchBoxWidgetReq.proto\032\022LunchBox" +
       "Data.proto\"?\n\026SetUpLunchBoxWidgetReq\022%\n\016" +
-      "lunch_box_data\030\007 \001(\0132\r.LunchBoxDataB\033\n\031e" +
-      "mu.grasscutter.net.protob\006proto3"
+      "lunch_box_data\030\016 \001(\0132\r.LunchBoxDataB=\n\031e" +
+      "mu.grasscutter.net.protoB SetUpLunchBoxW" +
+      "idgetReqOuterClassb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
