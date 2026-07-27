@@ -164,8 +164,11 @@ public class Scene {
 	private static final int SEIRAI_WEATHER_AMAKUMO_LOWER = 3219;
 	private static final int SEIRAI_WEATHER_SEIRAIMARU = 3165;
 	private static final int SEIRAI_WEATHER_INITIAL_ISLAND = 3165;
+	private static final int SEIRAI_WEATHER_ASASE_SHRINE = 3073;
 
 	private static final int SANGONOMIYA_WEATHER_GENERAL = 3067;
+	
+	private static final int TSURUMI_WEATHER_GENERAL = 3422;
 
 	private static final Position THUNDER_MANIFESTATION_ARENA_POS =
 			new Position(-4707.378f, 479.99323f, -4258.842f);
@@ -179,12 +182,14 @@ public class Scene {
 	private static final Position SEIRAI_INITIAL_ISLAND_POS =
 			new Position(-4254.716f, 200.696f, -3929.955f);
 
-	private static final Position SEIRAI_ASASE_SHRINE_CLEAR_POS = new Position(-4700.761f, 205.0f, -3674.826f);
+	private static final Position SEIRAI_ASASE_SHRINE_POS =
+			new Position(-4700.761f, 205.0f, -3674.826f);
+
+	private static final float SEIRAI_ASASE_SHRINE_RADIUS = 165.0f;
 
 	private static final float THUNDER_MANIFESTATION_WEATHER_RADIUS = 230.0f;
 	private static final float THUNDER_MANIFESTATION_MIN_WEATHER_Y = 350.0f;
 
-	private static final float SEIRAI_ASASE_SHRINE_CLEAR_RADIUS = 165.0f;
 	private static final float SEIRAI_SEIRAIMARU_RADIUS = 220.0f;
 	private static final float SEIRAI_INITIAL_ISLAND_RADIUS = 430.0f;
 	private static final float SEIRAI_AMAKUMO_LOWER_RADIUS = 560.0f;
@@ -339,6 +344,34 @@ public class Scene {
 			{-3981.5112, -938.4824},
 			{-3976.57, -977.2434},
 			{-3967.6797, -1023.8548}
+	};
+	
+	/*
+	 * Tsurumi Island weather perimeter in the X/Z plane.
+	 *
+	 * Y is deliberately ignored so caves, cliffs, elevated terrain, and
+	 * underground areas inside the horizontal island boundary receive the
+	 * same weather profile.
+	 *
+	 * The Golden Wolflord arena is inside this polygon. Its encounter weather
+	 * therefore receives explicit priority in applySeiraiFallbackWeather().
+	 */
+	private static final double[][] TSURUMI_WEATHER_PERIMETER_XZ = {
+			{-6135.585, -3269.1047},
+			{-6366.2153, -3204.9846},
+			{-6274.818, -3282.8364},
+			{-6415.3, -3135.5952},
+			{-6523.622, -2891.8843},
+			{-6618.703, -2761.4695},
+			{-6818.6978, -2715.6787},
+			{-6748.992, -2495.455},
+			{-6412.203, -2270.3623},
+			{-5997.094, -2266.4353},
+			{-5711.072, -2349.364},
+			{-5592.6123, -2621.8452},
+			{-5809.151, -2797.5205},
+			{-5878.544, -3036.1528},
+			{-6063.014, -3152.9297}
 	};
 
 	/*
@@ -2559,7 +2592,16 @@ public class Scene {
 		}
 
 		for (Player player : this.getPlayers()) {
-			player.setWeather(GOLDEN_WOLFLORD_WEATHER_ID, ClimateType.CLIMATE_SUNNY);
+			/*
+			 * Golden Wolflord temporarily replaces the regional Tsurumi weather.
+			 * Forget the previous regional state so it will be recalculated after
+			 * the encounter weather ends.
+			 */
+			this.seiraiFallbackWeatherByUid.remove(player.getUid());
+
+			player.setWeather(
+					GOLDEN_WOLFLORD_WEATHER_ID,
+					ClimateType.CLIMATE_SUNNY);
 		}
 
 		this.goldenWolflordWeatherActive = true;
@@ -2577,11 +2619,26 @@ public class Scene {
 			return;
 		}
 
-		for (Player player : this.getPlayers()) {
-			this.resetGoldenWolflordFallbackWeather(player);
-		}
-
+		/*
+		 * Release boss-weather ownership before recalculating regional weather.
+		 * Otherwise applySeiraiFallbackWeather() would correctly refuse to run.
+		 */
 		this.goldenWolflordWeatherActive = false;
+
+		for (Player player : this.getPlayers()) {
+			/*
+			 * First restore the global default. The regional resolver below will
+			 * replace it with 3073 when the player is still inside Tsurumi.
+			 */
+			this.resetGoldenWolflordFallbackWeather(player);
+
+			this.seiraiFallbackWeatherByUid.remove(
+					player.getUid());
+
+			this.applySeiraiFallbackWeather(
+					player,
+					false);
+		}
 	}
 
 	private void resetGoldenWolflordFallbackWeather(Player player) {
@@ -2700,6 +2757,15 @@ public class Scene {
 		if (pos == null) {
 			return SEIRAI_WEATHER_DEFAULT;
 		}
+		
+		/*
+		 * Tsurumi Island participates in the Scene 3 regional-weather resolver.
+		 * Golden Wolflord weather priority is handled separately before this
+		 * result is applied.
+		 */
+		if (this.isInTsurumiWeatherZone(pos)) {
+			return TSURUMI_WEATHER_GENERAL;
+		}
 
 		 /*
 		 * Watatsumi Island is geographically separate from every Seirai zone,
@@ -2714,10 +2780,10 @@ public class Scene {
 		}
 
 		/*
-		 * Asase Shrine use weather 0.
+		 * Apply Asase Shrine's dedicated weather profile.
 		 */
-		if (this.isInAsaseShrineClearWeatherZone(pos)) {
-			return SEIRAI_WEATHER_DEFAULT;
+		if (this.isInAsaseShrineWeatherZone(pos)) {
+			return SEIRAI_WEATHER_ASASE_SHRINE;
 		}
 
 		if (this.isNear2d(
@@ -2752,12 +2818,12 @@ public class Scene {
 						THUNDER_MANIFESTATION_WEATHER_RADIUS);
 	}
 	
-	private boolean isInAsaseShrineClearWeatherZone(Position pos) {
+	private boolean isInAsaseShrineWeatherZone(Position pos) {
 		return pos != null
 				&& this.isNear2d(
 						pos,
-						SEIRAI_ASASE_SHRINE_CLEAR_POS,
-						SEIRAI_ASASE_SHRINE_CLEAR_RADIUS);
+						SEIRAI_ASASE_SHRINE_POS,
+						SEIRAI_ASASE_SHRINE_RADIUS);
 	}
 
 	private boolean isInSangonomiyaWeatherZone(Position pos) {
@@ -2798,6 +2864,55 @@ public class Scene {
 
 		return inside;
 	}
+	
+	private boolean isInTsurumiWeatherZone(Position pos) {
+		return this.isInsideWeatherPerimeterXZ(
+				pos,
+				TSURUMI_WEATHER_PERIMETER_XZ);
+	}
+
+	private boolean isInsideWeatherPerimeterXZ(
+			Position pos,
+			double[][] perimeter) {
+
+		if (pos == null
+				|| perimeter == null
+				|| perimeter.length < 3) {
+			return false;
+		}
+
+		double x = pos.getX();
+		double z = pos.getZ();
+		boolean inside = false;
+
+		for (int i = 0, j = perimeter.length - 1;
+				i < perimeter.length;
+				j = i++) {
+
+			double xi = perimeter[i][0];
+			double zi = perimeter[i][1];
+
+			double xj = perimeter[j][0];
+			double zj = perimeter[j][1];
+
+			boolean crossesZ =
+					(zi > z) != (zj > z);
+
+			if (crossesZ) {
+				double edgeX =
+						(xj - xi)
+								* (z - zi)
+								/ (zj - zi)
+								+ xi;
+
+				if (x < edgeX) {
+					inside = !inside;
+				}
+			}
+		}
+
+		return inside;
+	}
 
 	private boolean isNear2d(Position pos, Position center, float radius) {
 		return distance2d(pos, center) <= radius;
@@ -2815,11 +2930,25 @@ public class Scene {
 		if (player == null || this.getId() != SEIRAI_SCENE_ID) {
 			return;
 		}
+		
+		/*
+		 * Golden Wolflord encounter weather owns the entire Scene 3 weather state
+		 * while active. Do not let Tsurumi's regional weather replace it.
+		 *
+		 * Remove the regional tracking entry so that Tsurumi weather is applied
+		 * again after the encounter weather releases ownership.
+		 */
+		if (this.goldenWolflordWeatherActive) {
+			this.seiraiFallbackWeatherByUid.remove(
+					player.getUid());
 
+			return;
+		}
+		
 		Position pos = player.getPosition();
 
-		boolean inAsaseClearZone =
-				this.isInAsaseShrineClearWeatherZone(pos);
+		boolean inAsaseShrineZone =
+				this.isInAsaseShrineWeatherZone(pos);
 
 		int desiredWeather =
 				this.getDesiredSeiraiWeather(pos);
@@ -2833,25 +2962,18 @@ public class Scene {
 						player.getUid(),
 						SEIRAI_WEATHER_DEFAULT);
 
-		/*
-		 * Explicitly own the clear weather while inside Asase Shrine.
-		 *
-		 * Keeping weather 0 in the tracking map lets the system correctly
-		 * switch back to a Seirai weather profile when the player leaves
-		 * the shrine circle.
-		 */
-		if (inAsaseClearZone) {
+		if (inAsaseShrineZone) {
 			if (!hadFallbackWeather
-					|| currentWeather != SEIRAI_WEATHER_DEFAULT) {
+					|| currentWeather != SEIRAI_WEATHER_ASASE_SHRINE) {
 
 				player.setWeather(
-						SEIRAI_WEATHER_DEFAULT,
+						SEIRAI_WEATHER_ASASE_SHRINE,
 						ClimateType.CLIMATE_SUNNY);
 			}
 
 			this.seiraiFallbackWeatherByUid.put(
 					player.getUid(),
-					SEIRAI_WEATHER_DEFAULT);
+					SEIRAI_WEATHER_ASASE_SHRINE);
 
 			return;
 		}
