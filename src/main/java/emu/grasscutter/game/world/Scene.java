@@ -164,11 +164,11 @@ public class Scene {
 	private static final int SEIRAI_WEATHER_AMAKUMO_LOWER = 3219;
 	private static final int SEIRAI_WEATHER_SEIRAIMARU = 3165;
 	private static final int SEIRAI_WEATHER_INITIAL_ISLAND = 3165;
-	private static final int SEIRAI_WEATHER_ASASE_SHRINE = 3073;
+	private static final int SEIRAI_WEATHER_ASASE_SHRINE = 3422;
 
 	private static final int SANGONOMIYA_WEATHER_GENERAL = 3067;
 	
-	private static final int TSURUMI_WEATHER_GENERAL = 3422;
+	private static final int TSURUMI_WEATHER_GENERAL = 3073;
 
 	private static final Position THUNDER_MANIFESTATION_ARENA_POS =
 			new Position(-4707.378f, 479.99323f, -4258.842f);
