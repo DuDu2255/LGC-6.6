@@ -12,21 +12,29 @@ import java.util.*;
 
 public class PacketMailChangeNotify extends BasePacket {
 
-    public PacketMailChangeNotify(Player player, Mail message) {
-        this(
-                player,
-                new ArrayList<Mail>() {
-                    {
-                        add(message);
-                    }
-                });
-    }
+	/*
+	 * A single Mail means a newly received mail.
+	 */
+	public PacketMailChangeNotify(Player player, Mail message) {
+		this(player, Collections.singletonList(message), null, false);
+	}
 
-    public PacketMailChangeNotify(Player player, List<Mail> mailList) {
-        this(player, mailList, null);
-    }
+	/*
+	 * A List<Mail> is used by read, star and attachment-claim handlers.
+	 * Those are changes to mail already known by the client.
+	 */
+	public PacketMailChangeNotify(Player player, List<Mail> changedMailList) {
+		this(player, changedMailList, null, true);
+	}
 
-    public PacketMailChangeNotify(Player player, List<Mail> mailList, List<Integer> delMailIdList) {
+	/*
+	 * Currently used by the deletion path with mailList == null.
+	 */
+	public PacketMailChangeNotify(Player player, List<Mail> mailList, List<Integer> delMailIdList) {
+		this(player,mailList,delMailIdList,false);
+	}
+
+	private PacketMailChangeNotify(Player player, List<Mail> mailList, List<Integer> delMailIdList, boolean changedMail) {
         super(PacketOpcodes.MailChangeNotify);
 
         var proto = MailChangeNotify.newBuilder();
@@ -51,7 +59,7 @@ public class PacketMailChangeNotify extends BasePacket {
                 }
 
                 var mailData = MailData.newBuilder();
-                mailData.setMailId(player.getMailId(message));
+                mailData.setMailId(player.getMailHandler().toClientMailId(player.getMailId(message)));
                 mailData.setMailTextContent(mailTextContent.build());
                 mailData.addAllItemList(mailItems);
                 mailData.setSendTime((int) message.sendTime);
@@ -61,7 +69,13 @@ public class PacketMailChangeNotify extends BasePacket {
                 mailData.setIsAttachmentGot(message.isAttachmentGot);
                 mailData.setCollectStateValue(message.stateValue);
 
-                proto.addMailList(mailData.build());
+				MailData builtMailData = mailData.build();
+
+				if (changedMail) {
+					proto.addChangeMailList(builtMailData);
+				} else {
+					proto.addMailList(builtMailData);
+				}
             }
         }
 
