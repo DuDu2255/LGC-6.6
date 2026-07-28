@@ -199,6 +199,7 @@ public class Player implements PlayerHook, FieldFetch {
     @Getter @Setter private int nextResinRefresh;
     @Getter @Setter private int resinBuyCount;
     @Getter @Setter private int lastDailyReset;
+	@Getter @Setter private int lastBirthdayMailYear;
     @Getter private transient MpSettingType mpSetting = MpSettingType.MpSettingType_MP_SETTING_ENTER_AFTER_APPLY;
     @Getter private long playerGameTime = 540000;
 
@@ -1304,6 +1305,8 @@ public class Player implements PlayerHook, FieldFetch {
         }
 
         this.setResinBuyCount(0);
+		
+		BirthdayMailSystem.checkAndSend(this, currentDate);
 
         this.setLastDailyReset(currentTime);
     }
