@@ -6,7 +6,8 @@ Protocol buffer definitions can be found on [GitLab](https://gitlab.com/CarolBic
 
 ## Updated version of Grasscutters, with some new features implemented.
 Features and functionality of the PS is not guaranteed, try it yourself to see what works and what doesnt.
-This is possibly the only public PS with updated mob and gadget spawns! (Up to Version 5.4)
+This is possibly the only public PS with updated mob and gadget spawns, including custom fallback mob spawns for otherwise unsupported post-5.4
+overworld regions.
 
 # Read the [handbook](handbook.md)!
 
