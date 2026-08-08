@@ -149,14 +149,14 @@ public class Scene {
 
 	private final Map<Integer, Float> icewindFallbackVirtualHp = new ConcurrentHashMap<>();
 	private final Map<Integer, Float> icewindFallbackVirtualMaxHp = new ConcurrentHashMap<>();
-	
+
 	private final Map<Integer, Long> pendingIcewindSuiteArenaTeleports = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> icewindFallbackSpawnTimes = new ConcurrentHashMap<>();
 	private final Map<Integer, Float> icewindFallbackLastHpRatios = new ConcurrentHashMap<>();
 
     private final List<Runnable> afterLoadedCallbacks = new ArrayList<>();
     private final List<Runnable> afterHostInitCallbacks = new ArrayList<>();
-	
+
 	private static final int SEIRAI_SCENE_ID = 3;
 
 	private static final int SEIRAI_WEATHER_DEFAULT = 0;
@@ -167,8 +167,10 @@ public class Scene {
 	private static final int SEIRAI_WEATHER_ASASE_SHRINE = 3422;
 
 	private static final int SANGONOMIYA_WEATHER_GENERAL = 3067;
-	
+
 	private static final int TSURUMI_WEATHER_GENERAL = 3073;
+
+	private static final int HIISI_WEATHER_GENERAL = 6345;
 
 	private static final Position THUNDER_MANIFESTATION_ARENA_POS =
 			new Position(-4707.378f, 479.99323f, -4258.842f);
@@ -372,6 +374,32 @@ public class Scene {
 			{-5809.151, -2797.5205},
 			{-5878.544, -3036.1528},
 			{-6063.014, -3152.9297}
+	};
+	
+	/*
+	 * Hiisi Island weather perimeter in the X/Z plane.
+	 *
+	 * Y is deliberately ignored so the same atmosphere applies across the
+	 * island regardless of elevation, including cliffs, ruins, lower terrain,
+	 * and elevated areas.
+	 */
+	private static final double[][] HIISI_WEATHER_PERIMETER_XZ = {
+			{1677.0642, 10158.858},
+			{1914.9126, 10237.664},
+			{2119.4636, 10353.916},
+			{2372.5654, 10551.104},
+			{2557.975, 10665.884},
+			{2474.5815, 10838.049},
+			{2375.691, 10923.986},
+			{2198.2034, 10957.586},
+			{2151.9104, 10968.8545},
+			{2144.7458, 11281.389},
+			{1995.958, 11272.563},
+			{1665.4482, 11270.768},
+			{1458.9417, 11206.139},
+			{1394.2742, 10911.5625},
+			{1383.4873, 10448.144},
+			{1618.8003, 10155.363}
 	};
 
 	/*
@@ -2759,6 +2787,15 @@ public class Scene {
 		}
 		
 		/*
+		 * Hiisi Island participates in the Scene 3 regional-weather resolver.
+		 * Its 6.6 weather profile provides the purple/mystic Nod-Krai
+		 * atmosphere that is otherwise missing when Scene 3 remains on weather ID 0.
+		 */
+		if (this.isInHiisiWeatherZone(pos)) {
+			return HIISI_WEATHER_GENERAL;
+		}
+		
+		/*
 		 * Tsurumi Island participates in the Scene 3 regional-weather resolver.
 		 * Golden Wolflord weather priority is handled separately before this
 		 * result is applied.
@@ -2869,6 +2906,12 @@ public class Scene {
 		return this.isInsideWeatherPerimeterXZ(
 				pos,
 				TSURUMI_WEATHER_PERIMETER_XZ);
+	}
+	
+	private boolean isInHiisiWeatherZone(Position pos) {
+		return this.isInsideWeatherPerimeterXZ(
+				pos,
+				HIISI_WEATHER_PERIMETER_XZ);
 	}
 
 	private boolean isInsideWeatherPerimeterXZ(
@@ -2992,8 +3035,8 @@ public class Scene {
 
 			/*
 			 * Reset to weather ID 0 when the player leaves every region owned by
-			 * this Scene 3 regional-weather fallback, including Seirai Island and
-			 * the Sangonomiya Shrine perimeter.
+			 * this Scene 3 regional-weather fallback, including Seirai, Watatsumi,
+			 * Tsurumi, and Hiisi Island.
 			 */
 			if (allowDefaultReset && hadFallbackWeather) {
 				player.setWeather(
