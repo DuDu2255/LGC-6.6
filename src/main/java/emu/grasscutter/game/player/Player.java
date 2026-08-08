@@ -31,6 +31,7 @@ import emu.grasscutter.game.props.*;
 import emu.grasscutter.game.quest.QuestManager;
 import emu.grasscutter.game.quest.enums.*;
 import emu.grasscutter.game.shop.ShopLimit;
+import emu.grasscutter.game.systems.DailyCheckInSystem;
 import emu.grasscutter.game.talk.TalkManager;
 import emu.grasscutter.game.tower.*;
 import emu.grasscutter.game.world.*;
@@ -201,6 +202,10 @@ public class Player implements PlayerHook, FieldFetch {
     @Getter @Setter private int lastDailyReset;
 	@Getter @Setter private int lastBirthdayMailYear;
     @Getter private transient MpSettingType mpSetting = MpSettingType.MpSettingType_MP_SETTING_ENTER_AFTER_APPLY;
+	
+	@Getter @Setter private int lastDailyCheckInDate;
+	@Getter @Setter private int dailyCheckInDay;
+	
     @Getter private long playerGameTime = 540000;
 
     @Getter private PlayerProgress playerProgress;
@@ -1448,6 +1453,14 @@ public class Player implements PlayerHook, FieldFetch {
         }
 
         getServer().registerPlayer(this);
+		
+		/*
+		 * Award at most one daily check-in reward per server-local calendar day.
+		 *
+		 * Missing days do not reset the cycle. Once day 31 is claimed, the next
+		 * eligible login begins again at day 1.
+		 */
+		DailyCheckInSystem.checkAndSend(this);
     }
 
     public void onLogout() {

@@ -547,41 +547,39 @@ public final class ResourceLoader {
         }
     }
 
-    private static void loadSpawnData() {
-        String[] spawnDataNames = {"Spawns.json", "GadgetSpawns.json"};
-        ArrayList<SpawnGroupEntry> spawnEntryMap = new ArrayList<>();
+	private static void loadSpawnData() {
+		String[] spawnDataNames = {"Spawns.json", "GadgetSpawns.json", "CustomSpawns.json"};
+		ArrayList<SpawnGroupEntry> spawnEntryMap = new ArrayList<>();
 
-        for (String name : spawnDataNames) {
+		for (String name : spawnDataNames) {
 
-            try (InputStreamReader reader = DataLoader.loadReader(name)) {
+			try (InputStreamReader reader = DataLoader.loadReader(name)) {
 
-                spawnEntryMap.addAll(JsonUtils.loadToList(reader, SpawnGroupEntry.class));
-            } catch (Exception ignored) {
-            }
-        }
+				spawnEntryMap.addAll(JsonUtils.loadToList(reader, SpawnGroupEntry.class));
+			} catch (Exception ignored) {
+			}
+		}
+		if (spawnEntryMap.isEmpty()) {
+			Grasscutter.getLogger().error("No spawn data loaded!");
+			return;
+		}
 
-        if (spawnEntryMap.isEmpty()) {
-            Grasscutter.getLogger().error("No spawn data loaded!");
-            return;
-        }
-
-        HashMap<GridBlockId, ArrayList<SpawnDataEntry>> areaSort = new HashMap<>();
-
-        for (SpawnGroupEntry entry : spawnEntryMap) {
-            entry
-                    .getSpawns()
-                    .forEach(
-                            s -> {
-                                s.setGroup(entry);
-                                GridBlockId point = s.getBlockId();
-                                if (!areaSort.containsKey(point)) {
-                                    areaSort.put(point, new ArrayList<>());
-                                }
-                                areaSort.get(point).add(s);
-                            });
-        }
-        GameDepot.addSpawnListById(areaSort);
-    }
+		HashMap<GridBlockId, ArrayList<SpawnDataEntry>> areaSort = new HashMap<>();
+		for (SpawnGroupEntry entry : spawnEntryMap) {
+			entry
+					.getSpawns()
+					.forEach(
+							s -> {
+								s.setGroup(entry);
+								GridBlockId point = s.getBlockId();
+								if (!areaSort.containsKey(point)) {
+									areaSort.put(point, new ArrayList<>());
+								}
+								areaSort.get(point).add(s);
+							});
+		}
+		GameDepot.addSpawnListById(areaSort);
+	}
 
     private static void buildAbilityTalentVarMaps() {
         var abilityTalentVarMap = GameData.getAbilityTalentVarMap();
