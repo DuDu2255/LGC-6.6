@@ -326,7 +326,7 @@ public class ConfigContainer {
             /* The items attached to the birthday mail. Defaults to a small amount of Mora and Primogems. */
             public GiftItem[] gifts = new GiftItem[] {
                 new GiftItem(202, 10000000), // Mora
-                new GiftItem(201, 600000)     // Primogem
+                new GiftItem(201, 16000)     // Primogem
             };
 
             public static class GiftItem {
