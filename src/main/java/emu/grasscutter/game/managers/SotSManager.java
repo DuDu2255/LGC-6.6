@@ -83,6 +83,13 @@ public class SotSManager extends BasePlayerManager {
             autoRecoverTimer = new Timer();
             autoRecoverTimer.schedule(new AutoRecoverTimerTick(), 2500, 15000);
         }
+
+        // Refill phlogiston when the player is near an in-Natlan trans point (waypoint or statue).
+        if (player.getTeamManager().isInNatlan()) {
+            player.setPhlogistonValue(100);
+            player.sendPacket(new PacketServerGlobalValueChangeNotify(
+                    player.getTeamManager().getEntity(), "SGV_PlayerTeam_Phlogiston", 100f));
+        }
     }
 
     public void handleExitTransPointRegionNotify() {

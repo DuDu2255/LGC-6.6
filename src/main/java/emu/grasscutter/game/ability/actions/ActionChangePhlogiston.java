@@ -10,7 +10,6 @@ import emu.grasscutter.game.ability.actions.AbilityActionHandler;
 import emu.grasscutter.data.common.DynamicFloat;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import emu.grasscutter.game.props.FightProperty;
-import emu.grasscutter.game.props.PlayerProperty;
 import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.game.avatar.*;
 import emu.grasscutter.game.entity.EntityVehicle;

@@ -8,6 +8,7 @@ import emu.grasscutter.data.GameData;
 import emu.grasscutter.data.binout.config.ConfigLevelEntity;
 import emu.grasscutter.data.binout.config.fields.ConfigAbilityData;
 import emu.grasscutter.data.excels.avatar.AvatarSkillDepotData;
+import emu.grasscutter.data.excels.world.WorldAreaData;
 import emu.grasscutter.game.avatar.Avatar;
 import emu.grasscutter.game.entity.*;
 import emu.grasscutter.game.props.*;
@@ -52,7 +53,7 @@ public final class TeamManager extends BasePlayerDataManager {
 
     @Transient @Getter @Setter
     private int previousIndex = -1;
-	
+
 	private static final int REL6_MAX_CONFIGURABLE_TEAMS = 20;
 	private static final int FIRST_BACKUP_TEAM_ID = GameConstants.DEFAULT_TEAMS + 1;
 
@@ -78,13 +79,13 @@ public final class TeamManager extends BasePlayerDataManager {
         }
     }
 
-    public AbilityControlBlockOuterClass.AbilityControlBlock getAbilityControlBlock() {
+public AbilityControlBlockOuterClass.AbilityControlBlock getAbilityControlBlock() {
         AbilityControlBlockOuterClass.AbilityControlBlock.Builder abilityControlBlock =
             AbilityControlBlockOuterClass.AbilityControlBlock.newBuilder();
         int embryoId = 0;
 
         if (Arrays.stream(GameConstants.DEFAULT_TEAM_ABILITY_STRINGS).count() > 0) {
-            boolean inNatlan = player.getScene() != null && player.getScene().getId() == 101;
+            boolean inNatlan = isInNatlan();
             List<String> teamAbilties =
                 Arrays.stream(GameConstants.DEFAULT_TEAM_ABILITY_STRINGS).toList();
             for (String skill : teamAbilties) {
@@ -124,6 +125,11 @@ public final class TeamManager extends BasePlayerDataManager {
         }
 
         return abilityControlBlock.build();
+    }
+
+    public boolean isInNatlan() {
+        WorldAreaData worldAreaData = WorldAreaData.getByAreaId(player.getAreaId(), player.getAreaType());
+        return worldAreaData != null && worldAreaData.getElementType() == ElementType.Fire;
     }
 
     public World getWorld() {
@@ -541,7 +547,7 @@ public final class TeamManager extends BasePlayerDataManager {
 
         teamInfo.getAvatars().clear();
         this.addAvatarsToTeam(teamInfo, newTeam);
-		
+
 		this.sanitizeAvatarTeams();
         if (this.getPlayer() != null) {
             this.getPlayer().save();
@@ -745,7 +751,7 @@ public final class TeamManager extends BasePlayerDataManager {
         teamInfo.setName(teamName);
 
         this.getPlayer().sendPacket(new PacketChangeTeamNameRsp(teamId, teamName));
-		
+
 		if (this.getPlayer() != null) {
             this.getPlayer().save();
         }
@@ -960,11 +966,11 @@ public final class TeamManager extends BasePlayerDataManager {
     public void onPlayerLogin() {
         this.sanitizeAvatarTeams();
         this.ensureSafeCurrentTeam();
-		
+
         this.updateTeamEntities(null);
-		
+
         this.updateTeamResonances();
-		
+
 		if (this.getPlayer() != null) {
             this.getPlayer().sendPacket(new PacketAvatarTeamAllDataNotify(this.getPlayer()));
             this.getPlayer().sendPacket(new PacketAvatarTeamUpdateNotify(this.getPlayer()));
@@ -1006,14 +1012,14 @@ public final class TeamManager extends BasePlayerDataManager {
 
         player.sendPacket(new PacketAvatarTeamAllDataNotify(player));
         player.sendPacket(new PacketAddBackupAvatarTeamRsp());
-		
+
 		if (this.getPlayer() != null) {
             this.getPlayer().save();
         }
     }
 
     public synchronized void removeCustomTeam(int id) {
-		
+
 		this.sanitizeAvatarTeams();
 
         if (!this.teams.containsKey(id)) {
@@ -1027,7 +1033,7 @@ public final class TeamManager extends BasePlayerDataManager {
         }
 
         this.teams.remove(id);
-		
+
 		if (this.currentTeamIndex == id) {
             this.currentTeamIndex = this.getFirstUsableTeamId();
             this.currentCharacterIndex = 0;
@@ -1036,7 +1042,7 @@ public final class TeamManager extends BasePlayerDataManager {
 
         player.sendPacket(new PacketAvatarTeamAllDataNotify(player));
         player.sendPacket(new PacketDelBackupAvatarTeamRsp(id));
-		
+
 		if (this.getPlayer() != null) {
             this.getPlayer().save();
         }
@@ -1184,7 +1190,7 @@ public final class TeamManager extends BasePlayerDataManager {
 
         if (trialAvatarIds.size() == 1) this.getPlayer().sendPacket(new PacketAvatarTeamUpdateNotify());
     }
-	
+
 	private boolean isUsableTeam(TeamInfo teamInfo) {
         return this.hasAnyValidAvatar(teamInfo);
     }

@@ -259,7 +259,14 @@ public interface JsonAdapters {
 				@Override
 				public T read(JsonReader reader) throws IOException {
 					return switch (reader.peek()) {
-						case STRING -> map.get(reader.nextString());
+						case STRING -> {
+							String value = reader.nextString();
+							T match = map.get(value);
+							if (match == null && value.startsWith("__exp_")) {
+								match = map.get(value.substring("__exp_".length()));
+							}
+							yield match;
+						}
 
 						case NUMBER -> map.get(String.valueOf(reader.nextInt()));
 
