@@ -38,6 +38,7 @@ public class HandlerSceneInitFinishReq extends PacketHandler {
         session.send(new PacketSceneTeamUpdateNotify(player));
         session.send(new PacketSyncTeamEntityNotify(player));
         session.send(new PacketSyncScenePlayTeamEntityNotify(player));
+		session.send(new PacketWorldOwnerDailyTaskNotify(player));
         session.send(new PacketSceneInitFinishRsp(player));
         session.send((BasePacket)new PacketWindSeedUID());
         player.setSceneLoadState(SceneLoadState.INIT);

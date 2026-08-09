@@ -11,6 +11,7 @@ import emu.grasscutter.game.activity.PlayerActivityData;
 import emu.grasscutter.game.activity.musicgame.MusicGameBeatmap;
 import emu.grasscutter.game.avatar.Avatar;
 import emu.grasscutter.game.battlepass.BattlePassManager;
+import emu.grasscutter.game.dailytask.DailyTaskManager;
 import emu.grasscutter.game.friends.Friendship;
 import emu.grasscutter.game.gacha.GachaRecord;
 import emu.grasscutter.game.home.GameHome;
@@ -225,9 +226,8 @@ public final class DatabaseHelper {
         DatabaseHelper.asyncOperation(
                 () -> {
                     // Delete data from collections
-                    DatabaseManager.getGameDatabase()
-                            .getCollection("achievements")
-                            .deleteMany(eq("uid", uid));
+                    DatabaseManager.getGameDatabase().getCollection("achievements").deleteMany(eq("uid", uid));
+					DatabaseManager.getGameDatabase().getCollection("dailytasks").deleteMany(eq("ownerUid", uid));
                     DatabaseManager.getGameDatabase().getCollection("activities").deleteMany(eq("uid", uid));
                     DatabaseManager.getGameDatabase().getCollection("homes").deleteMany(eq("ownerUid", uid));
                     DatabaseManager.getGameDatabase().getCollection("mail").deleteMany(eq("ownerUid", uid));
@@ -235,9 +235,7 @@ public final class DatabaseHelper {
                     DatabaseManager.getGameDatabase().getCollection("gachas").deleteMany(eq("ownerId", uid));
                     DatabaseManager.getGameDatabase().getCollection("items").deleteMany(eq("ownerId", uid));
                     DatabaseManager.getGameDatabase().getCollection("quests").deleteMany(eq("ownerUid", uid));
-                    DatabaseManager.getGameDatabase()
-                            .getCollection("battlepass")
-                            .deleteMany(eq("ownerUid", uid));
+                    DatabaseManager.getGameDatabase().getCollection("battlepass").deleteMany(eq("ownerUid", uid));
 
                     // Delete friendships.
                     // Here, we need to make sure to not only delete the deleted account's friendships,
@@ -519,6 +517,27 @@ public final class DatabaseHelper {
     public static void saveBattlePass(BattlePassManager manager) {
         DatabaseHelper.saveGameAsync(manager);
     }
+
+	public static DailyTaskManager loadDailyTaskManager(Player player) {
+		DailyTaskManager manager =
+				DatabaseManager.getGameDatastore()
+						.find(DailyTaskManager.class)
+						.filter(Filters.eq("ownerUid", player.getUid()))
+						.first();
+
+		if (manager == null) {
+			manager = new DailyTaskManager(player);
+			manager.save();
+		} else {
+			manager.setPlayer(player);
+		}
+
+		return manager;
+	}
+
+	public static void saveDailyTaskManager(DailyTaskManager manager) {
+		DatabaseHelper.saveGameAsync(manager);
+	}
 
     public static PlayerActivityData getPlayerActivityData(int uid, int activityId) {
         return DatabaseManager.getGameDatastore()

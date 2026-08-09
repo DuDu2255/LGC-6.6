@@ -235,6 +235,18 @@ public final class GameData {
     private static final Int2ObjectMap<DailyDungeonData> dailyDungeonDataMap =
             new Int2ObjectOpenHashMap<>();
 
+	@Getter
+	private static final Int2ObjectMap<DailyTaskData> dailyTaskDataMap =
+			new Int2ObjectOpenHashMap<>();
+
+	@Getter
+	private static final Int2ObjectMap<DailyTaskLevelData> dailyTaskLevelDataMap =
+			new Int2ObjectOpenHashMap<>();
+
+	@Getter
+	private static final Int2ObjectMap<DailyTaskRewardData> dailyTaskRewardDataMap =
+			new Int2ObjectOpenHashMap<>();
+
     @Getter
     private static final Int2ObjectMap<DropTableData> dropTableDataMap =
             new Int2ObjectOpenHashMap<>();

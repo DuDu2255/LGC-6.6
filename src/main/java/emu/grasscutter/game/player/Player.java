@@ -12,6 +12,7 @@ import emu.grasscutter.game.achievement.Achievements;
 import emu.grasscutter.game.activity.ActivityManager;
 import emu.grasscutter.game.avatar.*;
 import emu.grasscutter.game.battlepass.BattlePassManager;
+import emu.grasscutter.game.dailytask.DailyTaskManager;
 import emu.grasscutter.game.city.CityInfoData;
 import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.game.expedition.ExpeditionInfo;
@@ -156,6 +157,7 @@ public class Player implements PlayerHook, FieldFetch {
     @Getter private transient DeforestationManager deforestationManager;
     @Getter private transient FurnitureManager furnitureManager;
     @Getter private transient BattlePassManager battlePassManager;
+	@Getter private transient DailyTaskManager dailyTaskManager;
     @Getter private transient CookingManager cookingManager;
     @Getter private transient CookingCompoundManager cookingCompoundManager;
     @Getter private transient ActivityManager activityManager;
@@ -1196,6 +1198,14 @@ public class Player implements PlayerHook, FieldFetch {
         this.battlePassManager.getMissions().values().removeIf(mission -> mission.getData() == null);
     }
 
+	public void loadDailyTaskManager() {
+		if (this.dailyTaskManager != null) {
+			return;
+		}
+
+		this.dailyTaskManager = DatabaseHelper.loadDailyTaskManager(this);
+	}
+
     public PlayerCollectionRecords getCollectionRecordStore() {
         if (this.collectionRecordStore == null) {
             this.collectionRecordStore = new PlayerCollectionRecords();
@@ -1313,6 +1323,10 @@ public class Player implements PlayerHook, FieldFetch {
 		
 		BirthdayMailSystem.checkAndSend(this, currentDate);
 
+		if (this.getDailyTaskManager() != null) {
+			this.getDailyTaskManager().resetDailyTasks();
+		}
+
         this.setLastDailyReset(currentTime);
     }
 
@@ -1359,11 +1373,11 @@ public class Player implements PlayerHook, FieldFetch {
 
         runner.submit(this::loadBattlePassManager);
 
-        Utils.waitFor(() ->
-            this.getAvatars().isLoaded() &&
-                this.getInventory().isLoaded());
+        Utils.waitFor(() -> this.getAvatars().isLoaded() && this.getInventory().isLoaded());
 
-        this.getPlayerProgress().setPlayer(this);
+		this.loadDailyTaskManager();
+
+		this.getPlayerProgress().setPlayer(this);
     }
 
     public void onLogin() {
@@ -1384,14 +1398,17 @@ public class Player implements PlayerHook, FieldFetch {
         }
 
         World world = new World(this);
-        world.addPlayer(this);
+		world.addPlayer(this);
+		this.setProperty(PlayerProperty.PROP_PLAYER_MP_SETTING_TYPE, this.getMpSetting().getNumber(), false);
+		this.setProperty(PlayerProperty.PROP_IS_MP_MODE_AVAILABLE, 1, false);
 
-        this.setProperty(PlayerProperty.PROP_PLAYER_MP_SETTING_TYPE, this.getMpSetting().getNumber(), false);
-        this.setProperty(PlayerProperty.PROP_IS_MP_MODE_AVAILABLE, 1, false);
+		this.loadDailyTaskManager();
 
-        this.doDailyReset();
+		this.doDailyReset();
 
-        getQuestManager().onLogin();
+		this.getDailyTaskManager().onPlayerLogin();
+
+		getQuestManager().onLogin();
 
         session.send(new PacketPlayerDataNotify(this));
         session.send(new PacketStoreWeightLimitNotify());
