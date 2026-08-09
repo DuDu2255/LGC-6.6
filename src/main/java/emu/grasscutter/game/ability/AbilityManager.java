@@ -192,27 +192,6 @@ public final class AbilityManager extends BasePlayerManager {
         GameEntity target = ability.getOwner();
         Player player = getPlayer();
 
-        if (handler == mixinHandlers.get(AbilityMixinData.Type.PhlogistonCostMixin)) {
-
-            EntityAvatar avatarEntity = player.getTeamManager().getCurrentAvatarEntity();
-            Avatar avatar = avatarEntity.getAvatar();
-            if (avatar.getAvatarId() == 10000106 || avatar.getAvatarId() == 10000107 || avatar.getAvatarId() == 10000105 || avatar.getAvatarId() == 10000103 || avatar.getAvatarId() == 10000100) {
-
-                Grasscutter.getLogger().trace("NyxValue: " + avatarEntity.getNyxValue());
-                float curPhlogiston = player.getPhlogistonValue();
-                float consume = 0.67f;
-                float updatedPhlogistonValue = curPhlogiston - consume;
-                updatedPhlogistonValue = Math.max(0, Math.min(100, updatedPhlogistonValue));
-                player.setPhlogistonValue(updatedPhlogistonValue);
-
-                player.sendPacket(new PacketServerGlobalValueChangeNotify(
-                    player.getTeamManager().getEntity().getId(),
-                    "SGV_PlayerTeam_Phlogiston",
-                    updatedPhlogistonValue
-                ));
-
-            }
-        }
 
         if (handler == mixinHandlers.get(AbilityMixinData.Type.SwitchHealToHPDebtsMixin)) {
 
@@ -304,6 +283,8 @@ public final class AbilityManager extends BasePlayerManager {
             case AbilityInvokeArgument_ABILITY_META_SET_KILLED_SETATE -> this.handleKillState(invoke);
             case AbilityInvokeArgument_ABILITY_META_ADD_SPECIAL_ENERGY_VALUE -> this.handleAddSpecialEnergy(invoke);
 
+            case AbilityInvokeArgument_ABILITY_META_CHANGE_NYX_VALUE -> this.handleChangeNyxValue(invoke);
+
             default -> {
                 int typeVal = invoke.getArgumentTypeValue();
                 if (typeVal > 100) {
@@ -353,6 +334,77 @@ public final class AbilityManager extends BasePlayerManager {
         if (target == null) target = entity;
         float specialEnergyAdd = abilityMetaSpecialEnergy.getValue();
         target.addSpecialEnergy(specialEnergyAdd);
+    }
+
+    /**
+     * Client sends CHANGE_NYX_VALUE while a phlogiston drain modifier is active.
+     * Run the modifier's onThinkInterval ChangePhlogiston actions to drain the bar.
+     */
+    private void handleChangeNyxValue(AbilityInvokeEntry invoke) {
+        var head = invoke.getHead();
+        var entity = this.player.getScene().getEntityById(invoke.getEntityId());
+        if (entity == null) {
+            return;
+        }
+
+        if (entity instanceof EntityAvatar avatarEntity) {
+            float nyx = avatarEntity.getNyxValue();
+            if (nyx > 0.01f) {
+                return;
+            }
+        }
+
+        var target = entity;
+        if (head.getTargetId() != 0) {
+            var targetEntity = this.player.getScene().getEntityById(head.getTargetId());
+            if (targetEntity != null) target = targetEntity;
+        }
+
+        AbilityModifierController modifierController = null;
+        int modId = head.getInstancedModifierId();
+        if (modId != 0 && entity.getInstancedModifiers().containsKey(modId)) {
+            modifierController = entity.getInstancedModifiers().get(modId);
+        }
+        if (modifierController != null) {
+            var ability = modifierController.getAbility();
+            var modifierData = modifierController.getModifierData();
+            if (ability != null && modifierData != null && modifierData.onThinkInterval != null
+                    && modifierData.onThinkInterval.length > 0) {
+                for (var action : modifierData.onThinkInterval) {
+                    this.executeAction(ability, action, invoke.getAbilityData(), target);
+                }
+                return;
+            }
+        }
+
+        Ability ability = null;
+        if (modifierController != null) {
+            ability = modifierController.getAbility();
+        } else if (head.getInstancedAbilityId() != 0
+                && (head.getInstancedAbilityId() - 1) < entity.getInstancedAbilities().size()) {
+            ability = entity.getInstancedAbilities().get(head.getInstancedAbilityId() - 1);
+        }
+        if (ability == null) {
+            return;
+        }
+
+        int mcl = head.getModifierConfigLocalId();
+        if (mcl > 0 && ability.getData().modifiers != null) {
+            var sortedModifiers = ability.getData().modifiers.entrySet().stream()
+                    .sorted(java.util.Map.Entry.comparingByKey())
+                    .map(java.util.Map.Entry::getValue)
+                    .toList();
+
+            if (mcl < sortedModifiers.size()) {
+                var modifierData = sortedModifiers.get(mcl);
+                if (modifierData.onThinkInterval != null && modifierData.onThinkInterval.length > 0) {
+                    for (var action : modifierData.onThinkInterval) {
+                        this.executeAction(ability, action, invoke.getAbilityData(), target);
+                    }
+                    return;
+                }
+            }
+        }
     }
 
     public void handleServerInvoke(AbilityInvokeEntry invoke) {
