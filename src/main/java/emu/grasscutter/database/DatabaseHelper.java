@@ -536,7 +536,18 @@ public final class DatabaseHelper {
 	}
 
 	public static void saveDailyTaskManager(DailyTaskManager manager) {
-		DatabaseHelper.saveGameAsync(manager);
+		try {
+			/*
+			 * Daily commission state is intentionally saved synchronously.
+			 *
+			 * The manager contains the daily quota date, selected tasks,
+			 * progress and completion-reward state. These writes are rare and
+			 * must be durable before the caller continues or the server exits.
+			 */
+			DatabaseManager.getGameDatastore().save(manager);
+		} catch (Exception e) {
+			Grasscutter.getLogger().error("[DailyTask] Failed to persist daily commission state " + "for UID {}.", manager.getOwnerUid(), e);
+		}
 	}
 
     public static PlayerActivityData getPlayerActivityData(int uid, int activityId) {

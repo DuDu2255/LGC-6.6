@@ -1324,7 +1324,13 @@ public class Player implements PlayerHook, FieldFetch {
 		BirthdayMailSystem.checkAndSend(this, currentDate);
 
 		if (this.getDailyTaskManager() != null) {
-			this.getDailyTaskManager().resetDailyTasks();
+			/*
+			 * Never force a commission reroll from Player.lastDailyReset.
+			 *
+			 * DailyTaskManager has its own persisted calendar-day quota and will
+			 * regenerate only if its current set genuinely belongs to an older day.
+			 */
+			this.getDailyTaskManager().resetDailyTasksForNewDay();
 		}
 
 		this.setLastDailyReset(currentTime);

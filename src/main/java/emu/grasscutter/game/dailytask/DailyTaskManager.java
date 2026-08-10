@@ -34,6 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import lombok.Getter;
 import org.bson.types.ObjectId;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Getter
 @Entity(value = "dailytasks", useDiscriminator = false)
@@ -78,6 +80,17 @@ public class DailyTaskManager {
      * It represents the reward obtained after all four commissions are done.
      */
     private boolean scoreRewardTaken;
+	
+	/*
+	 * Calendar day for which dailyTasks was generated.
+	 *
+	 * Stored as YYYYMMDD
+	 *
+	 * This is the authoritative quota marker for daily commissions.
+	 * A server restart must never generate another set while this value
+	 * still represents the current server-local calendar day.
+	 */
+	private int lastGenerationDate;
 
     public DailyTaskManager() {}
 
@@ -98,55 +111,142 @@ public class DailyTaskManager {
 		}
     }
 
-    public void onPlayerLogin() {
-        if (this.player == null) {
-            return;
-        }
+	public void onPlayerLogin() {
+		if (this.player == null) {
+			return;
+		}
 
-        if (this.dailyTasks == null) {
-            this.dailyTasks = new ArrayList<>();
-        }
+		if (this.dailyTasks == null) {
+			this.dailyTasks = new ArrayList<>();
+		}
 
-        /*
-         * Remove stale/unsupported tasks. This is useful if the database
-         * contains data from an earlier implementation.
-         */
-        this.dailyTasks.removeIf(
-                task ->
-                        task == null
-                                || !isSupportedTask(
-                                        GameData.getDailyTaskDataMap()
-                                                .get(task.getTaskId())));
+		/*
+		 * Make sure today's set exists.
+		 *
+		 * This method is date-aware. If today's set has already been generated,
+		 * it will NEVER reroll it merely because the server restarted.
+		 */
+		this.ensureDailyTasksForToday(false);
 
-        /*
-         * A new player, or an old player receiving this feature for the first
-         * time, may have no dailies even though Player.lastDailyReset already
-         * points to today.
-         */
-        if (this.dailyTasks.size() != DAILY_TASK_COUNT) {
-            this.resetDailyTasks(false);
-        }
+		/*
+		 * Do not remove supposedly unsupported tasks here.
+		 *
+		 * Resource support is a generation-time concern. Once a daily set has
+		 * been issued, login must preserve it for the remainder of that day.
+		 *
+		 * If a stored set is ever genuinely corrupted, /dt reset remains the
+		 * explicit administrative repair mechanism.
+		 */
+		if (this.lastGenerationDate == getCurrentDateKey()
+				&& this.dailyTasks.size() != DAILY_TASK_COUNT) {
+			Grasscutter.getLogger()
+					.warn(
+							"[DailyTask] UID {} has {} stored commission(s) for today {}. "
+									+ "The set will NOT be automatically rerolled.",
+							this.ownerUid,
+							this.dailyTasks.size(),
+							this.lastGenerationDate);
+		}
 
-        /*
-         * WorldOwnerDailyTaskNotify is sent later when the scene is initialized.
-         */
-        this.player.sendPacket(
-                new PacketDailyTaskDataNotify(this.player));
-    }
+		this.player.sendPacket(
+				new PacketDailyTaskDataNotify(this.player));
+	}
 
-    public synchronized int resetDailyTasks() {
-        return this.resetDailyTasks(true);
-    }
+	/**
+	 * Ensures that the player has a commission set for the current calendar day.
+	 *
+	 * This is the method automatic systems must use.
+	 */
+	public synchronized int ensureDailyTasksForToday() {
+		return this.ensureDailyTasksForToday(true);
+	}
 
-	private synchronized int resetDailyTasks(boolean syncClient) {
+	private synchronized int ensureDailyTasksForToday(
+			boolean syncClient) {
 		if (this.player == null) {
 			return 0;
 		}
 
+		if (this.dailyTasks == null) {
+			this.dailyTasks = new ArrayList<>();
+		}
+
+		int today =
+				getCurrentDateKey();
+
 		/*
-		 * Remember the currently active dynamic groups so they can be
-		 * removed before today's new commissions are installed.
+		 * This is the main quota guard.
+		 *
+		 * If a set was already generated today, absolutely nothing about
+		 * restarting/relogging may generate another one.
 		 */
+		if (this.lastGenerationDate == today) {
+			Grasscutter.getLogger()
+					.debug(
+							"[DailyTask] UID {} already has today's commission quota "
+									+ "(date={}, tasks={}).",
+							this.ownerUid,
+							today,
+							this.dailyTasks.size());
+
+			return this.dailyTasks.size();
+		}
+
+		/*
+		 * Migration for databases created before lastGenerationDate existed.
+		 *
+		 * If four commissions are already stored, preserve them rather than
+		 * rerolling them once just because this new field defaults to zero.
+		 */
+		if (this.lastGenerationDate == 0
+				&& this.dailyTasks.size() == DAILY_TASK_COUNT) {
+			this.lastGenerationDate = today;
+
+			Grasscutter.getLogger()
+					.info(
+							"[DailyTask] Migrated existing commission set for UID {} "
+									+ "to daily date {} without rerolling.",
+							this.ownerUid,
+							today);
+
+			this.save();
+
+			return this.dailyTasks.size();
+		}
+
+		return this.generateDailyTasks(
+				syncClient,
+				today);
+	}
+
+	/**
+	 * Called by Player.doDailyReset().
+	 *
+	 * Despite Player already having lastDailyReset, DailyTaskManager performs
+	 * its own persisted date check as a second and authoritative safeguard.
+	 */
+	public synchronized int resetDailyTasksForNewDay() {
+		return this.ensureDailyTasksForToday(true);
+	}
+
+	/**
+	 * Explicit administrative reroll.
+	 *
+	 * /dt reset is intentionally allowed to replace today's existing set.
+	 */
+	public synchronized int resetDailyTasks() {
+		return this.generateDailyTasks(
+				true,
+				getCurrentDateKey());
+	}
+
+	private synchronized int generateDailyTasks(
+			boolean syncClient,
+			int generationDate) {
+		if (this.player == null) {
+			return 0;
+		}
+
 		Set<Integer> previousGroupIds =
 				this.collectTaskGroupIds(false);
 
@@ -205,27 +305,26 @@ public class DailyTaskManager {
 		} else {
 			Grasscutter.getLogger()
 					.info(
-							"[DailyTask] Generated {} commissions from city {}. Filter city is {}.",
+							"[DailyTask] Generated {} commissions from city {} "
+									+ "for date {}. Filter city is {}.",
 							this.dailyTasks.size(),
 							selectedCityId,
+							generationDate,
 							this.cityId);
 		}
+
+		this.lastGenerationDate =
+				generationDate;
 
 		this.save();
 
 		if (syncClient) {
 			if (this.player.isOnline()
 					&& this.player.getScene() != null) {
-				/*
-				 * Remove the previous day's/debug-reset encounters.
-				 */
 				this.unloadGroups(
 						this.player.getScene(),
 						previousGroupIds);
 
-				/*
-				 * Activate the newly selected commission encounters.
-				 */
 				this.loadActiveGroups(
 						this.player.getScene());
 			}
@@ -1111,6 +1210,21 @@ public class DailyTaskManager {
 				.filter(data -> data.getCityId() == cityId)
 				.filter(DailyTaskManager::isSupportedTask)
 				.count();
+	}
+
+	private static int getCurrentDateKey() {
+		LocalDate today =
+				LocalDate.now(ZoneId.systemDefault());
+
+		return today.getYear() * 10000
+				+ today.getMonthValue() * 100
+				+ today.getDayOfMonth();
+	}
+
+	private int getStoredTaskCount() {
+		return this.dailyTasks == null
+				? 0
+				: this.dailyTasks.size();
 	}
 
     public void syncAll() {
