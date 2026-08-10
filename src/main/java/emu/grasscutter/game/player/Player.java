@@ -1327,7 +1327,8 @@ public class Player implements PlayerHook, FieldFetch {
 			this.getDailyTaskManager().resetDailyTasks();
 		}
 
-        this.setLastDailyReset(currentTime);
+		this.setLastDailyReset(currentTime);
+		this.save();
     }
 
     public void resetSendPlayerLocTime() {
