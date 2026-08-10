@@ -40,8 +40,9 @@ public final class DailyTaskCommand implements CommandHandler {
             case "list" -> {
 				CommandHandler.sendMessage(
 						sender,
-						"Daily commissions: filter=%s (%d), activeRegion=%s (%d), finished=%d/4, scoreReward=%d, bonusTaken=%s"
+						"Daily commissions: date=%08d, filter=%s (%d), activeRegion=%s (%d), finished=%d/4, scoreReward=%d, bonusTaken=%s"
 								.formatted(
+										manager.getLastGenerationDate(),
 										getCityName(manager.getCityId()),
 										manager.getCityId(),
 										getCityName(manager.getActiveCityId()),
