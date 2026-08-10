@@ -1085,10 +1085,15 @@ public class Scene {
 
 		if (target instanceof EntityMonster monster) {
 			this.handleOceanidFallbackMonsterDeath(monster, attackerId);
+
+			Player host = this.getWorld().getHost();
+
+			if (host != null && host.getDailyTaskManager() != null) {
+				host.getDailyTaskManager().onMonsterDeath(this, monster.getGroupId());
+			}
 		}
-		
-        this.triggerDungeonEvent(
-                DungeonPassConditionType.DUNGEON_COND_KILL_MONSTER_COUNT, ++killedMonsterCount);
+
+		this.triggerDungeonEvent(DungeonPassConditionType.DUNGEON_COND_KILL_MONSTER_COUNT, ++killedMonsterCount);
     }
 
 	private void markStaticSpawnForRespawn(GameEntity entity) {

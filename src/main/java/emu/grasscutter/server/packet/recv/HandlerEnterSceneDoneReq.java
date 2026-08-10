@@ -48,15 +48,45 @@ public class HandlerEnterSceneDoneReq extends PacketHandler {
         player.getScene().loadNpcForPlayerEnter(player);
 
         // notify client to load the npc for quest
-        var questGroupSuites = player.getQuestManager().getSceneGroupSuite(player.getSceneId());
+		var questGroupSuites = player.getQuestManager().getSceneGroupSuite(player.getSceneId());
 
-        player.getScene().loadGroupForQuest(questGroupSuites);
-        Grasscutter.getLogger()
-                .trace("Loaded Scene {} Quest(s) Groupsuite(s): {}", player.getSceneId(), questGroupSuites);
-        session.send(new PacketGroupSuiteNotify(questGroupSuites));
+		player.getScene().loadGroupForQuest(questGroupSuites);
 
-        // Reset timer for sending player locations
-        player.resetSendPlayerLocTime();
+		Grasscutter.getLogger()
+				.trace(
+						"Loaded Scene {} Quest(s) Groupsuite(s): {}",
+						player.getSceneId(),
+						questGroupSuites);
+
+		session.send(new PacketGroupSuiteNotify(questGroupSuites));
+
+		/*
+		 * Daily commissions use dynamic Lua groups.
+		 *
+		 * Unlike normal overworld groups, these are intentionally excluded from
+		 * Scene.checkGroups() and therefore have to be explicitly activated while
+		 * their corresponding daily tasks are active.
+		 *
+		 * Use the world owner's commissions so multiplayer visitors see the host's
+		 * active daily encounters as well.
+		 */
+		var worldOwner = player.getWorld().getHost();
+
+		if (worldOwner != null
+				&& worldOwner.getDailyTaskManager() != null) {
+			int readyDailyGroups =
+					worldOwner.getDailyTaskManager()
+							.loadActiveGroups(player.getScene());
+
+			Grasscutter.getLogger()
+					.info(
+							"[DailyTask] {} active commission group(s) ready in scene {}.",
+							readyDailyGroups,
+							player.getSceneId());
+		}
+
+		// Reset timer for sending player locations
+		player.resetSendPlayerLocTime();
 
         // Rsp
         session.send(new PacketEnterSceneDoneRsp(player));

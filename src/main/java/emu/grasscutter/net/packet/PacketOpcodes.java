@@ -708,6 +708,9 @@ public final class PacketOpcodes {
     public static final int WorldOwnerBlossomScheduleInfoNotify = 21080;
     public static final int ActivitySelectAvatarCardReq = 21929;
     public static final int CancelCoopTaskRsp = 25682;
+	public static final int DailyTaskDataNotify = 28810;
+	public static final int DailyTaskProgressNotify = 4209;
+	public static final int WorldOwnerDailyTaskNotify = 4004;
 
     public static final HashSet<Integer> BANNED_PACKETS = new HashSet<>() {
         {
