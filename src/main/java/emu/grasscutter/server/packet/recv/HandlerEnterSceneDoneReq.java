@@ -74,15 +74,8 @@ public class HandlerEnterSceneDoneReq extends PacketHandler {
 
 		if (worldOwner != null
 				&& worldOwner.getDailyTaskManager() != null) {
-			int readyDailyGroups =
-					worldOwner.getDailyTaskManager()
-							.loadActiveGroups(player.getScene());
-
-			Grasscutter.getLogger()
-					.info(
-							"[DailyTask] {} active commission group(s) ready in scene {}.",
-							readyDailyGroups,
-							player.getSceneId());
+			worldOwner.getDailyTaskManager()
+					.updateActiveGroups(player.getScene());
 		}
 
 		// Reset timer for sending player locations

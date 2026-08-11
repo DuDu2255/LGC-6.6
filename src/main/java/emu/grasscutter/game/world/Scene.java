@@ -1032,6 +1032,7 @@ public class Scene {
 
         var world = this.getWorld();
 		if (target instanceof EntityMonster monster
+				&& attacker != null
 				&& this.getSceneType() != SceneType.SCENE_DUNGEON
 				&& !this.isOceanidFallbackBody(monster)) {
 			boolean handled = false;
@@ -1089,7 +1090,7 @@ public class Scene {
 			Player host = this.getWorld().getHost();
 
 			if (host != null && host.getDailyTaskManager() != null) {
-				host.getDailyTaskManager().onMonsterDeath(this, monster.getGroupId());
+				host.getDailyTaskManager().onMonsterDeath(this, monster.getGroupId(), attackerId);
 			}
 		}
 
@@ -1164,14 +1165,30 @@ public class Scene {
             this.getScheduler().runTasks();
         }
 
-        if (this.getScriptManager().isInit()) {
+		if (this.getScriptManager().isInit()) {
 			this.checkGroups();
 			this.checkLegacySpawnsForMissingScriptGroups();
+
+			/*
+			 * Stream active daily commission groups according to player proximity.
+			 *
+			 * This deliberately happens BEFORE checkRegions(). If the player has
+			 * teleported far away, the obsolete commission group and its regions
+			 * are removed before Lua can observe a giant ENTER/LEAVE transition.
+			 */
+			Player host =
+					this.getWorld().getHost();
+
+			if (host != null
+					&& host.getDailyTaskManager() != null) {
+				host.getDailyTaskManager()
+						.updateActiveGroups(this);
+			}
 		} else {
 			this.checkSpawns();
 		}
 
-        this.scriptManager.checkRegions();
+		this.scriptManager.checkRegions();
 
         if (challenge != null) {
             challenge.onCheckTimeOut();

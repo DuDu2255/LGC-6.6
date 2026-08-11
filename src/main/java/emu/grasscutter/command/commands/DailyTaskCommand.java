@@ -210,7 +210,7 @@ public final class DailyTaskCommand implements CommandHandler {
 
 					CommandHandler.sendMessage(
 							sender,
-							"%s (%d): %d/%d combat commissions have usable encounter resources."
+							"%s (%d): %d/%d combat commissions currently playable."
 									.formatted(
 											getCityName(cityId),
 											cityId,

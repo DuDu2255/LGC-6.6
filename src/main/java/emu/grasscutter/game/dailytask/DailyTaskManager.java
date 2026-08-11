@@ -14,9 +14,14 @@ import emu.grasscutter.data.excels.RewardPreviewData;
 import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.props.ActionReason;
+import emu.grasscutter.game.world.Position;
 import emu.grasscutter.game.world.Scene;
 import emu.grasscutter.game.entity.EntityMonster;
+import emu.grasscutter.game.entity.EntityAvatar;
+import emu.grasscutter.game.entity.EntityClientGadget;
+import emu.grasscutter.game.entity.GameEntity;
 import emu.grasscutter.scripts.ScriptLoader;
+import emu.grasscutter.scripts.data.SceneGroup;
 import emu.grasscutter.utils.FileUtils;
 import emu.grasscutter.server.packet.send.PacketDailyTaskDataNotify;
 import emu.grasscutter.server.packet.send.PacketDailyTaskProgressNotify;
@@ -52,6 +57,19 @@ public class DailyTaskManager {
 
     private static final String SUPPORTED_FINISH_TYPE =
             "DAILY_FINISH_MONSTER_NUM";
+
+	private static final double DAILY_GROUP_LOAD_RADIUS = 500.0;
+	private static final double DAILY_GROUP_UNLOAD_RADIUS = 1200.0;
+	
+	/*
+	 * Daily tasks deliberately disabled until their required gameplay
+	 * mechanics are properly supported by LunaGC.
+	 *
+	 * 31240 = Perilous Watersport
+	 *         Requires practical Waverider access to clear as intended.
+	 */
+	private static final Set<Integer> EXCLUDED_DAILY_TASK_IDS =
+			Set.of(31240);
 			
 	private static final ConcurrentMap<Integer, Boolean> GROUP_RESOURCE_SUPPORT_CACHE =
         new ConcurrentHashMap<>();
@@ -325,7 +343,7 @@ public class DailyTaskManager {
 						this.player.getScene(),
 						previousGroupIds);
 
-				this.loadActiveGroups(
+				this.updateActiveGroups(
 						this.player.getScene());
 			}
 
@@ -364,6 +382,155 @@ public class DailyTaskManager {
 				&& data.getTaskRewardId() > 0
 				&& data.getNewGroupVec() != null
 				&& !data.getNewGroupVec().isEmpty();
+	}
+
+	private boolean isAnyPlayerWithinHorizontalDistance(
+			Scene scene,
+			Position position,
+			double radius) {
+		if (scene == null || position == null) {
+			return false;
+		}
+
+		double radiusSquared =
+				radius * radius;
+
+		for (Player scenePlayer : scene.getPlayers()) {
+			if (scenePlayer == null
+					|| scenePlayer.getPosition() == null) {
+				continue;
+			}
+
+			double dx =
+					scenePlayer.getPosition().getX()
+							- position.getX();
+
+			double dz =
+					scenePlayer.getPosition().getZ()
+							- position.getZ();
+
+			if ((dx * dx) + (dz * dz)
+					<= radiusSquared) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private SceneGroup getCommissionGroupMetadata(
+			Scene scene,
+			int groupId) {
+		if (scene == null
+				|| scene.getScriptManager() == null) {
+			return null;
+		}
+
+		int blockId =
+				getBlockIdFromGroupId(groupId);
+
+		var block =
+				scene.getScriptManager()
+						.getBlocks()
+						.get(blockId);
+
+		if (block == null) {
+			return null;
+		}
+
+		/*
+		 * Loading a block gives us its group metadata, including position.
+		 * It does NOT mean we are activating this dynamic group.
+		 */
+		scene.loadBlock(block);
+
+		if (block.groups == null) {
+			return null;
+		}
+
+		return block.groups.get(groupId);
+	}
+
+	public synchronized void updateActiveGroups(
+			Scene scene) {
+		if (scene == null
+				|| scene.getId() != TEYVAT_SCENE_ID
+				|| scene.getScriptManager() == null
+				|| !scene.getScriptManager().isInit()) {
+			return;
+		}
+
+		Set<Integer> activeGroupIds =
+				this.collectTaskGroupIds(true);
+
+		for (int groupId : activeGroupIds) {
+			SceneGroup group =
+					this.getCommissionGroupMetadata(
+							scene,
+							groupId);
+
+			if (group == null
+					|| group.pos == null) {
+				continue;
+			}
+
+			boolean loaded =
+					this.isGroupLoaded(
+							scene,
+							groupId);
+
+			if (!loaded) {
+				if (!this.isAnyPlayerWithinHorizontalDistance(
+						scene,
+						group.pos,
+						DAILY_GROUP_LOAD_RADIUS)) {
+					continue;
+				}
+
+				int suiteId =
+						scene.loadDynamicGroup(groupId);
+
+				if (suiteId > 0) {
+					Grasscutter.getLogger()
+							.debug(
+									"[DailyTask] Loaded nearby commission group {} "
+											+ "with suite {}.",
+									groupId,
+									suiteId);
+				} else {
+					Grasscutter.getLogger()
+							.warn(
+									"[DailyTask] Failed to load nearby commission group {}.",
+									groupId);
+				}
+
+				continue;
+			}
+
+			/*
+			 * Already loaded. Keep it alive while anyone remains reasonably
+			 * close to the encounter.
+			 */
+			if (this.isAnyPlayerWithinHorizontalDistance(
+					scene,
+					group.pos,
+					DAILY_GROUP_UNLOAD_RADIUS)) {
+				continue;
+			}
+
+			/*
+			 * Safe streaming unload.
+			 *
+			 * unregisterDynamicGroup/unloadGroup removes the entities directly
+			 * rather than killing them, so this creates no fake monster deaths.
+			 */
+			if (scene.unregisterDynamicGroup(groupId)) {
+				Grasscutter.getLogger()
+						.debug(
+								"[DailyTask] Unloaded distant commission group {}.",
+								groupId);
+			}
+		}
 	}
 
 	/*
@@ -476,9 +643,14 @@ public class DailyTaskManager {
 		}
 
 		/*
-		 * Every group required by the commission must actually be
-		 * representable by the current Lua world resources.
+		 * Some commissions have perfectly valid Lua resources but depend on
+		 * gameplay systems that LunaGC does not currently implement well enough
+		 * for normal completion.
 		 */
+		if (EXCLUDED_DAILY_TASK_IDS.contains(data.getId())) {
+			return false;
+		}
+
 		return data.getNewGroupVec()
 				.stream()
 				.allMatch(DailyTaskManager::hasUsableGroupResources);
@@ -776,10 +948,28 @@ public class DailyTaskManager {
 
 	public synchronized void onMonsterDeath(
 			Scene scene,
-			int groupId) {
+			int groupId,
+			int attackerId) {
 		if (groupId <= 0
 				|| this.player == null
 				|| this.dailyTasks == null) {
+			return;
+		}
+
+		/*
+		 * Lua cleanup and other server-side kills use attackerId == 0.
+		 * They must never count toward a daily commission.
+		 */
+		if (!this.isPlayerControlledKill(
+				scene,
+				attackerId)) {
+			Grasscutter.getLogger()
+					.debug(
+							"[DailyTask] Ignoring non-player death from group {} "
+									+ "(attackerId={}).",
+							groupId,
+							attackerId);
+
 			return;
 		}
 
@@ -856,6 +1046,43 @@ public class DailyTaskManager {
 
 		this.save();
 		this.syncAll();
+	}
+
+	private boolean isPlayerControlledKill(
+			Scene scene,
+			int attackerId) {
+		if (scene == null || attackerId <= 0) {
+			return false;
+		}
+
+		GameEntity attacker =
+				scene.getEntityById(attackerId);
+
+		if (attacker == null) {
+			return false;
+		}
+
+		/*
+		 * Direct character attack.
+		 */
+		if (attacker instanceof EntityAvatar) {
+			return true;
+		}
+
+		/*
+		 * Character-owned client gadget/projectile.
+		 */
+		if (attacker instanceof EntityClientGadget gadget) {
+			return gadget.getOwner() != null;
+		}
+
+		/*
+		 * Catch entities whose real owner resolves back to an avatar.
+		 */
+		GameEntity trueOwner =
+				attacker.getTrueOwner();
+
+		return trueOwner instanceof EntityAvatar;
 	}
 
 	private void scheduleStalledWaveRecovery(
