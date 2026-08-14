@@ -12,6 +12,7 @@ import emu.grasscutter.database.DatabaseHelper;
 import emu.grasscutter.game.entity.*;
 import emu.grasscutter.game.entity.gadget.platform.BaseRoute;
 import emu.grasscutter.game.props.EntityIdType;
+import emu.grasscutter.game.player.Player;
 import emu.grasscutter.game.quest.*;
 import emu.grasscutter.game.world.*;
 import emu.grasscutter.net.proto.VisionTypeOuterClass;
@@ -343,16 +344,27 @@ public class SceneScriptManager {
         }
 
         var group = groupInstance.getLuaGroup();
-        var monstersToSpawn =
-                group.monsters.values().stream()
-                        .filter(
-                                m -> {
-                                    var entity = scene.getEntityByConfigId(m.config_id, groupId);
-                                    return (entity == null
-                                            || entity.getGroupId()
-                                                    != group
-                                                            .id); /*&& !groupInstance.getDeadEntities().contains(entity); */ // TODO: Investigate the usage of deadEntities
-                                })
+		var monstersToSpawn =
+				group.monsters
+						.values()
+						.stream()
+						.filter(
+								monster -> {
+									var existingEntity =
+											scene.getEntityByConfigId(
+													monster.config_id,
+													groupId);
+
+									if (existingEntity != null
+											&& existingEntity.getGroupId()
+													== group.id) {
+										return false;
+									}
+
+									return !this.isDefeatedDailyTaskMonster(
+											groupId,
+											monster.config_id);
+								})
                         .map(mob -> createMonster(group.id, group.block_id, mob))
                         .toList(); // TODO check if it interferes with bigworld or anything else
         this.addEntities(monstersToSpawn);
@@ -746,23 +758,77 @@ public class SceneScriptManager {
                 .toList();
     }
 
-    public List<EntityMonster> getMonstersInGroupSuite(
-            SceneGroupInstance groupInstance, SceneSuite suite) {
-        var group = groupInstance.getLuaGroup();
-        return suite.sceneMonsters.stream()
-                .filter(
-                        m -> {
-                            var entity = scene.getEntityByConfigId(m.config_id, group.id);
-                            return (entity == null
-                                    || entity.getGroupId()
-                                            != group
-                                                    .id); /*&& !groupInstance.getDeadEntities().contains(entity); */ // TODO:
-                            // Investigate the usage of deadEntities
-                        }) // TODO: Add persistent monster cached data
-                .map(mob -> createMonster(group.id, group.block_id, mob))
-                .filter(Objects::nonNull)
-                .toList();
-    }
+	private boolean isDefeatedDailyTaskMonster(int groupId, int configId) {
+		if (this.scene == null
+				|| this.scene.getWorld() == null) {
+			return false;
+		}
+
+		Player host = this.scene.getWorld().getHost();
+
+		if (host == null || host.getDailyTaskManager() == null) {
+			return false;
+		}
+
+		return host.getDailyTaskManager().isDailyTaskMonsterDefeated(groupId, configId);
+	}
+
+	public List<EntityMonster> getMonstersInGroupSuite(SceneGroupInstance groupInstance, SceneSuite suite) {
+		var group = groupInstance.getLuaGroup();
+
+		return suite.sceneMonsters
+				.stream()
+				.filter(
+						monster -> {
+							var existingEntity =
+									scene.getEntityByConfigId(
+											monster.config_id,
+											group.id);
+
+							/*
+							 * Do not create a duplicate while the original entity
+							 * is still alive/present in the scene.
+							 */
+							if (existingEntity != null
+									&& existingEntity.getGroupId()
+											== group.id) {
+								return false;
+							}
+
+							/*
+							 * Daily commissions are non-respawning encounters.
+							 *
+							 * If this exact monster config has already contributed
+							 * to today's commission progress, unloading/reloading
+							 * the dynamic group must not recreate it.
+							 *
+							 * Ordinary overworld groups are unaffected.
+							 */
+							if (this.isDefeatedDailyTaskMonster(
+									group.id,
+									monster.config_id)) {
+								Grasscutter.getLogger()
+										.debug(
+												"[DailyTask] Suppressing respawn "
+														+ "of defeated commission monster "
+														+ "group={}, config={}.",
+												group.id,
+												monster.config_id);
+
+								return false;
+							}
+
+							return true;
+						})
+				.map(
+						monster ->
+								createMonster(
+										group.id,
+										group.block_id,
+										monster))
+				.filter(Objects::nonNull)
+				.toList();
+	}
 
     public void addGroupSuite(SceneGroupInstance groupInstance, SceneSuite suite) {
         this.addGroupSuite(groupInstance, suite, null);
