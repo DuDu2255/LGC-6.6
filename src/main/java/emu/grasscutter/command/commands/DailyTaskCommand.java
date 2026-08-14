@@ -2,23 +2,29 @@ package emu.grasscutter.command.commands;
 
 import emu.grasscutter.command.Command;
 import emu.grasscutter.command.CommandHandler;
+import emu.grasscutter.game.dailytask.DailyTask;
+import emu.grasscutter.game.dailytask.DailyTaskManager;
+import emu.grasscutter.server.packet.send.PacketWorldOwnerDailyTaskNotify;
 import emu.grasscutter.data.GameData;
 import emu.grasscutter.game.player.Player;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 @Command(
         label = "dailytask",
         aliases = {"dt"},
-        usage = {
-			"list",
-			"load",
-			"reset",
-			"city <random|cityId|region>",
-			"finish <taskId>",
-			"support",
-			"bonus"
-		},
+			usage = {
+				"list",
+				"load",
+				"reset",
+				"city <random|cityId|region>",
+				"finish <taskId>",
+				"support",
+				"preview <taskId|clear>",
+				"capture <taskId>",
+				"bonus"
+			},
         permission = "player.dailytask",
         permissionTargeted = "player.dailytask.others",
         targetRequirement = Command.TargetRequirement.ONLINE)
@@ -217,6 +223,199 @@ public final class DailyTaskCommand implements CommandHandler {
 											resourceBacked,
 											defined));
 				}
+			}
+
+			case "preview" -> {
+				if (args.size() < 2) {
+					this.sendUsageMessage(sender);
+					return;
+				}
+
+				if ("clear".equalsIgnoreCase(args.get(1))) {
+					/*
+					 * Restore the client's view of the real persisted commission set.
+					 */
+					targetPlayer.sendPacket(
+							new PacketWorldOwnerDailyTaskNotify(
+									targetPlayer));
+
+					CommandHandler.sendMessage(
+							sender,
+							"Daily commission preview cleared.");
+
+					return;
+				}
+
+				int taskId;
+
+				try {
+					taskId =
+							Integer.parseInt(
+									args.get(1));
+				} catch (NumberFormatException ignored) {
+					CommandHandler.sendMessage(
+							sender,
+							"Invalid daily task ID.");
+
+					return;
+				}
+
+				var data =
+						GameData.getDailyTaskDataMap()
+								.get(taskId);
+
+				DailyTask previewTask =
+						manager.createPreviewTask(taskId);
+
+				if (data == null
+						|| previewTask == null) {
+					CommandHandler.sendMessage(
+							sender,
+							"Task %d is not a supported monster-count DailyTask definition."
+									.formatted(taskId));
+
+					return;
+				}
+
+				if (manager.getDailyTasks() == null
+						|| manager.getDailyTasks().size() != 4) {
+					CommandHandler.sendMessage(
+							sender,
+							"Preview requires a normal four-task daily set to already exist.");
+
+					return;
+				}
+
+				/*
+				 * Replace slot 1 only in the packet sent to this client.
+				 *
+				 * The real DailyTaskManager list is NOT modified.
+				 */
+				List<DailyTask> previewTasks =
+						new ArrayList<>(
+								manager.getDailyTasks());
+
+				previewTasks.set(
+						0,
+						previewTask);
+
+				targetPlayer.sendPacket(
+						new PacketWorldOwnerDailyTaskNotify(
+								targetPlayer,
+								previewTasks,
+								data.getCityId()));
+
+				CommandHandler.sendMessage(
+						sender,
+						"Previewing task %d: city=%d, finishProgress=%d, groups=%s."
+								.formatted(
+										taskId,
+										data.getCityId(),
+										data.getFinishProgress(),
+										data.getNewGroupVec()));
+			}
+
+			case "capture" -> {
+				if (args.size() < 2) {
+					this.sendUsageMessage(sender);
+					return;
+				}
+
+				int taskId;
+
+				try {
+					taskId =
+							Integer.parseInt(
+									args.get(1));
+				} catch (NumberFormatException ignored) {
+					CommandHandler.sendMessage(
+							sender,
+							"Invalid daily task ID.");
+
+					return;
+				}
+
+				if (targetPlayer.getScene() == null
+						|| targetPlayer.getSceneId() != 3) {
+					CommandHandler.sendMessage(
+							sender,
+							"Daily commission captures must be taken in Teyvat (scene 3).");
+
+					return;
+				}
+
+				var data =
+						GameData.getDailyTaskDataMap()
+								.get(taskId);
+
+				if (data == null
+						|| data.getNewGroupVec() == null
+						|| data.getNewGroupVec().size() != 1
+						|| manager.createPreviewTask(taskId) == null) {
+					CommandHandler.sendMessage(
+							sender,
+							"Task %d is not a single-group monster-count commission."
+									.formatted(taskId));
+
+					return;
+				}
+
+				int groupId =
+						data.getNewGroupVec()
+								.get(0);
+
+				int blockId =
+						DailyTaskManager.getBlockIdFromGroupId(
+								groupId);
+
+				var position =
+						targetPlayer.getPosition();
+
+				CommandHandler.sendMessage(
+						sender,
+						"=== Daily commission capture ===");
+
+				CommandHandler.sendMessage(
+						sender,
+						"task=%d city=%d group=%d block=%d finishProgress=%d"
+								.formatted(
+										taskId,
+										data.getCityId(),
+										groupId,
+										blockId,
+										data.getFinishProgress()));
+
+				CommandHandler.sendMessage(
+						sender,
+						String.format(
+								Locale.ROOT,
+								"position={ x = %.3f, y = %.3f, z = %.3f }",
+								position.getX(),
+								position.getY(),
+								position.getZ()));
+
+				CommandHandler.sendMessage(
+						sender,
+						"blockFile=Scripts/Scene/3/scene3_block%d.lua"
+								.formatted(blockId));
+
+				CommandHandler.sendMessage(
+						sender,
+						"groupFile=Scripts/Scene/3/scene3_group%d.lua"
+								.formatted(groupId));
+
+				String blockEntry =
+						String.format(
+								Locale.ROOT,
+								"{ id = %d, pos = { x = %.3f, y = %.3f, z = %.3f }, dynamic_load = true, is_replaceable = { value = true, version = 0, new_bin_only = true }, business = { type = 2 } },",
+								groupId,
+								position.getX(),
+								position.getY(),
+								position.getZ());
+
+				CommandHandler.sendMessage(
+						sender,
+						"blockEntry=" + blockEntry);
 			}
 
             case "bonus" -> {

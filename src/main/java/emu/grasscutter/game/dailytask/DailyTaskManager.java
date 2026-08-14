@@ -41,6 +41,8 @@ import lombok.Getter;
 import org.bson.types.ObjectId;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.io.IOException;
+import java.util.regex.Pattern;
 
 @Getter
 @Entity(value = "dailytasks", useDiscriminator = false)
@@ -543,7 +545,7 @@ public class DailyTaskManager {
 	 * 133401348 -> block 3401
 	 * 133605146 -> block 3605
 	 */
-	private static int getBlockIdFromGroupId(int groupId) {
+	public static int getBlockIdFromGroupId(int groupId) {
 		return (groupId / 1000) % 10000;
 	}
 
@@ -630,6 +632,42 @@ public class DailyTaskManager {
 							"[DailyTask] Rejecting group {}: missing group script {}.",
 							groupId,
 							groupScript);
+
+			return false;
+		}
+
+		/*
+		 * Verify that the block Lua actually declares the group.
+		 */
+		try {
+			String blockContents =
+					Files.readString(
+							FileUtils.getScriptPath(blockScript));
+
+			Pattern groupDeclaration =
+					Pattern.compile(
+							"\\bid\\s*=\\s*"
+									+ groupId
+									+ "\\b");
+
+			if (!groupDeclaration
+					.matcher(blockContents)
+					.find()) {
+				Grasscutter.getLogger()
+						.debug(
+								"[DailyTask] Rejecting group {}: block {} exists but does not declare it.",
+								groupId,
+								blockId);
+
+				return false;
+			}
+		} catch (IOException e) {
+			Grasscutter.getLogger()
+					.warn(
+							"[DailyTask] Could not inspect block script {} while validating group {}.",
+							blockScript,
+							groupId,
+							e);
 
 			return false;
 		}
@@ -739,6 +777,51 @@ public class DailyTaskManager {
                 .findFirst()
                 .orElse(null);
     }
+
+	private DailyTask getDailyTaskByGroupId(
+			int groupId) {
+		if (groupId <= 0
+				|| this.dailyTasks == null) {
+			return null;
+		}
+
+		for (DailyTask task : this.dailyTasks) {
+			if (task == null || task.isFinished()) {
+				continue;
+			}
+
+			DailyTaskData data =
+					GameData.getDailyTaskDataMap()
+							.get(task.getTaskId());
+
+			if (data == null
+					|| data.getNewGroupVec() == null) {
+				continue;
+			}
+
+			if (data.getNewGroupVec()
+					.contains(groupId)) {
+				return task;
+			}
+		}
+
+		return null;
+	}
+
+	public boolean isDailyTaskMonsterDefeated(
+			int groupId,
+			int configId) {
+		DailyTask task =
+				this.getDailyTaskByGroupId(groupId);
+
+		if (task == null) {
+			return false;
+		}
+
+		return task.isMonsterDefeated(
+				groupId,
+				configId);
+	}
 
     public int getFinishedCount() {
         if (this.dailyTasks == null) {
@@ -949,6 +1032,7 @@ public class DailyTaskManager {
 	public synchronized void onMonsterDeath(
 			Scene scene,
 			int groupId,
+			int configId,
 			int attackerId) {
 		if (groupId <= 0
 				|| this.player == null
@@ -989,6 +1073,27 @@ public class DailyTaskManager {
 			}
 
 			if (!data.getNewGroupVec().contains(groupId)) {
+				continue;
+			}
+
+			/*
+			 * Commission progress is tied to an individual Lua monster config.
+			 *
+			 * If this exact monster was already legitimately defeated earlier today,
+			 * never allow it to count again even if some scene-loading bug manages
+			 * to recreate it.
+			 */
+			if (!task.markMonsterDefeated(
+					groupId,
+					configId)) {
+				Grasscutter.getLogger()
+						.warn(
+								"[DailyTask] Ignoring duplicate kill for task {}: "
+										+ "group={}, config={}.",
+								task.getTaskId(),
+								groupId,
+								configId);
+
 				continue;
 			}
 
@@ -1475,4 +1580,28 @@ public class DailyTaskManager {
     public void save() {
         DatabaseHelper.saveDailyTaskManager(this);
     }
+
+	public DailyTask createPreviewTask(int taskId) {
+		if (this.player == null) {
+			return null;
+		}
+
+		DailyTaskData data =
+				GameData.getDailyTaskDataMap()
+						.get(taskId);
+
+		/*
+		 * Preview requires only the type of commission our backend understands.
+		 *
+		 * We deliberately DO NOT call isSupportedTask() here. The whole purpose
+		 * of preview mode is to expose a task whose Lua group does not exist yet.
+		 */
+		if (!isBaseSupportedTask(data)) {
+			return null;
+		}
+
+		return DailyTask.create(
+				this.player,
+				taskId);
+	}
 }

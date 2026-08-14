@@ -1090,7 +1090,7 @@ public class Scene {
 			Player host = this.getWorld().getHost();
 
 			if (host != null && host.getDailyTaskManager() != null) {
-				host.getDailyTaskManager().onMonsterDeath(this, monster.getGroupId(), attackerId);
+				host.getDailyTaskManager().onMonsterDeath(this, monster.getGroupId(), monster.getConfigId(), attackerId);
 			}
 		}
 
