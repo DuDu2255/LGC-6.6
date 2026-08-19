@@ -350,7 +350,7 @@ public class EntityAvatar extends GameEntity {
             }
         }
 
-        boolean inNatlan = this.getPlayer().getScene() != null && this.getPlayer().getScene().getId() == 101;
+        boolean inNatlan = this.getPlayer().getTeamManager().isInNatlan();
         int phlogistonHash = Utils.abilityHash("DynamicAbility_Phlogiston");
         for (int id : GameConstants.DEFAULT_ABILITY_HASHES) {
             if (id == phlogistonHash && !inNatlan) continue;

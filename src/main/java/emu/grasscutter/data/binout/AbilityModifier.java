@@ -408,6 +408,7 @@ public class AbilityModifier implements Serializable {
         public DynamicFloat baseEnergy;
         @SerializedName(value = "ratio", alternate = "value")
         public DynamicFloat ratio = DynamicFloat.ONE;
+        @SerializedName(value = "determineType", alternate = "__unk_Q1576551192")
         public String determineType;
         public int configID;
 

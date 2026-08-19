@@ -139,7 +139,7 @@ public class Player implements PlayerHook, FieldFetch {
     @Transient @Getter private int weatherId = 0;
     @Transient @Getter private ClimateType climate = ClimateType.CLIMATE_SUNNY;
     @Transient @Getter private int areaId = 0;
-    @Transient @Getter private int areaType = 0;
+    @Transient @Getter private AreaType areaType = AreaType.NONE;
 
     @Getter private transient AvatarStorage avatars;
     @Getter private transient Inventory inventory;
@@ -204,10 +204,10 @@ public class Player implements PlayerHook, FieldFetch {
     @Getter @Setter private int lastDailyReset;
 	@Getter @Setter private int lastBirthdayMailYear;
     @Getter private transient MpSettingType mpSetting = MpSettingType.MpSettingType_MP_SETTING_ENTER_AFTER_APPLY;
-	
+
 	@Getter @Setter private int lastDailyCheckInDate;
 	@Getter @Setter private int dailyCheckInDay;
-	
+
     @Getter private long playerGameTime = 540000;
 
     @Getter private PlayerProgress playerProgress;
@@ -436,7 +436,7 @@ public class Player implements PlayerHook, FieldFetch {
         this.session.send(new PacketSceneAreaWeatherNotify(this));
     }
 
-    public void setArea(int areaId, int areaType) {
+    public void setArea(int areaId, AreaType areaType) {
         this.areaId = areaId;
         this.areaType = areaType;
 
@@ -585,14 +585,10 @@ public class Player implements PlayerHook, FieldFetch {
                 withQuesting ? 10000 : 0);
         this.setOrFetch(PlayerProperty.PROP_PLAYER_RESIN, 200);
 
-        this.setProperty(PlayerProperty.PROP_PHLOGISTON_ENABLE, 1);
-
         this.setProperty(PlayerProperty.PROP_CUR_PERSIST_STAMINA,
             this.getProperty(PlayerProperty.PROP_MAX_STAMINA));
         this.setProperty(PlayerProperty.PROP_DIVE_CUR_STAMINA,
                 this.getProperty(PlayerProperty.PROP_DIVE_MAX_STAMINA));
-        this.setProperty(PlayerProperty.PROP_CUR_PHLOGISTON,
-            this.getProperty(PlayerProperty.PROP_PHLOGISTON_MAX_VALUE));
     }
 
     private void applyStartingSceneTags() {
@@ -699,7 +695,7 @@ public class Player implements PlayerHook, FieldFetch {
                             changeReason));
         }
     }
-    
+
     private void updateWorldLevel() {
         int currentWorldLevel = this.getWorldLevel();
         int currentLevel = this.getLevel();
@@ -1320,7 +1316,7 @@ public class Player implements PlayerHook, FieldFetch {
         }
 
         this.setResinBuyCount(0);
-		
+
 		BirthdayMailSystem.checkAndSend(this, currentDate);
 
 		if (this.getDailyTaskManager() != null) {
@@ -1431,7 +1427,7 @@ public class Player implements PlayerHook, FieldFetch {
         session.send(new PacketCodexDataFullNotify(this));
 		session.send(new PacketGetWidgetSlotRsp(this));
 		session.send(new PacketGetWidgetQuickSlotListRsp(this));
-		
+
 		if (this.getLunchBoxSlotMaterialMap() != null
 				&& !this.getLunchBoxSlotMaterialMap().isEmpty()) {
 			session.send(new PacketNreLunchBoxDataNotify(this));
@@ -1477,7 +1473,7 @@ public class Player implements PlayerHook, FieldFetch {
         }
 
         getServer().registerPlayer(this);
-		
+
 		/*
 		 * Award at most one daily check-in reward per server-local calendar day.
 		 *
