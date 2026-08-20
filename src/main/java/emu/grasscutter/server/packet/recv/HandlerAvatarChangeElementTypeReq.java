@@ -1,6 +1,6 @@
 package emu.grasscutter.server.packet.recv;
 
-import emu.grasscutter.data.GameData;
+import emu.grasscutter.data.excels.world.WorldAreaData;
 import emu.grasscutter.net.packet.*;
 import emu.grasscutter.net.proto.AvatarChangeElementTypeReqOuterClass.AvatarChangeElementTypeReq;
 import emu.grasscutter.net.proto.RetcodeOuterClass.Retcode;
@@ -15,7 +15,8 @@ public class HandlerAvatarChangeElementTypeReq extends PacketHandler {
     @Override
     public void handle(GameSession session, byte[] header, byte[] payload) throws Exception {
         var req = AvatarChangeElementTypeReq.parseFrom(payload);
-        var area = GameData.getWorldAreaDataMap().get(req.getAreaId());
+        var player = session.getPlayer();
+        var area = WorldAreaData.getByAreaId(req.getAreaId(), player.getAreaType());
 
         if (area == null
                 || area.getElementType() == null

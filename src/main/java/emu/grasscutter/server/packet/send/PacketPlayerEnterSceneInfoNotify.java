@@ -52,13 +52,13 @@ public class PacketPlayerEnterSceneInfoNotify extends BasePacket {
     public PacketPlayerEnterSceneInfoNotify(Player player) {
         super(PacketOpcodes.PlayerEnterSceneInfoNotify);
 
+        float svgValue = player.getPhlogistonValue();
         AbilityScalarValueEntry scalarValue = AbilityScalarValueEntry.newBuilder()
                 .setKey(AbilityStringOuterClass.AbilityString.newBuilder().setHash(Utils.abilityHash("SGV_PlayerTeam_Phlogiston"))
                         .setStr("SGV_PlayerTeam_Phlogiston")
                         .build())
-                        .setFloatValue(100)
+                        .setFloatValue(svgValue)
                 .build();
-                player.setPhlogistonValue(100);
 
         long hexCount = player.getTeamManager().getActiveTeam().stream()
                 .filter(e -> getHexenzirkelIds().contains(e.getAvatar().getAvatarId()))

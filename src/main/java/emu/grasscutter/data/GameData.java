@@ -494,6 +494,14 @@ public final class GameData {
             new Int2ObjectOpenHashMap<>();
 
     @Getter
+    private static final Int2ObjectMap<WorldAreaData> worldAreaParentDataMap =
+            new Int2ObjectOpenHashMap<>();
+
+    @Getter
+    private static final Int2ObjectMap<WorldAreaData> worldAreaChildDataMap =
+            new Int2ObjectOpenHashMap<>();
+
+    @Getter
     private static final Int2ObjectMap<WorldLevelData> worldLevelDataMap =
             new Int2ObjectOpenHashMap<>();
 
